@@ -1,0 +1,83 @@
+.sources-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.sources-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  margin: 20px;
+}
+
+.sources-modal h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.sources-modal p {
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.sources-modal ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.sources-modal li {
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.sources-modal a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.sources-modal a:hover {
+  text-decoration: underline;
+}
+
+.sources-modal .disclaimer {
+  font-size: 13px;
+  color: #666;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+  line-height: 1.5;
+}
+
+.sources-modal .close-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.sources-modal .close-btn:hover {
+  background: #f5f5f5;
+}
+
+.sources-link {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.sources-link:hover {
+  text-decoration: underline;
+}

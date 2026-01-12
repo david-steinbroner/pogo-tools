@@ -1,0 +1,35 @@
+{
+  "sources": {
+    "pvpoke": {
+      "name": "PvPoke",
+      "url": "https://pvpoke.com",
+      "description": "Battle simulations and meta rankings for PvP",
+      "lastAccessed": "2025-01-15"
+    },
+    "gamepress": {
+      "name": "GamePress Pokemon GO",
+      "url": "https://gamepress.gg/pokemongo/",
+      "description": "Raid guides, tier lists, and Pokemon analysis",
+      "lastAccessed": "2025-01-15"
+    },
+    "pokebattler": {
+      "name": "Pokebattler",
+      "url": "https://www.pokebattler.com/",
+      "description": "Raid counter rankings and battle simulations",
+      "lastAccessed": "2025-01-15"
+    },
+    "silphroad": {
+      "name": "The Silph Road",
+      "url": "https://thesilphroad.com/",
+      "description": "Research, game mechanics, and community findings",
+      "lastAccessed": "2025-01-15"
+    },
+    "stadiumgaming": {
+      "name": "Stadium Gaming",
+      "url": "https://pokemon.gameinfo.io/",
+      "description": "IV calculators and Pokemon stats",
+      "lastAccessed": "2025-01-15"
+    }
+  },
+  "disclaimer": "This tool uses data and rankings from community sources. Meta shifts over time as new Pokemon and moves are released. Always verify with current sources before making major investments."
+}
