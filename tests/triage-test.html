@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triage Logic Test - PoGO Tools</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { margin-bottom: 10px; }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .status.loading { background: #fff3cd; }
+    .status.success { background: #d4edda; color: #1e7e34; }
+    .status.error { background: #f8d7da; color: #721c24; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th { background: #f5f5f5; }
+
+    .verdict {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .verdict-KEEP_PVP { background: #d4edda; color: #1e7e34; }
+    .verdict-KEEP_RAID { background: #d1ecf1; color: #0c5460; }
+    .verdict-TRADE { background: #fff3cd; color: #856404; }
+    .verdict-TRANSFER { background: #f8d7da; color: #721c24; }
+
+    .reason { font-size: 13px; color: #666; }
+    .details {
+      font-size: 12px;
+      color: #888;
+      max-width: 400px;
+      cursor: help;
+    }
+
+    #summary {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    #summary span {
+      display: inline-block;
+      margin-right: 20px;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Triage Logic Test</h1>
+  <p>Testing the Pokemon triage logic with sample-pokegenie.csv</p>
+
+  <div id="status" class="status loading">Loading modules...</div>
+
+  <div id="summary" style="display: none;"></div>
+
+  <table id="results" style="display: none;">
+    <thead>
+      <tr>
+        <th>Pokemon</th>
+        <th>CP</th>
+        <th>IVs</th>
+        <th>Verdict</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2 style="margin-top: 30px;">Console Output</h2>
+  <pre id="console"></pre>
+
+  <!-- Load dependencies -->
+  <script src="../tools/csv-to-json/vendor/papaparse.min.js"></script>
+  <script src="../shared/pokemon-parser.js"></script>
+  <script src="../shared/pokemon-triage.js"></script>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const summaryEl = document.getElementById('summary');
+    const resultsEl = document.getElementById('results');
+    const consoleEl = document.getElementById('console');
+
+    // Override console.log to show in page
+    const originalLog = console.log;
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      consoleEl.textContent += args.map(a =>
+        typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)
+      ).join(' ') + '\n';
+    };
+
+    async function runTest() {
+      try {
+        statusEl.textContent = 'Loading sample CSV...';
+
+        // Load sample CSV
+        const csvResponse = await fetch('../samples/sample-pokegenie.csv');
+        if (!csvResponse.ok) throw new Error('Failed to load sample CSV');
+        const csvText = await csvResponse.text();
+
+        statusEl.textContent = 'Parsing CSV...';
+        console.log('Parsing sample-pokegenie.csv...');
+
+        // Parse CSV
+        const parsed = PogoParser.parseCollection(csvText, 'sample-pokegenie.csv');
+        console.log(`Detected format: ${parsed.format}`);
+        console.log(`Parsed ${parsed.pokemon.length} Pokemon\n`);
+
+        statusEl.textContent = 'Running triage...';
+
+        // Run triage
+        const triaged = await PogoTriage.triageCollection(parsed.pokemon);
+
+        // Show summary
+        summaryEl.style.display = 'block';
+        summaryEl.innerHTML = `
+          <strong>Summary:</strong>
+          <span style="color: #1e7e34;">Keep (PvP): ${triaged.summary.keepPvp}</span>
+          <span style="color: #0c5460;">Keep (Raid): ${triaged.summary.keepRaid}</span>
+          <span style="color: #856404;">Trade: ${triaged.summary.trade}</span>
+          <span style="color: #721c24;">Transfer: ${triaged.summary.transfer}</span>
+        `;
+
+        // Show results table
+        resultsEl.style.display = 'table';
+        const tbody = resultsEl.querySelector('tbody');
+
+        triaged.pokemon.forEach(p => {
+          const display = PogoTriage.getVerdictDisplay(p.triage.verdict);
+          const ivStr = p.atkIv !== null ? `${p.atkIv}/${p.defIv}/${p.staIv}` : '?';
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong>${p.name}</strong>${p.form ? ` (${p.form})` : ''}</td>
+            <td>${p.cp || '?'}</td>
+            <td>${ivStr}</td>
+            <td><span class="verdict verdict-${p.triage.verdict}">${display.icon} ${display.label}</span></td>
+            <td>
+              <div class="reason">${p.triage.reason}</div>
+            </td>
+          `;
+          tbody.appendChild(row);
+
+          // Log to console
+          console.log(`${p.name}: ${p.triage.verdict} - ${p.triage.reason}`);
+        });
+
+        console.log('\nSummary:', triaged.summary);
+
+        // Verify expected results
+        console.log('\n--- Verification ---');
+        const azumarill = triaged.pokemon.find(p => p.name === 'Azumarill');
+        const machamp = triaged.pokemon.find(p => p.name === 'Machamp');
+        const pidgey = triaged.pokemon.find(p => p.name === 'Pidgey');
+
+        if (azumarill) {
+          const pass = azumarill.triage.verdict === 'KEEP_PVP';
+          console.log(`Azumarill verdict: ${azumarill.triage.verdict} (expected KEEP_PVP) - ${pass ? 'PASS' : 'FAIL'}`);
+        }
+
+        if (machamp) {
+          const pass = machamp.triage.verdict === 'KEEP_RAID';
+          console.log(`Machamp verdict: ${machamp.triage.verdict} (expected KEEP_RAID) - ${pass ? 'PASS' : 'FAIL'}`);
+        }
+
+        if (pidgey) {
+          const pass = pidgey.triage.verdict === 'TRANSFER';
+          console.log(`Pidgey verdict: ${pidgey.triage.verdict} (expected TRANSFER) - ${pass ? 'PASS' : 'FAIL'}`);
+        }
+
+        statusEl.textContent = 'Test complete! Check results below.';
+        statusEl.className = 'status success';
+
+      } catch (err) {
+        console.error('Test failed:', err);
+        statusEl.textContent = `Error: ${err.message}`;
+        statusEl.className = 'status error';
+      }
+    }
+
+    // Run test on page load
+    runTest();
+  </script>
+</body>
+</html>
