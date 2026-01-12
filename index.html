@@ -110,10 +110,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       transform: translateY(-2px);
     }
-    .card-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
     .card h3 {
       font-size: 17px;
       margin-bottom: 6px;
@@ -124,62 +120,21 @@
       color: #666;
       margin: 0;
     }
-    .card.featured {
-      border-left: 4px solid #0066cc;
-    }
-
-    /* Quick Links */
-    .quick-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .quick-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      color: #333;
-      text-decoration: none;
-      font-size: 14px;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .quick-links a:hover {
-      border-color: #0066cc;
-      background: #f0f7ff;
-    }
-
     /* Features */
     .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
       margin-bottom: 32px;
-      padding: 24px;
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e5e5e5;
     }
-    .feature {
-      text-align: center;
-    }
-    .feature-icon {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
-    .feature h3 {
-      font-size: 15px;
-      margin-bottom: 4px;
-      color: #333;
-    }
-    .feature p {
-      font-size: 13px;
+    .feature-badge {
+      font-size: 14px;
       color: #666;
-      margin: 0;
+    }
+    .feature-badge:not(:last-child)::after {
+      content: " · ";
+      color: #ccc;
+      margin-left: 24px;
     }
 
     /* Footer */
@@ -234,65 +189,22 @@
     <p class="privacy-note">100% free and private. Your data never leaves your browser.</p>
   </section>
 
-  <h2>Tools</h2>
-  <div class="cards">
-    <a href="tools/collection-triage/" class="card featured">
-      <div class="card-icon">📊</div>
-      <h3>Collection Triage</h3>
-      <p>Upload your collection and get clear verdicts: Keep for PvP, Keep for Raids, Trade, or Transfer.</p>
-    </a>
-    <a href="tools/csv-to-json/" class="card">
-      <div class="card-icon">🔄</div>
-      <h3>CSV to JSON Converter</h3>
-      <p>Convert Poke Genie or Calcy IV exports to JSON for use with other tools.</p>
-    </a>
-  </div>
-
   <h2>Learn</h2>
   <div class="cards">
     <a href="guide/" class="card">
-      <div class="card-icon">📚</div>
       <h3>Beginner's Guide</h3>
       <p>New to IVs, PvP, and raids? Start here with plain English explanations.</p>
     </a>
     <a href="guide/glossary.html" class="card">
-      <div class="card-icon">📖</div>
       <h3>Glossary</h3>
       <p>Quick definitions for every Pokemon GO term you'll encounter.</p>
-    </a>
-    <a href="guide/scanning.html" class="card">
-      <div class="card-icon">📱</div>
-      <h3>How to Scan</h3>
-      <p>Step-by-step guide to exporting your collection from Poke Genie or Calcy IV.</p>
-    </a>
-    <a href="guide/tagging.html" class="card">
-      <div class="card-icon">🏷️</div>
-      <h3>Using Tags</h3>
-      <p>Organize your Pokemon in-game with tags and search strings.</p>
     </a>
   </div>
 
   <div class="features">
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
-      <h3>Private</h3>
-      <p>All processing happens in your browser</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🆓</div>
-      <h3>Free</h3>
-      <p>No ads, no subscriptions, no catches</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🌐</div>
-      <h3>Open Source</h3>
-      <p>MIT licensed, community driven</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📊</div>
-      <h3>Data-Driven</h3>
-      <p>Backed by PvPoke, GamePress & more</p>
-    </div>
+    <span class="feature-badge">Private</span>
+    <span class="feature-badge">Free</span>
+    <span class="feature-badge">Open Source</span>
   </div>
 
   <footer>
