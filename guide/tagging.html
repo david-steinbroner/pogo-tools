@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Using Tags in Pokemon GO - PoGO Tools</title>
+  <link rel="stylesheet" href="../shared/guide-styles.css">
+</head>
+<body>
+  <header>
+    <a href="./">&larr; Guide</a>
+    <a href="https://github.com/david-steinbroner/pogo-tools/issues">Give Feedback</a>
+  </header>
+
+  <main>
+    <h1>Using Tags in Pokemon GO</h1>
+    <p class="intro">
+      Tags are a built-in feature in Pokemon GO that let you organize your
+      collection. After running Collection Triage, use tags to keep things sorted.
+    </p>
+
+    <section>
+      <h2>Step 1: Create Your Tags</h2>
+      <p>We recommend these tags to match our triage results:</p>
+
+      <ul class="tag-list">
+        <li><span class="tag pvp">PvP</span> - Pokemon to keep for battles</li>
+        <li><span class="tag raid">Raid</span> - Pokemon to keep for raids</li>
+        <li><span class="tag trade">Trade</span> - Pokemon safe to trade away</li>
+      </ul>
+
+      <p>Optional extra tags if you want more detail:</p>
+      <ul class="tag-list">
+        <li><span class="tag">GL</span> - Great League specific</li>
+        <li><span class="tag">UL</span> - Ultra League specific</li>
+        <li><span class="tag">ML</span> - Master League specific</li>
+        <li><span class="tag">Lucky Trade</span> - High priority for lucky trades</li>
+        <li><span class="tag">Power Up</span> - Pokemon you want to invest in next</li>
+      </ul>
+
+      <div class="how-to">
+        <h3>How to create a tag:</h3>
+        <ol>
+          <li>Open Pokemon GO</li>
+          <li>Go to your Pokemon storage</li>
+          <li>Tap the tag icon in the top right (looks like a label)</li>
+          <li>Tap "Create New Tag"</li>
+          <li>Type the name and pick a color</li>
+          <li>Tap "OK"</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>Step 2: Download Your Checklist</h2>
+      <p>
+        After running <a href="../tools/collection-triage/">Collection Triage</a>,
+        download the Action Checklist. It lists exactly which Pokemon to tag,
+        with their Name and CP so you can find them.
+      </p>
+      <p>Example checklist:</p>
+      <pre class="checklist-example">=== TAG AS "PVP" (3) ===
+[ ] Azumarill CP 1487 (0/14/15)
+    Rank #1 Great League - excellent!
+[ ] Swampert CP 1496 (0/15/13)
+    Rank #2 Great League - excellent!
+[ ] Galarian Stunfisk CP 1491 (0/13/15)
+    Rank #6 Great League - excellent!
+
+=== TAG AS "RAID" (2) ===
+[ ] Machamp CP 2847 (15/14/13)
+    Top normal, rock, steel raid attacker
+[ ] Tyranitar CP 3456 (15/12/14)
+    Top fire, flying, ice raid attacker
+
+=== TAG AS "TRADE" (2) ===
+[ ] Machop CP 542 [Shadow]
+[ ] Eevee CP 648
+
+=== SAFE TO TRANSFER (3) ===
+3 Pokemon can be transferred for candy.
+...</pre>
+    </section>
+
+    <section>
+      <h2>Step 3: Apply Tags</h2>
+      <p>Work through your checklist:</p>
+      <ol>
+        <li>Open Pokemon GO</li>
+        <li>Search for the Pokemon (e.g., type "Azumarill" in search)</li>
+        <li>Find the one matching the CP on your checklist</li>
+        <li>Tap to open it</li>
+        <li>Tap the tag icon (bottom right of the Pokemon screen)</li>
+        <li>Select the appropriate tag</li>
+        <li>Check it off your list and move to the next one</li>
+      </ol>
+
+      <div class="tip">
+        <strong>Pro tip:</strong> You can tag multiple Pokemon at once!
+        Long-press one Pokemon, then tap others to select them, then tap the tag icon.
+      </div>
+
+      <div class="how-to">
+        <h3>Faster method with search:</h3>
+        <p>
+          If you have many of the same Pokemon (e.g., multiple Machamp), use search
+          with CP to find the exact one:
+        </p>
+        <ol>
+          <li>Type: <code>machamp&cp1234</code> (replace 1234 with the actual CP)</li>
+          <li>This will show only Machamp with that exact CP</li>
+          <li>If there are still multiple, check IVs to find the right one</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <h2>Step 4: Use Your Tags</h2>
+      <p>Now you can filter by tag anytime:</p>
+
+      <ul>
+        <li>
+          <strong>Before trading:</strong> Filter by "Trade" tag to see all
+          your trade candidates in one place.
+        </li>
+        <li>
+          <strong>Building a team:</strong> Filter by "PvP" to see your best
+          battle Pokemon.
+        </li>
+        <li>
+          <strong>Before a raid:</strong> Filter by "Raid" to quickly pick
+          your attackers.
+        </li>
+        <li>
+          <strong>Cleaning up:</strong> Filter by excluding all your tags to
+          find untagged Pokemon you might want to transfer.
+        </li>
+      </ul>
+
+      <div class="how-to">
+        <h3>How to filter by tag:</h3>
+        <ol>
+          <li>Go to your Pokemon storage</li>
+          <li>Tap the tag icon</li>
+          <li>Tap the tag you want to filter by</li>
+          <li>Only Pokemon with that tag will show</li>
+        </ol>
+        <p>
+          Or type in search: <code>tag:PvP</code> or <code>tag:Raid</code>
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Step 5: Mass Transfer</h2>
+      <p>
+        After tagging your keepers, you can safely mass-transfer everything else:
+      </p>
+      <ol>
+        <li>In Pokemon storage, type: <code>!tag:PvP&!tag:Raid&!tag:Trade</code></li>
+        <li>This shows Pokemon with NONE of your tags</li>
+        <li>Review the list to make sure nothing important is there</li>
+        <li>Long-press to select multiple</li>
+        <li>Tap "Transfer" to send them to the Professor</li>
+      </ol>
+
+      <div class="notice warning">
+        <strong>Be careful!</strong> Double-check before mass transferring.
+        Favorites, shinies, and legendaries have extra protection, but it's still
+        good to review.
+      </div>
+    </section>
+
+    <section>
+      <h2>Useful Search Strings</h2>
+      <p>
+        Pokemon GO has a powerful search feature. Here are useful searches
+        to combine with tags:
+      </p>
+
+      <table class="search-table">
+        <tr>
+          <th>Search</th>
+          <th>What it does</th>
+        </tr>
+        <tr>
+          <td><code>tag:PvP</code></td>
+          <td>Show Pokemon tagged "PvP"</td>
+        </tr>
+        <tr>
+          <td><code>!tag:PvP&!tag:Raid&!tag:Trade</code></td>
+          <td>Show Pokemon with NONE of your tags (unprocessed)</td>
+        </tr>
+        <tr>
+          <td><code>tag:PvP&!evolve</code></td>
+          <td>PvP Pokemon that are fully evolved</td>
+        </tr>
+        <tr>
+          <td><code>4*</code></td>
+          <td>Show 100% IV Pokemon (4-star)</td>
+        </tr>
+        <tr>
+          <td><code>3*</code></td>
+          <td>Show 82-98% IV Pokemon (3-star)</td>
+        </tr>
+        <tr>
+          <td><code>0*,1*,2*</code></td>
+          <td>Show Pokemon with lower IVs</td>
+        </tr>
+        <tr>
+          <td><code>shiny</code></td>
+          <td>Show all shinies</td>
+        </tr>
+        <tr>
+          <td><code>lucky</code></td>
+          <td>Show all lucky Pokemon</td>
+        </tr>
+        <tr>
+          <td><code>shadow</code></td>
+          <td>Show all shadow Pokemon</td>
+        </tr>
+        <tr>
+          <td><code>purified</code></td>
+          <td>Show all purified Pokemon</td>
+        </tr>
+        <tr>
+          <td><code>@special</code></td>
+          <td>Show Pokemon with legacy/special moves</td>
+        </tr>
+        <tr>
+          <td><code>@weather</code></td>
+          <td>Show Pokemon boosted by current weather</td>
+        </tr>
+        <tr>
+          <td><code>evolve</code></td>
+          <td>Show Pokemon you can evolve now</td>
+        </tr>
+        <tr>
+          <td><code>item</code></td>
+          <td>Show Pokemon that need items to evolve</td>
+        </tr>
+        <tr>
+          <td><code>costume</code></td>
+          <td>Show Pokemon wearing costumes</td>
+        </tr>
+        <tr>
+          <td><code>legendary</code></td>
+          <td>Show legendary Pokemon</td>
+        </tr>
+        <tr>
+          <td><code>mythical</code></td>
+          <td>Show mythical Pokemon</td>
+        </tr>
+        <tr>
+          <td><code>cp1400-1500</code></td>
+          <td>Show Pokemon in a CP range</td>
+        </tr>
+        <tr>
+          <td><code>pokemon&cp1234</code></td>
+          <td>Find exact Pokemon by name and CP</td>
+        </tr>
+      </table>
+
+      <div class="tip">
+        <strong>Combine searches with &:</strong> Use <code>&</code> to combine
+        multiple filters. Example: <code>shadow&3*&fighting</code> shows 3-star
+        shadow Fighting-types.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="./">&larr; Back to Guide</a></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beginner's Guide - PoGO Tools</title>
+  <link rel="stylesheet" href="../shared/guide-styles.css">
+  <link rel="stylesheet" href="../shared/sources-modal.css">
+</head>
+<body>
+  <header>
+    <a href="../">&larr; PoGO Tools</a>
+    <a href="https://github.com/david-steinbroner/pogo-tools/issues">Give Feedback</a>
+  </header>
+
+  <main>
+    <h1>Beginner's Guide</h1>
+    <p class="intro">
+      New to managing your Pokemon GO collection? You're in the right place.
+      These guides explain everything in plain English - no jargon, no assumptions.
+    </p>
+
+    <section class="guide-cards">
+      <a href="glossary.html" class="guide-card">
+        <h2>Glossary</h2>
+        <p>IV, CP, PvP, Great League... what does it all mean? Quick definitions for every term.</p>
+      </a>
+
+      <a href="scanning.html" class="guide-card">
+        <h2>How to Scan Your Collection</h2>
+        <p>Step-by-step guide to exporting your Pokemon data using Calcy IV (free) or Poke Genie.</p>
+      </a>
+
+      <a href="tagging.html" class="guide-card">
+        <h2>Using Tags in Pokemon GO</h2>
+        <p>How to organize your collection with in-game tags so you can find things fast.</p>
+      </a>
+
+      <a href="../tools/collection-triage/" class="guide-card highlight">
+        <h2>Ready to Start?</h2>
+        <p>Got your CSV? Jump straight to the Collection Triage tool.</p>
+      </a>
+    </section>
+
+    <section class="faq">
+      <h2>Common Questions</h2>
+
+      <details>
+        <summary>Why should I care about IVs?</summary>
+        <p>
+          IVs (Individual Values) are hidden stats that make each Pokemon unique.
+          Two Pikachu can have the same CP but different IVs - and in competitive
+          battles, those small differences matter.
+        </p>
+        <p>
+          For casual play? Don't stress about IVs. For PvP battles or serious raiding?
+          They're worth paying attention to.
+        </p>
+      </details>
+
+      <details>
+        <summary>What's the difference between PvP and Raids?</summary>
+        <p>
+          <strong>PvP (Player vs Player)</strong> is battling other trainers - either
+          friends or strangers in GO Battle League. You want bulky Pokemon that can
+          survive and fight back.
+        </p>
+        <p>
+          <strong>Raids</strong> are cooperative battles against powerful bosses.
+          You want Pokemon that hit as hard as possible, even if they're fragile.
+        </p>
+        <p>
+          The same Pokemon might be great for one and bad for the other!
+        </p>
+      </details>
+
+      <details>
+        <summary>Why do PvP IVs look "bad"?</summary>
+        <p>
+          In PvP leagues with CP limits (Great League: 1500, Ultra League: 2500),
+          you want to maximize your stats within that limit.
+        </p>
+        <p>
+          Lower Attack IV = lower CP at the same level = you can power up more =
+          more total stats. That's why "0/15/15" is often better than "15/15/15"
+          for Great League.
+        </p>
+        <p>
+          It's counterintuitive, but the math checks out.
+          <a href="glossary.html#stat-product">Learn more about stat product</a>
+        </p>
+      </details>
+
+      <details>
+        <summary>Should I keep Shadow Pokemon?</summary>
+        <p>
+          Shadow Pokemon deal 20% more damage but also take 20% more damage.
+          This makes them:
+        </p>
+        <ul>
+          <li><strong>Great for raids</strong> - more damage = faster wins</li>
+          <li><strong>Risky for PvP</strong> - glass cannons that can dominate or crumble</li>
+        </ul>
+        <p>
+          Don't purify good Shadow Pokemon! The damage bonus is usually worth more
+          than the IV boost from purifying.
+        </p>
+      </details>
+
+      <details>
+        <summary>What does "meta" mean?</summary>
+        <p>
+          "Meta" is short for "metagame" - it refers to the most effective strategies
+          and Pokemon that players are currently using. A "meta Pokemon" is one that's
+          commonly used because it's strong and effective.
+        </p>
+        <p>
+          The meta shifts over time as Niantic releases new Pokemon, moves, and balance changes.
+          Our triage tool uses current meta data to help you identify which Pokemon are worth keeping.
+        </p>
+      </details>
+
+      <details>
+        <summary>Do I need to scan every Pokemon?</summary>
+        <p>
+          For the best results, yes - scan your entire collection. The triage tool
+          can find hidden gems you might have overlooked, and it can also identify
+          duplicates where you have a better version of the same Pokemon.
+        </p>
+        <p>
+          That said, you can also scan just the Pokemon you're unsure about.
+          The tool works with any size collection.
+        </p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      <span class="sources-placeholder"></span> ·
+      <a href="https://github.com/david-steinbroner/pogo-tools/issues">Feedback</a>
+    </p>
+  </footer>
+
+  <script src="../shared/sources-modal.js"></script>
+  <script>PogoSources.initSourcesLinks();</script>
+</body>
+</html>
