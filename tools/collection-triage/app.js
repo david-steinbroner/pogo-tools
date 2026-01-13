@@ -396,6 +396,70 @@
     return POKEMON_TYPES[name] || null;
   }
 
+  // Column configuration for table
+  var DEFAULT_COLUMNS = [
+    { id: 'pokemon', label: 'Pokemon', locked: true, visible: true },
+    { id: 'type', label: 'Type', locked: false, visible: true },
+    { id: 'tier', label: 'Tier', locked: false, visible: true },
+    { id: 'league', label: 'League', locked: false, visible: true },
+    { id: 'cp', label: 'CP', locked: false, visible: true },
+    { id: 'ivs', label: 'IVs', locked: false, visible: true },
+    { id: 'verdict', label: 'Verdict', locked: false, visible: true },
+    { id: 'why', label: 'Why?', locked: false, visible: true }
+  ];
+
+  var columnConfig = loadColumnConfig();
+
+  function loadColumnConfig() {
+    var saved = localStorage.getItem('pokemonColumnConfig');
+    if (saved) {
+      try {
+        var parsed = JSON.parse(saved);
+        // Validate and merge with defaults to handle new columns
+        return mergeColumnConfig(parsed);
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_COLUMNS));
+      }
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_COLUMNS));
+  }
+
+  function mergeColumnConfig(saved) {
+    // Ensure all default columns exist in saved config
+    var result = [];
+    var savedIds = saved.map(function(c) { return c.id; });
+
+    // First, add saved columns that still exist in defaults
+    saved.forEach(function(col) {
+      var defaultCol = DEFAULT_COLUMNS.find(function(d) { return d.id === col.id; });
+      if (defaultCol) {
+        result.push({
+          id: col.id,
+          label: defaultCol.label,
+          locked: defaultCol.locked,
+          visible: col.visible
+        });
+      }
+    });
+
+    // Then add any new default columns that weren't in saved
+    DEFAULT_COLUMNS.forEach(function(defaultCol) {
+      if (savedIds.indexOf(defaultCol.id) === -1) {
+        result.push(JSON.parse(JSON.stringify(defaultCol)));
+      }
+    });
+
+    return result;
+  }
+
+  function saveColumnConfig() {
+    localStorage.setItem('pokemonColumnConfig', JSON.stringify(columnConfig));
+  }
+
+  function getVisibleColumns() {
+    return columnConfig.filter(function(c) { return c.visible; });
+  }
+
   // Initialize on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
     initUploadButton();
@@ -408,6 +472,7 @@
     initTeamFilters();
     initTradeToggle();
     initModeSelector();
+    initColumnSettings();
     PogoSources.initSourcesLinks();
   });
 
@@ -540,6 +605,9 @@
     teamFilters = teamFilters || {};
     const tbody = document.getElementById('resultsBody');
 
+    // Render table headers based on column config
+    renderTableHeaders();
+
     // Filter Pokemon by verdict
     let filtered = pokemon;
     if (filter !== 'all') {
@@ -604,8 +672,42 @@
 
     // Show empty state if needed
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">' + getEmptyStateMessage(filter) + '</td></tr>';
+      var visibleCount = getVisibleColumns().length;
+      tbody.innerHTML = '<tr><td colspan="' + visibleCount + '" class="empty-state">' + getEmptyStateMessage(filter) + '</td></tr>';
     }
+  }
+
+  function renderTableHeaders() {
+    var thead = document.querySelector('#resultsTable thead tr');
+    if (!thead) return;
+
+    var visibleColumns = getVisibleColumns();
+
+    // Column sort data and CSS classes
+    var columnMeta = {
+      'pokemon': { sort: 'name', sortable: true },
+      'type': { sort: null, sortable: false },
+      'tier': { sort: 'tier', sortable: true },
+      'league': { sort: 'cp', sortable: true },
+      'cp': { sort: 'cp', sortable: true },
+      'ivs': { sort: 'ivPercent', sortable: true },
+      'verdict': { sort: 'verdict', sortable: true },
+      'why': { sort: null, sortable: false }
+    };
+
+    thead.innerHTML = visibleColumns.map(function(col) {
+      var meta = columnMeta[col.id] || { sortable: false };
+      var classes = ['col-' + col.id];
+      if (meta.sortable) classes.push('sortable');
+
+      var sortIndicator = meta.sortable ? '<span class="sort-indicator"></span>' : '';
+      var sortAttr = meta.sort ? ' data-sort="' + meta.sort + '"' : '';
+
+      return '<th class="' + classes.join(' ') + '"' + sortAttr + '>' + col.label + sortIndicator + '</th>';
+    }).join('');
+
+    // Re-attach sort handlers
+    initSortableHeaders();
   }
 
   function sortByVerdict(pokemon, filter) {
@@ -750,26 +852,44 @@
     var types = getPokemonTypes(pokemon.name, pokemon.form);
     var typeDisplay = types ? types.join(' / ') : '';
 
+    // Get visible columns and render cells dynamically
+    var visibleColumns = getVisibleColumns();
+    var cells = visibleColumns.map(function(col) {
+      switch (col.id) {
+        case 'pokemon':
+          return '<td class="col-pokemon">' +
+            '<strong>' + pokemonName + '</strong>' + formStr +
+            badges +
+          '</td>';
+        case 'type':
+          return '<td class="col-type">' + typeDisplay + '</td>';
+        case 'tier':
+          return '<td class="col-tier">' + tierBadge + '</td>';
+        case 'league':
+          return '<td class="col-league">' + leagueBadges + '</td>';
+        case 'cp':
+          return '<td class="col-cp">' + (pokemon.cp || '?') + '</td>';
+        case 'ivs':
+          return '<td class="col-ivs">' + ivStr + '</td>';
+        case 'verdict':
+          return '<td class="col-verdict">' +
+            '<span class="verdict verdict-' + verdictClass + '">' +
+              verdictDisplay.icon + ' ' + verdictDisplay.label +
+            '</span>' +
+          '</td>';
+        case 'why':
+          return '<td class="col-why">' +
+            '<span class="reason">' + escapeHtml(pokemon.triage.reason) + '</span>' +
+            effectivenessBadge +
+            (escapedDetails ? '<button class="details-btn" onclick="showDetails(\'' + pokemonName + '\', \'' + escapedDetails.replace(/'/g, "\\'") + '\')">?</button>' : '') +
+          '</td>';
+        default:
+          return '<td>-</td>';
+      }
+    }).join('');
+
     return '<tr data-verdict="' + verdict + '" data-name="' + pokemonName.toLowerCase() + '" data-tier="' + (tier || '') + '">' +
-      '<td class="col-pokemon">' +
-        '<strong>' + pokemonName + '</strong>' + formStr +
-        badges +
-      '</td>' +
-      '<td class="col-type">' + typeDisplay + '</td>' +
-      '<td class="col-tier">' + tierBadge + '</td>' +
-      '<td class="col-league">' + leagueBadges + '</td>' +
-      '<td class="col-cp">' + (pokemon.cp || '?') + '</td>' +
-      '<td class="col-ivs">' + ivStr + '</td>' +
-      '<td class="col-verdict">' +
-        '<span class="verdict verdict-' + verdictClass + '">' +
-          verdictDisplay.icon + ' ' + verdictDisplay.label +
-        '</span>' +
-      '</td>' +
-      '<td class="col-why">' +
-        '<span class="reason">' + escapeHtml(pokemon.triage.reason) + '</span>' +
-        effectivenessBadge +
-        (escapedDetails ? '<button class="details-btn" onclick="showDetails(\'' + pokemonName + '\', \'' + escapedDetails.replace(/'/g, "\\'") + '\')">?</button>' : '') +
-      '</td>' +
+      cells +
     '</tr>';
   }
 
@@ -1510,6 +1630,138 @@
     } else {
       countEl.textContent = `Showing ${visible} of ${total}`;
     }
+  }
+
+  // ============================================
+  // Column Settings
+  // ============================================
+
+  function initColumnSettings() {
+    var btn = document.getElementById('columnSettingsBtn');
+    var dropdown = document.getElementById('columnSettingsDropdown');
+    var resetBtn = document.getElementById('columnResetBtn');
+
+    if (!btn || !dropdown) return;
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      dropdown.hidden = !dropdown.hidden;
+      if (!dropdown.hidden) {
+        renderColumnSettings();
+      }
+    });
+
+    resetBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      columnConfig = JSON.parse(JSON.stringify(DEFAULT_COLUMNS));
+      saveColumnConfig();
+      renderColumnSettings();
+      renderTable(); // Re-render with default columns
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target) && e.target !== btn) {
+        dropdown.hidden = true;
+      }
+    });
+  }
+
+  function renderColumnSettings() {
+    var list = document.getElementById('columnSettingsList');
+    if (!list) return;
+
+    list.innerHTML = columnConfig.map(function(col, index) {
+      return '<div class="column-setting-item ' + (col.locked ? 'locked' : '') + '" ' +
+             'draggable="' + (!col.locked) + '" ' +
+             'data-index="' + index + '" ' +
+             'data-id="' + col.id + '">' +
+        '<span class="column-drag-handle">⋮⋮</span>' +
+        '<input type="checkbox" ' +
+               'id="col-' + col.id + '" ' +
+               (col.visible ? 'checked ' : '') +
+               (col.locked ? 'disabled ' : '') + '>' +
+        '<label for="col-' + col.id + '">' + col.label + '</label>' +
+      '</div>';
+    }).join('');
+
+    // Add checkbox listeners
+    list.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+      checkbox.addEventListener('change', function(e) {
+        var id = e.target.id.replace('col-', '');
+        toggleColumnVisibility(id);
+      });
+    });
+
+    initColumnDragAndDrop();
+  }
+
+  function toggleColumnVisibility(colId) {
+    var col = columnConfig.find(function(c) { return c.id === colId; });
+    if (col && !col.locked) {
+      col.visible = !col.visible;
+      saveColumnConfig();
+      renderTable(); // Re-render table
+    }
+  }
+
+  function initColumnDragAndDrop() {
+    var list = document.getElementById('columnSettingsList');
+    if (!list) return;
+
+    var draggedItem = null;
+    var draggedIndex = null;
+
+    list.querySelectorAll('.column-setting-item[draggable="true"]').forEach(function(item) {
+      item.addEventListener('dragstart', function(e) {
+        draggedItem = item;
+        draggedIndex = parseInt(item.dataset.index);
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      item.addEventListener('dragend', function() {
+        item.classList.remove('dragging');
+        list.querySelectorAll('.column-setting-item').forEach(function(i) {
+          i.classList.remove('drag-over');
+        });
+        draggedItem = null;
+        draggedIndex = null;
+      });
+
+      item.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (!draggedItem || draggedItem === item) return;
+
+        var targetIndex = parseInt(item.dataset.index);
+
+        // Don't allow dropping before locked items
+        if (targetIndex === 0 && columnConfig[0].locked) return;
+
+        item.classList.add('drag-over');
+      });
+
+      item.addEventListener('dragleave', function() {
+        item.classList.remove('drag-over');
+      });
+
+      item.addEventListener('drop', function(e) {
+        e.preventDefault();
+        if (!draggedItem || draggedItem === item) return;
+
+        var targetIndex = parseInt(item.dataset.index);
+
+        // Don't allow dropping at position 0 if it's locked
+        if (targetIndex === 0 && columnConfig[0].locked) return;
+
+        // Reorder
+        var moved = columnConfig.splice(draggedIndex, 1)[0];
+        columnConfig.splice(targetIndex, 0, moved);
+
+        saveColumnConfig();
+        renderColumnSettings();
+        renderTable();
+      });
+    });
   }
 
   // ============================================
