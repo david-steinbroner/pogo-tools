@@ -18,10 +18,24 @@
     direction: 'asc'
   };
 
+  // League CP presets
+  var LEAGUE_PRESETS = {
+    great: { min: 0, max: 1500 },
+    ultra: { min: 1501, max: 2500 },
+    master: { min: 2501, max: 99999 },
+    little: { min: 0, max: 500 }
+  };
+
+  // All Pokemon types
+  var ALL_TYPES = ['Bug', 'Dark', 'Dragon', 'Electric', 'Fairy', 'Fighting',
+                   'Fire', 'Flying', 'Ghost', 'Grass', 'Ground', 'Ice',
+                   'Normal', 'Poison', 'Psychic', 'Rock', 'Steel', 'Water'];
+
   // Initialize on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
     initUploadZone();
     initFilters();
+    initPvpFilters();
     initDownloadButtons();
     initCardFilters();
     initSortableHeaders();
@@ -172,17 +186,41 @@
     keepSection.innerHTML = '<span id="countKeep">' + keepCount + '</span> with no special flags';
   }
 
-  function renderTable(pokemon, filter, opponentType) {
+  function renderTable(pokemon, filter, opponentType, pvpFilters) {
     filter = filter || 'all';
     opponentType = opponentType || '';
+    pvpFilters = pvpFilters || null;
     const tbody = document.getElementById('resultsBody');
 
-    // Filter Pokemon
+    // Filter Pokemon by verdict
     let filtered = pokemon;
     if (filter !== 'all') {
       filtered = pokemon.filter(function(p) {
         return p.triage.verdict === filter;
       });
+    }
+
+    // Apply PvP filters (CP range and type filters) if on Top PvP view
+    if (pvpFilters && filter === 'TOP_PVP') {
+      // CP range filter
+      if (pvpFilters.minCP > 0 || pvpFilters.maxCP < 99999) {
+        filtered = filtered.filter(function(p) {
+          var cp = p.cp || 0;
+          return cp >= pvpFilters.minCP && cp <= pvpFilters.maxCP;
+        });
+      }
+
+      // Type filter (include/exclude)
+      if (pvpFilters.selectedTypes.length > 0 && pvpFilters.selectedTypes.length < 18) {
+        filtered = filtered.filter(function(p) {
+          var types = PogoTriage.getPokemonTypes ? PogoTriage.getPokemonTypes(p) : [];
+          if (types.length === 0) return true; // If no type data, include by default
+          var hasType = types.some(function(t) {
+            return pvpFilters.selectedTypes.includes(t);
+          });
+          return pvpFilters.typeMode === 'include' ? hasType : !hasType;
+        });
+      }
     }
 
     // Calculate effectiveness for each Pokemon if opponent type is selected
@@ -218,7 +256,7 @@
 
     // Show empty state if needed
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">' + getEmptyStateMessage(filter) + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">' + getEmptyStateMessage(filter) + '</td></tr>';
     }
   }
 
@@ -351,12 +389,16 @@
       effectivenessBadge = ' <span class="effectiveness-badge">Super Effective</span>';
     }
 
+    // Render league eligibility badges
+    var leagueBadges = renderLeagueBadges(pokemon.cp || 0);
+
     return '<tr data-verdict="' + verdict + '" data-name="' + pokemonName.toLowerCase() + '" data-tier="' + (tier || '') + '">' +
       '<td>' +
         '<strong>' + pokemonName + '</strong>' + formStr +
         badges +
       '</td>' +
       '<td class="tier-cell">' + tierBadge + '</td>' +
+      '<td class="league-cell">' + leagueBadges + '</td>' +
       '<td>' + (pokemon.cp || '?') + '</td>' +
       '<td class="ivs">' + ivStr + '</td>' +
       '<td>' +
@@ -425,9 +467,101 @@
   // ============================================
 
   function initFilters() {
-    document.getElementById('filterVerdict').addEventListener('change', applyFilters);
+    document.getElementById('filterVerdict').addEventListener('change', function() {
+      // Show/hide PvP filters based on verdict
+      var isPvP = this.value === 'TOP_PVP';
+      document.getElementById('pvpFilters').hidden = !isPvP;
+      applyFilters();
+    });
     document.getElementById('filterOpponentType').addEventListener('change', applyFilters);
     document.getElementById('searchInput').addEventListener('input', applySearchFilter);
+  }
+
+  function initPvpFilters() {
+    // Generate type checkboxes
+    var typeCheckboxes = document.getElementById('typeCheckboxes');
+    ALL_TYPES.forEach(function(type) {
+      var label = document.createElement('label');
+      label.innerHTML = '<input type="checkbox" value="' + type + '" checked><span>' + type + '</span>';
+      typeCheckboxes.appendChild(label);
+    });
+
+    // League dropdown - updates CP inputs
+    document.getElementById('filterLeague').addEventListener('change', function() {
+      var preset = LEAGUE_PRESETS[this.value];
+      if (preset) {
+        document.getElementById('filterMinCP').value = preset.min > 0 ? preset.min : '';
+        document.getElementById('filterMaxCP').value = preset.max < 99999 ? preset.max : '';
+      } else if (this.value === '' || this.value === 'custom') {
+        // Clear for "All Leagues" or "Custom"
+        if (this.value === '') {
+          document.getElementById('filterMinCP').value = '';
+          document.getElementById('filterMaxCP').value = '';
+        }
+      }
+      applyFilters();
+    });
+
+    // CP range inputs
+    document.getElementById('filterMinCP').addEventListener('input', applyFilters);
+    document.getElementById('filterMaxCP').addEventListener('input', applyFilters);
+
+    // Type filter toggle
+    document.getElementById('typeFilterToggle').addEventListener('click', function() {
+      var content = document.getElementById('typeFilterContent');
+      content.hidden = !content.hidden;
+      this.textContent = content.hidden ? 'Type Filter ▼' : 'Type Filter ▲';
+    });
+
+    // Type mode radio buttons
+    document.querySelectorAll('input[name="typeMode"]').forEach(function(radio) {
+      radio.addEventListener('change', applyFilters);
+    });
+
+    // Select All / Clear All buttons
+    document.getElementById('selectAllTypes').addEventListener('click', function() {
+      document.querySelectorAll('#typeCheckboxes input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = true;
+      });
+      applyFilters();
+    });
+
+    document.getElementById('clearAllTypes').addEventListener('click', function() {
+      document.querySelectorAll('#typeCheckboxes input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = false;
+      });
+      applyFilters();
+    });
+
+    // Individual type checkboxes
+    document.getElementById('typeCheckboxes').addEventListener('change', applyFilters);
+  }
+
+  // Get selected types from checkboxes
+  function getSelectedTypes() {
+    var selected = [];
+    document.querySelectorAll('#typeCheckboxes input[type="checkbox"]:checked').forEach(function(cb) {
+      selected.push(cb.value);
+    });
+    return selected;
+  }
+
+  // Get Pokemon types from meta entry
+  function getPokemonTypes(pokemon) {
+    // Try to get types from the triaged data or meta entry
+    if (pokemon._types) return pokemon._types;
+    // Will be populated during rendering
+    return [];
+  }
+
+  // Render league eligibility badges
+  function renderLeagueBadges(cp) {
+    var badges = [];
+    if (cp <= 500) badges.push('<span class="league-badge league-lc">LC</span>');
+    if (cp <= 1500) badges.push('<span class="league-badge league-gl">GL</span>');
+    if (cp > 1500 && cp <= 2500) badges.push('<span class="league-badge league-ul">UL</span>');
+    if (cp > 2500) badges.push('<span class="league-badge league-ml">ML</span>');
+    return badges.join('');
   }
 
   function initCardFilters() {
@@ -678,8 +812,22 @@
     var opponentType = document.getElementById('filterOpponentType').value;
     var searchFilter = document.getElementById('searchInput').value.toLowerCase().trim();
 
+    // Collect PvP filters if on Top PvP view
+    var pvpFilters = null;
+    if (verdictFilter === 'TOP_PVP') {
+      var minCP = parseInt(document.getElementById('filterMinCP').value) || 0;
+      var maxCP = parseInt(document.getElementById('filterMaxCP').value) || 99999;
+      var typeMode = document.querySelector('input[name="typeMode"]:checked');
+      pvpFilters = {
+        minCP: minCP,
+        maxCP: maxCP,
+        typeMode: typeMode ? typeMode.value : 'include',
+        selectedTypes: getSelectedTypes()
+      };
+    }
+
     // Re-render table with new filters
-    renderTable(currentResults.pokemon, verdictFilter, opponentType);
+    renderTable(currentResults.pokemon, verdictFilter, opponentType, pvpFilters);
 
     // Apply search filter on top if present
     if (searchFilter) {

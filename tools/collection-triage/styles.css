@@ -751,6 +751,141 @@ footer a:hover {
   margin-top: 8px;
 }
 
+/* PvP Filters */
+.pvp-filters {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.pvp-filter-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.pvp-filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.pvp-filter-row select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.pvp-filter-row input[type="number"] {
+  width: 100px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Type Filter Section */
+.type-filter-section {
+  margin-top: 8px;
+}
+
+.type-filter-toggle {
+  background: #e9ecef;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.type-filter-toggle:hover {
+  background: #dee2e6;
+}
+
+.type-filter-content {
+  margin-top: 12px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.type-filter-mode {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.type-filter-mode label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.type-filter-mode button {
+  padding: 4px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.type-filter-mode button:hover {
+  background: #f0f0f0;
+}
+
+.type-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.type-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.type-checkboxes label:hover {
+  background: #e0e0e0;
+}
+
+.type-checkboxes input[type="checkbox"]:checked + span {
+  font-weight: 600;
+}
+
+/* League Badges */
+.league-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.league-lc { background: #9333ea; color: white; }
+.league-gl { background: #2563eb; color: white; }
+.league-ul { background: #f59e0b; color: white; }
+.league-ml { background: #6b7280; color: white; }
+
+.league-cell {
+  white-space: nowrap;
+}
+
 /* Effectiveness Badge */
 .effectiveness-badge {
   display: inline-block;
@@ -792,14 +927,30 @@ footer a:hover {
     font-size: 13px;
   }
 
-  /* Hide Tier (2nd), CP (3rd), and IVs (4th) columns on mobile */
+  /* Hide Tier (2nd), League (3rd), CP (4th), and IVs (5th) columns on mobile */
   .results-table th:nth-child(2),
   .results-table td:nth-child(2),
   .results-table th:nth-child(3),
   .results-table td:nth-child(3),
   .results-table th:nth-child(4),
-  .results-table td:nth-child(4) {
+  .results-table td:nth-child(4),
+  .results-table th:nth-child(5),
+  .results-table td:nth-child(5) {
     display: none;
+  }
+
+  /* Hide PvP filters section on small screens */
+  .pvp-filters {
+    padding: 8px;
+  }
+
+  .pvp-filter-row {
+    flex-direction: column;
+  }
+
+  .pvp-filter-row select,
+  .pvp-filter-row input[type="number"] {
+    width: 100%;
   }
 }
 

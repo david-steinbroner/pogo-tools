@@ -643,6 +643,16 @@
   }
 
   /**
+   * Get Pokemon's types from meta entry
+   * @param {Object} pokemon - The Pokemon object
+   * @returns {Array} - Array of type strings, e.g., ['Water', 'Ground']
+   */
+  function getPokemonTypes(pokemon) {
+    const metaEntry = getMetaEntry(pokemon);
+    return metaEntry?.types || [];
+  }
+
+  /**
    * Render tier badge HTML
    * @param {string} tier - The tier (S, A+, A, B+, B, C) or null
    * @returns {string} - HTML for the tier badge
@@ -2071,6 +2081,7 @@
     getTier: getTier,
     renderTierBadge: renderTierBadge,
     getEffectivenessAgainst: getEffectivenessAgainst,
+    getPokemonTypes: getPokemonTypes,
     VERDICTS: VERDICTS,
     THRESHOLDS: THRESHOLDS,
     TIER_COLORS: TIER_COLORS,
