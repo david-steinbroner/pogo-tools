@@ -66,6 +66,14 @@
         <span id="countKeep">0</span> Pokemon are fine to keep (not shown by default)
       </div>
 
+      <div class="triage-options">
+        <label class="toggle-label">
+          <input type="checkbox" id="tradeToggle">
+          <span class="toggle-text">I have a trade partner</span>
+          <span class="toggle-hint">Duplicates become trade candidates instead of transfers</span>
+        </label>
+      </div>
+
       <div class="actions">
         <button id="downloadChecklist" class="primary">Download Action Checklist</button>
         <button id="downloadJson">Download Full Results (JSON)</button>
@@ -88,10 +96,10 @@
         <table class="results-table" id="resultsTable">
           <thead>
             <tr>
-              <th>Pokemon</th>
-              <th>CP</th>
-              <th>IVs</th>
-              <th>Verdict</th>
+              <th class="sortable" data-sort="name">Pokemon<span class="sort-indicator"></span></th>
+              <th class="sortable" data-sort="cp">CP<span class="sort-indicator"></span></th>
+              <th class="sortable" data-sort="ivPercent">IVs<span class="sort-indicator"></span></th>
+              <th class="sortable" data-sort="verdict">Verdict<span class="sort-indicator"></span></th>
               <th>Why?</th>
             </tr>
           </thead>

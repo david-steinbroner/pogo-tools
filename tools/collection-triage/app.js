@@ -8,6 +8,14 @@
 
   let currentResults = null;
   let currentFilename = '';
+  let currentParsedPokemon = null; // Store parsed data for re-analysis
+  let hasTradePartner = false;
+
+  // Sorting state
+  let currentSort = {
+    column: null,
+    direction: 'asc'
+  };
 
   // Initialize on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
@@ -15,6 +23,8 @@
     initFilters();
     initDownloadButtons();
     initCardFilters();
+    initSortableHeaders();
+    initTradeToggle();
     PogoSources.initSourcesLinks();
   });
 
@@ -97,16 +107,31 @@
       const formatName = parsed.format === 'pokegenie' ? 'Poke Genie' : 'Calcy IV';
       setStatus(`Detected ${formatName} format. Analyzing ${parsed.pokemon.length} Pokemon...`, 'loading');
 
-      const results = await PogoTriage.triageCollection(parsed.pokemon);
-      currentResults = results;
+      // Store parsed Pokemon for re-analysis when toggle changes
+      currentParsedPokemon = parsed.pokemon;
 
-      setStatus(`Analyzed ${results.pokemon.length} Pokemon`, 'success');
-      renderResults(results);
+      // Analyze with current trade partner setting
+      await analyzeAndRender();
 
     } catch (error) {
       setStatus('Error: ' + error.message, 'error');
       console.error('Processing error:', error);
     }
+  }
+
+  /**
+   * Analyze Pokemon with current settings and render results
+   */
+  async function analyzeAndRender() {
+    if (!currentParsedPokemon) return;
+
+    const results = await PogoTriage.triageCollection(currentParsedPokemon, {
+      hasTradePartner: hasTradePartner
+    });
+    currentResults = results;
+
+    setStatus(`Analyzed ${results.pokemon.length} Pokemon`, 'success');
+    renderResults(results);
   }
 
   // ============================================
@@ -148,8 +173,12 @@
       });
     }
 
-    // Sort by relevance based on filter
-    filtered = sortByVerdict(filtered, filter);
+    // Sort: use custom sort if active, otherwise use default verdict-based sort
+    if (currentSort.column) {
+      filtered = sortPokemon(filtered);
+    } else {
+      filtered = sortByVerdict(filtered, filter);
+    }
 
     // Build table rows
     tbody.innerHTML = filtered.map(function(p) {
@@ -177,21 +206,38 @@
         });
 
       case 'TOP_RAIDER':
-        // Sort by attack type, then rank within type
+        // Sort by attack type, then CP descending (strongest first)
         return pokemon.slice().sort(function(a, b) {
           var aType = a.triage.attackType || 'ZZZ';
           var bType = b.triage.attackType || 'ZZZ';
           if (aType !== bType) {
             return aType.localeCompare(bType);
           }
-          return (a.triage.typeRank || 99) - (b.triage.typeRank || 99);
+          // Within same type, sort by CP descending
+          return (b.cp || 0) - (a.cp || 0);
         });
 
       case 'TOP_PVP':
-        // Sort by league rank ascending (best first)
+        // Sort by league, then by readiness, then by PvP rank
         return pokemon.slice().sort(function(a, b) {
-          var aRank = a.triage.leagueRank || 9999;
-          var bRank = b.triage.leagueRank || 9999;
+          // Group by league first
+          var aLeague = a.triage.league || 'ZZZ';
+          var bLeague = b.triage.league || 'ZZZ';
+          var leagueOrder = { 'Great': 1, 'Ultra': 2, 'Master': 3 };
+          var aLeagueOrder = leagueOrder[aLeague] || 99;
+          var bLeagueOrder = leagueOrder[bLeague] || 99;
+          if (aLeagueOrder !== bLeagueOrder) {
+            return aLeagueOrder - bLeagueOrder;
+          }
+          // Then by readiness (ready first)
+          var aReady = (a.triage.readiness || '').includes('ready') ? 0 : 1;
+          var bReady = (b.triage.readiness || '').includes('ready') ? 0 : 1;
+          if (aReady !== bReady) {
+            return aReady - bReady;
+          }
+          // Then by PvP rank (lower is better)
+          var aRank = a.triage.pvpRank || a.triage.leagueRank || 9999;
+          var bRank = b.triage.pvpRank || b.triage.leagueRank || 9999;
           return aRank - bRank;
         });
 
@@ -304,6 +350,119 @@
         document.getElementById('filterVerdict').value = filter;
         applyFilters();
       });
+    });
+  }
+
+  // ============================================
+  // Sortable Headers
+  // ============================================
+
+  function initSortableHeaders() {
+    const headers = document.querySelectorAll('th.sortable');
+    headers.forEach(function(header) {
+      header.addEventListener('click', function() {
+        const column = header.dataset.sort;
+        handleSort(column);
+      });
+    });
+  }
+
+  function handleSort(column) {
+    // Toggle direction if same column, otherwise default to desc for numbers, asc for text
+    if (currentSort.column === column) {
+      currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSort.column = column;
+      // Default to descending for CP/IV (highest first), ascending for name/verdict
+      currentSort.direction = (column === 'cp' || column === 'ivPercent') ? 'desc' : 'asc';
+    }
+
+    updateSortHeaderUI();
+    applyFilters(); // Re-render with new sort
+  }
+
+  function updateSortHeaderUI() {
+    const headers = document.querySelectorAll('th.sortable');
+    headers.forEach(function(header) {
+      header.classList.remove('sort-asc', 'sort-desc');
+      if (header.dataset.sort === currentSort.column) {
+        header.classList.add('sort-' + currentSort.direction);
+      }
+    });
+  }
+
+  function sortPokemon(pokemon) {
+    if (!currentSort.column) return pokemon;
+
+    const column = currentSort.column;
+    const direction = currentSort.direction;
+    const multiplier = direction === 'asc' ? 1 : -1;
+
+    return pokemon.slice().sort(function(a, b) {
+      var valueA, valueB;
+
+      switch (column) {
+        case 'name':
+          valueA = (a.name || '').toLowerCase();
+          valueB = (b.name || '').toLowerCase();
+          return multiplier * valueA.localeCompare(valueB);
+
+        case 'cp':
+          valueA = a.cp || 0;
+          valueB = b.cp || 0;
+          return multiplier * (valueA - valueB);
+
+        case 'ivPercent':
+          valueA = a.ivPercent || 0;
+          valueB = b.ivPercent || 0;
+          return multiplier * (valueA - valueB);
+
+        case 'verdict':
+          // Custom order for verdicts
+          var verdictOrder = {
+            'TOP_PVP': 1,
+            'TOP_RAIDER': 2,
+            'TRADE_CANDIDATE': 3,
+            'SAFE_TRANSFER': 4,
+            'KEEP': 5
+          };
+          valueA = verdictOrder[a.triage.verdict] || 99;
+          valueB = verdictOrder[b.triage.verdict] || 99;
+          return multiplier * (valueA - valueB);
+
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // ============================================
+  // Trade Partner Toggle
+  // ============================================
+
+  function initTradeToggle() {
+    const toggle = document.getElementById('tradeToggle');
+    if (!toggle) return;
+
+    // Load saved preference
+    const saved = localStorage.getItem('pogo-has-trade-partner');
+    if (saved === 'true') {
+      toggle.checked = true;
+      hasTradePartner = true;
+    }
+
+    // Handle changes
+    toggle.addEventListener('change', async function(e) {
+      hasTradePartner = e.target.checked;
+
+      // Save preference
+      localStorage.setItem('pogo-has-trade-partner', hasTradePartner.toString());
+
+      // Re-analyze if we have data
+      if (currentParsedPokemon && currentParsedPokemon.length > 0) {
+        setStatus('Re-analyzing with new settings...', 'loading');
+        await analyzeAndRender();
+      }
     });
   }
 
@@ -433,9 +592,10 @@
         var emoji = getTypeEmoji(type);
         text += '\n' + emoji + ' ' + type + ':\n';
         byType[type]
-          .sort(function(a, b) { return (a.triage.typeRank || 99) - (b.triage.typeRank || 99); })
-          .forEach(function(p) {
-            text += '  ' + p.triage.typeRank + '. ' + p.name + ' CP ' + p.cp + ' (' + p.atkIv + '/' + p.defIv + '/' + p.staIv + ')\n';
+          .sort(function(a, b) { return (b.cp || 0) - (a.cp || 0); }) // Sort by CP descending
+          .forEach(function(p, i) {
+            var tier = p.triage.powerTier || 'usable';
+            text += '  ' + (i + 1) + '. ' + p.name + ' CP ' + p.cp + ' (' + p.atkIv + '/' + p.defIv + '/' + p.staIv + ') - ' + tier + '\n';
           });
       });
     }
@@ -448,27 +608,53 @@
     text += 'Your best Pokemon for GO Battle League:\n';
 
     if (topPvp.length === 0) {
-      text += '\n  (none identified with strong PvP IVs)\n';
+      text += '\n  (none identified - need final evolutions in league CP ranges)\n';
     } else {
       // Group by league
       var glPokemon = topPvp.filter(function(p) { return p.triage.league === 'Great'; });
       var ulPokemon = topPvp.filter(function(p) { return p.triage.league === 'Ultra'; });
+      var mlPokemon = topPvp.filter(function(p) { return p.triage.league === 'Master'; });
 
       if (glPokemon.length > 0) {
-        text += '\nGreat League (under 1500 CP):\n';
+        text += '\nGreat League (1000-1500 CP):\n';
         glPokemon
-          .sort(function(a, b) { return a.triage.leagueRank - b.triage.leagueRank; })
+          .sort(function(a, b) {
+            // Ready first, then by rank
+            var aReady = (a.triage.readiness || '').includes('ready') ? 0 : 1;
+            var bReady = (b.triage.readiness || '').includes('ready') ? 0 : 1;
+            if (aReady !== bReady) return aReady - bReady;
+            return (a.triage.pvpRank || 9999) - (b.triage.pvpRank || 9999);
+          })
           .forEach(function(p, i) {
-            text += '  ' + (i + 1) + '. ' + p.name + ' - Rank #' + p.triage.leagueRank + ' (' + p.atkIv + '/' + p.defIv + '/' + p.staIv + ')\n';
+            var rankStr = p.triage.pvpRank ? 'Rank #' + p.triage.pvpRank : '';
+            var readiness = p.triage.readiness || '';
+            text += '  ' + (i + 1) + '. ' + p.name + ' CP ' + p.cp + ' - ' + readiness + (rankStr ? ' ' + rankStr : '') + '\n';
           });
       }
 
       if (ulPokemon.length > 0) {
-        text += '\nUltra League (under 2500 CP):\n';
+        text += '\nUltra League (1500-2500 CP):\n';
         ulPokemon
-          .sort(function(a, b) { return a.triage.leagueRank - b.triage.leagueRank; })
+          .sort(function(a, b) {
+            var aReady = (a.triage.readiness || '').includes('ready') ? 0 : 1;
+            var bReady = (b.triage.readiness || '').includes('ready') ? 0 : 1;
+            if (aReady !== bReady) return aReady - bReady;
+            return (a.triage.pvpRank || 9999) - (b.triage.pvpRank || 9999);
+          })
           .forEach(function(p, i) {
-            text += '  ' + (i + 1) + '. ' + p.name + ' - Rank #' + p.triage.leagueRank + ' (' + p.atkIv + '/' + p.defIv + '/' + p.staIv + ')\n';
+            var rankStr = p.triage.pvpRank ? 'Rank #' + p.triage.pvpRank : '';
+            var readiness = p.triage.readiness || '';
+            text += '  ' + (i + 1) + '. ' + p.name + ' CP ' + p.cp + ' - ' + readiness + (rankStr ? ' ' + rankStr : '') + '\n';
+          });
+      }
+
+      if (mlPokemon.length > 0) {
+        text += '\nMaster League (2500+ CP):\n';
+        mlPokemon
+          .sort(function(a, b) { return (b.cp || 0) - (a.cp || 0); })
+          .forEach(function(p, i) {
+            var readiness = p.triage.readiness || '';
+            text += '  ' + (i + 1) + '. ' + p.name + ' CP ' + p.cp + ' - ' + readiness + '\n';
           });
       }
     }
