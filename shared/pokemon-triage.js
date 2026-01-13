@@ -248,23 +248,42 @@
 
   /**
    * Check if a Pokemon is a final evolution (can't evolve further)
+   * Uses Poke Genie data: if evolution target name matches current name, it's final
    */
   function isFinalEvolution(pokemon) {
-    const name = pokemon.name;
+    const name = pokemon.name?.toLowerCase();
+    if (!name) return false;
+
+    // Primary method: Check Poke Genie evolution targets
+    // If the evolution target for any league equals the current name, it's already final
+    const glTarget = pokemon.greatLeague?.name?.toLowerCase();
+    const ulTarget = pokemon.ultraLeague?.name?.toLowerCase();
+    const llTarget = pokemon.littleLeague?.name?.toLowerCase();
+
+    if (glTarget && glTarget === name) return true;
+    if (ulTarget && ulTarget === name) return true;
+    if (llTarget && llTarget === name) return true;
+
+    // Fallback: Check against known lists
+    const originalName = pokemon.name;
     const form = pokemon.form || '';
 
-    // Check direct name match
-    if (FINAL_EVOLUTIONS.includes(name)) return true;
-    if (SINGLE_STAGE_POKEMON.includes(name)) return true;
+    if (FINAL_EVOLUTIONS.includes(originalName)) return true;
+    if (SINGLE_STAGE_POKEMON.includes(originalName)) return true;
 
     // Check with form (e.g., "Alolan Ninetales")
     if (form) {
-      const formName = form.includes('Alolan') ? `Alolan ${name}` :
-                       form.includes('Galarian') ? `Galarian ${name}` :
-                       form.includes('Hisuian') ? `Hisuian ${name}` : null;
+      const formName = form.includes('Alolan') ? `Alolan ${originalName}` :
+                       form.includes('Galarian') ? `Galarian ${originalName}` :
+                       form.includes('Hisuian') ? `Hisuian ${originalName}` : null;
       if (formName && (FINAL_EVOLUTIONS.includes(formName) || SINGLE_STAGE_POKEMON.includes(formName))) {
         return true;
       }
+    }
+
+    // If we have no evolution data at all, check master list
+    if (!glTarget && !ulTarget && !llTarget) {
+      return FINAL_EVOLUTIONS.includes(originalName) || SINGLE_STAGE_POKEMON.includes(originalName);
     }
 
     return false;
@@ -507,172 +526,163 @@
   }
 
   /**
-   * Check if this Pokemon is one of the user's top raiders
-   * NEW: Prioritizes battle-ready Pokemon (final evolution + high CP)
-   * Returns { isTopRaider: bool, type: string, rank: number, reason: string, readiness: string }
+   * Get raid power tier based on CP
    */
-  function getTopRaiderInfo(pokemon, allPokemon) {
-    const attackType = getAttackType(pokemon);
+  function getRaidPowerTier(cp) {
+    if (cp >= 3000) return 'excellent';
+    if (cp >= 2500) return 'great';
+    if (cp >= 2000) return 'good';
+    return 'usable';
+  }
 
-    if (!attackType) {
+  /**
+   * Check if Pokemon is usable for raids
+   * INCLUSIVE - if it can contribute, show it
+   * No artificial limits - all final evolutions with enough CP qualify
+   */
+  function getTopRaiderInfo(pokemon) {
+    // Must be final evolution or single-stage
+    if (!isFinalEvolution(pokemon)) {
       return { isTopRaider: false };
     }
 
-    // Get all Pokemon with this attack type
-    const sameTypeAttackers = allPokemon.filter(p => getAttackType(p) === attackType);
+    const cp = pokemon.cp || 0;
 
-    // Sort by battle-readiness (primary), then Attack IV (secondary), then CP (tertiary)
-    sameTypeAttackers.sort((a, b) => {
-      // First: battle readiness score
-      const aReadiness = calculateRaidReadiness(a);
-      const bReadiness = calculateRaidReadiness(b);
-      if (bReadiness !== aReadiness) return bReadiness - aReadiness;
-
-      // Second: Attack IV
-      const aAtk = a.atkIv !== null ? a.atkIv : -1;
-      const bAtk = b.atkIv !== null ? b.atkIv : -1;
-      if (bAtk !== aAtk) return bAtk - aAtk;
-
-      // Third: CP
-      const aCp = a.cp || 0;
-      const bCp = b.cp || 0;
-      return bCp - aCp;
-    });
-
-    // Find this Pokemon's rank
-    const rank = sameTypeAttackers.findIndex(p => p.id === pokemon.id) + 1;
-
-    if (rank > 0 && rank <= THRESHOLDS.topRaiderCount) {
-      const readiness = getReadinessDescription(pokemon, 'raid');
-      const atkIv = pokemon.atkIv !== null ? pokemon.atkIv : '?';
-      return {
-        isTopRaider: true,
-        type: attackType,
-        rank: rank,
-        reason: `#${rank} ${attackType} attacker (${atkIv} Atk)`,
-        readiness: readiness
-      };
+    // Must have CP high enough to contribute
+    // 1500+ can contribute, 2000+ is solid, 2500+ is great
+    if (cp < 1500) {
+      return { isTopRaider: false };
     }
 
-    return { isTopRaider: false };
+    // Determine attack type from moveset
+    const attackType = getAttackType(pokemon);
+
+    // Get power tier based on CP
+    const powerTier = getRaidPowerTier(cp);
+
+    // Build reason and details
+    const typeDisplay = attackType || 'Mixed';
+    const atkIv = pokemon.atkIv !== null ? pokemon.atkIv : '?';
+    const reason = `${typeDisplay} attacker (${powerTier})`;
+    const details = `${cp} CP, ${atkIv} Atk IV`;
+
+    return {
+      isTopRaider: true,
+      type: attackType,
+      powerTier: powerTier,
+      reason: reason,
+      details: details
+    };
   }
 
   /**
-   * Check if this Pokemon is one of the user's top PvP Pokemon
-   * NEW: Prioritizes battle-ready Pokemon (final evolution + near CP cap)
-   * Returns { isTopPvP: bool, league: string, leagueRank: number, userRank: number, reason: string, details: string, readiness: string }
+   * Determine best PvP league based on CP
+   * More inclusive ranges - if they're close, they qualify
    */
-  function getTopPvPInfo(pokemon, allPokemon) {
-    // Get league rankings
-    const glRank = pokemon.greatLeague?.rank;
-    const ulRank = pokemon.ultraLeague?.rank;
+  function getBestLeagueForCP(cp) {
+    if (!cp) return null;
 
-    // Sort all Pokemon by battle-readiness for GL, then IV rank as tiebreaker
-    const glSorted = allPokemon
-      .filter(p => p.greatLeague?.rank)
-      .sort((a, b) => {
-        const aReadiness = calculatePvPReadiness(a, 'great');
-        const bReadiness = calculatePvPReadiness(b, 'great');
-        if (bReadiness !== aReadiness) return bReadiness - aReadiness;
-        return a.greatLeague.rank - b.greatLeague.rank;
-      });
-
-    const glPosition = glSorted.findIndex(p => p.id === pokemon.id) + 1;
-
-    // Sort all Pokemon by battle-readiness for UL, then IV rank as tiebreaker
-    const ulSorted = allPokemon
-      .filter(p => p.ultraLeague?.rank)
-      .sort((a, b) => {
-        const aReadiness = calculatePvPReadiness(a, 'ultra');
-        const bReadiness = calculatePvPReadiness(b, 'ultra');
-        if (bReadiness !== aReadiness) return bReadiness - aReadiness;
-        return a.ultraLeague.rank - b.ultraLeague.rank;
-      });
-
-    const ulPosition = ulSorted.findIndex(p => p.id === pokemon.id) + 1;
-
-    // Check if top N in either league (prefer league where Pokemon is more battle-ready)
-    const glReadiness = calculatePvPReadiness(pokemon, 'great');
-    const ulReadiness = calculatePvPReadiness(pokemon, 'ultra');
-
-    // Decide which league to show based on readiness, position, and rank
-    let bestLeague = null;
-    let bestPosition = 0;
-    let bestRank = null;
-    let bestReadiness = 0;
-
-    if (glPosition > 0 && glPosition <= THRESHOLDS.topPvpCount && glRank) {
-      bestLeague = 'great';
-      bestPosition = glPosition;
-      bestRank = glRank;
-      bestReadiness = glReadiness;
+    // Great League: 1000-1500
+    if (cp >= 1000 && cp <= 1500) {
+      return 'Great';
     }
 
-    if (ulPosition > 0 && ulPosition <= THRESHOLDS.topPvpCount && ulRank) {
-      // Prefer UL if more battle-ready there, or if not in GL top
-      if (!bestLeague || ulReadiness > bestReadiness) {
-        bestLeague = 'ultra';
-        bestPosition = ulPosition;
-        bestRank = ulRank;
-        bestReadiness = ulReadiness;
-      }
+    // Ultra League: 1800-2500
+    if (cp >= 1800 && cp <= 2500) {
+      return 'Ultra';
     }
 
-    if (bestLeague) {
-      const leagueName = bestLeague === 'great' ? 'Great' : 'Ultra';
-      const readiness = getReadinessDescription(pokemon, 'pvp', bestLeague);
-      const isFinal = isFinalEvolution(pokemon);
-      const cp = pokemon.cp || 0;
-      const cpLimits = bestLeague === 'great' ? BATTLE_READY_CP.greatLeague : BATTLE_READY_CP.ultraLeague;
-
-      // Build reason string - highlight if battle-ready
-      let reason;
-      if (isFinal && cp >= cpLimits.min) {
-        reason = `#${bestPosition} ${leagueName} League (ready!)`;
-      } else if (isFinal) {
-        reason = `#${bestPosition} ${leagueName} League (needs CP)`;
-      } else {
-        reason = `#${bestPosition} ${leagueName} (needs evolve)`;
-      }
-
-      const percentile = ((4096 - bestRank) / 4096 * 100).toFixed(1);
-      let details = `Rank #${bestRank} IVs (top ${percentile}%). `;
-      details += readiness + '.';
-
-      return {
-        isTopPvP: true,
-        league: leagueName,
-        leagueRank: bestRank,
-        userRank: bestPosition,
-        reason: reason,
-        details: details,
-        readiness: readiness
-      };
+    // Master League: 2500+ (no cap)
+    if (cp > 2500) {
+      return 'Master';
     }
 
-    return { isTopPvP: false };
+    // Pokemon between 1500-1800 could go either way
+    // Put them in Ultra since they'd need powering up anyway
+    if (cp > 1500 && cp < 1800) {
+      return 'Ultra';
+    }
+
+    // Below 1000 - not really usable without significant investment
+    return null;
   }
 
   /**
-   * Check if Pokemon is strictly dominated by another of the same species
-   * (Another has equal-or-better IVs in ALL stats AND at least one strictly better)
+   * Get human-readable PvP readiness status
    */
-  function findDominatingPokemon(pokemon, sameSpecies) {
-    return sameSpecies.find(other =>
-      other.id !== pokemon.id &&
-      other.atkIv !== null && pokemon.atkIv !== null &&
-      other.defIv !== null && pokemon.defIv !== null &&
-      other.staIv !== null && pokemon.staIv !== null &&
-      other.atkIv >= pokemon.atkIv &&
-      other.defIv >= pokemon.defIv &&
-      other.staIv >= pokemon.staIv &&
-      (other.level || 1) >= (pokemon.level || 1) &&
-      // At least one stat must be STRICTLY better
-      (other.atkIv > pokemon.atkIv ||
-       other.defIv > pokemon.defIv ||
-       other.staIv > pokemon.staIv ||
-       (other.level || 1) > (pokemon.level || 1))
-    );
+  function getPvPReadinessStatus(cp, league) {
+    if (league === 'Great') {
+      if (cp >= 1400 && cp <= 1500) return 'ready!';
+      if (cp >= 1300 && cp < 1400) return 'almost ready';
+      return 'needs CP';
+    }
+
+    if (league === 'Ultra') {
+      if (cp >= 2400 && cp <= 2500) return 'ready!';
+      if (cp >= 2200 && cp < 2400) return 'almost ready';
+      return 'needs CP';
+    }
+
+    if (league === 'Master') {
+      if (cp >= 3000) return 'ready!';
+      if (cp >= 2700) return 'almost ready';
+      return 'needs CP';
+    }
+
+    return 'needs CP';
+  }
+
+  /**
+   * Check if Pokemon is usable for PvP
+   * INCLUSIVE - shows everything that COULD be used
+   * No "top X" limit - if it fits criteria, it qualifies
+   */
+  function getTopPvPInfo(pokemon) {
+    // Must be final evolution or single-stage
+    if (!isFinalEvolution(pokemon)) {
+      return { isTopPvP: false };
+    }
+
+    const cp = pokemon.cp || 0;
+
+    // Determine which league this Pokemon fits based on CP
+    const league = getBestLeagueForCP(cp);
+
+    if (!league) {
+      return { isTopPvP: false };
+    }
+
+    // Get readiness status
+    const readiness = getPvPReadinessStatus(cp, league);
+
+    // Get PvP rank from Poke Genie data if available
+    let pvpRank = null;
+    if (league === 'Great' && pokemon.greatLeague?.rank) {
+      pvpRank = pokemon.greatLeague.rank;
+    } else if (league === 'Ultra' && pokemon.ultraLeague?.rank) {
+      pvpRank = pokemon.ultraLeague.rank;
+    }
+    // Master league doesn't use rank the same way
+
+    const rankDisplay = pvpRank ? `Rank #${pvpRank}` : '';
+    const percentile = pvpRank ? ((4096 - pvpRank) / 4096 * 100).toFixed(1) : null;
+
+    // Build reason and details
+    const reason = `${league} League (${readiness})`;
+    let details = '';
+    if (rankDisplay) {
+      details = `${rankDisplay} IVs (top ${percentile}%). `;
+    }
+    details += `${cp} CP ${pokemon.name}.`;
+
+    return {
+      isTopPvP: true,
+      league: league,
+      readiness: readiness,
+      pvpRank: pvpRank,
+      reason: reason,
+      details: details
+    };
   }
 
   // ============================================
@@ -939,122 +949,171 @@
   }
 
   /**
-   * Main triage function for a single Pokemon
-   * NEW Philosophy: Keep most things, only flag clear actions
+   * Check if this Pokemon is dominated by another copy you own
+   * A Pokemon is "dominated" if you have another of same species with:
+   * - Higher CP AND higher/equal IV%
+   * - OR same CP but significantly higher IV%
    */
-  function triagePokemon(pokemon, collection) {
+  function isDominatedDuplicate(pokemon, allPokemon) {
+    // Find all Pokemon of same species
+    const sameName = allPokemon.filter(p =>
+      p.name === pokemon.name &&
+      (p.form || '') === (pokemon.form || '') &&
+      p.id !== pokemon.id  // Not itself
+    );
+
+    if (sameName.length === 0) {
+      return { isDominated: false };
+    }
+
+    const myIvPercent = calculateIvPercent(pokemon) || 0;
+    const myCp = pokemon.cp || 0;
+
+    // Check if any copy is strictly better
+    const betterCopy = sameName.find(other => {
+      const otherIvPercent = calculateIvPercent(other) || 0;
+      const otherCp = other.cp || 0;
+
+      // Dominated if other has higher CP AND equal-or-better IVs
+      // OR same CP but significantly higher IV%
+      return (
+        (otherCp > myCp && otherIvPercent >= myIvPercent) ||
+        (otherCp >= myCp && otherIvPercent > myIvPercent + 10)
+      );
+    });
+
+    if (betterCopy) {
+      return {
+        isDominated: true,
+        betterCopy: betterCopy
+      };
+    }
+
+    return { isDominated: false };
+  }
+
+  /**
+   * Check if Pokemon is low value (bad IVs, not useful)
+   */
+  function isLowValuePokemon(pokemon) {
+    const ivPercent = calculateIvPercent(pokemon) || 0;
+
+    // Terrible IVs
+    if (ivPercent < THRESHOLDS.lowIvPercent) {
+      return {
+        isLow: true,
+        reason: `Low IVs (${ivPercent.toFixed(0)}%)`,
+        details: `${pokemon.atkIv}/${pokemon.defIv}/${pokemon.staIv} IVs is below average.`
+      };
+    }
+
+    // Common trash with below-average IVs
+    if (COMMON_TRASH_SPECIES.includes(pokemon.name) && ivPercent < THRESHOLDS.commonTrashIvPercent) {
+      return {
+        isLow: true,
+        reason: 'Common Pokemon with below-average IVs',
+        details: `${pokemon.name} is very common. These IVs aren't worth keeping.`
+      };
+    }
+
+    return { isLow: false };
+  }
+
+  /**
+   * Main triage function for a single Pokemon
+   * @param {Object} pokemon - The Pokemon to triage
+   * @param {Array} collection - All Pokemon in the collection
+   * @param {boolean} hasTradePartner - Whether user has a trade partner
+   */
+  function triagePokemon(pokemon, collection, hasTradePartner = false) {
     // Step 1: Check if this is a "special" Pokemon (never auto-transfer)
     const isSpecial = pokemon.isShiny || pokemon.isLucky || pokemon.isFavorite;
     const isShadowOrPurified = pokemon.isShadow || pokemon.isPurified;
 
-    // Calculate IV percent if not already present
-    const ivPercent = calculateIvPercent(pokemon) || 0;
-
-    // Step 2: Find all Pokemon of the same species in collection
-    const sameSpecies = collection.filter(p =>
-      p.pokedexNumber === pokemon.pokedexNumber &&
-      p.name === pokemon.name &&
-      (p.form || '') === (pokemon.form || '')
-    );
-
-    // Step 3: Check if this Pokemon is "strictly dominated" by another
-    const dominator = findDominatingPokemon(pokemon, sameSpecies);
-    const isDominated = dominator !== undefined && dominator !== null;
-
-    // Step 4: Check for Top Raider status
-    const raiderInfo = getTopRaiderInfo(pokemon, collection);
+    // Step 2: Check for Top Raider status (uses new inclusive logic)
+    const raiderInfo = getTopRaiderInfo(pokemon);
     if (raiderInfo.isTopRaider) {
-      let details = `One of your best ${raiderInfo.type}-type attackers for raids. `;
-      details += raiderInfo.readiness + '.';
+      const typeDisplay = raiderInfo.type || 'Mixed';
       return {
         verdict: VERDICTS.TOP_RAIDER,
         reason: raiderInfo.reason,
-        details: details,
+        details: raiderInfo.details,
         attackType: raiderInfo.type,
-        typeRank: raiderInfo.rank,
-        readiness: raiderInfo.readiness
+        powerTier: raiderInfo.powerTier
       };
     }
 
-    // Step 5: Check for Top PvP status
-    const pvpInfo = getTopPvPInfo(pokemon, collection);
+    // Step 3: Check for Top PvP status (uses new inclusive logic)
+    const pvpInfo = getTopPvPInfo(pokemon);
     if (pvpInfo.isTopPvP) {
       return {
         verdict: VERDICTS.TOP_PVP,
         reason: pvpInfo.reason,
         details: pvpInfo.details,
         league: pvpInfo.league,
-        leagueRank: pvpInfo.leagueRank,
+        pvpRank: pvpInfo.pvpRank,
         readiness: pvpInfo.readiness
       };
     }
 
-    // Step 6: SAFE_TRANSFER checks (only for non-special Pokemon)
-    if (!isSpecial && !isShadowOrPurified) {
+    // Step 4: Check for duplicates
+    const dominated = isDominatedDuplicate(pokemon, collection);
 
-      // Check if strictly dominated by another
-      if (isDominated) {
-        return {
-          verdict: VERDICTS.SAFE_TRANSFER,
-          reason: `You have a better ${pokemon.name}`,
-          details: `Your other ${pokemon.name} has ${dominator.atkIv}/${dominator.defIv}/${dominator.staIv} IVs at level ${dominator.level || '?'}. This one has ${pokemon.atkIv}/${pokemon.defIv}/${pokemon.staIv} at level ${pokemon.level || '?'}.`
-        };
-      }
+    if (dominated.isDominated) {
+      // This is a worse copy of something we have
+      const betterCp = dominated.betterCopy.cp || '?';
 
-      // Check for terrible IVs
-      if (ivPercent < THRESHOLDS.lowIvPercent) {
-        return {
-          verdict: VERDICTS.SAFE_TRANSFER,
-          reason: `Low IVs (${ivPercent.toFixed(0)}%)`,
-          details: `${pokemon.atkIv}/${pokemon.defIv}/${pokemon.staIv} IVs is below average. Not shiny, lucky, or shadow.`
-        };
-      }
-
-      // Check for common trash with below-average IVs
-      if (COMMON_TRASH_SPECIES.includes(pokemon.name) && ivPercent < THRESHOLDS.commonTrashIvPercent) {
-        return {
-          verdict: VERDICTS.SAFE_TRANSFER,
-          reason: 'Common Pokemon with below-average IVs',
-          details: `${pokemon.name} is very common. These ${pokemon.atkIv}/${pokemon.defIv}/${pokemon.staIv} IVs aren't worth keeping.`
-        };
-      }
-    }
-
-    // Step 7: TRADE_CANDIDATE checks
-
-    // Shadow Pokemon that is dominated (valuable to others)
-    if (pokemon.isShadow && isDominated) {
-      return {
-        verdict: VERDICTS.TRADE_CANDIDATE,
-        reason: 'Shadow duplicate - valuable to traders',
-        details: 'Shadow Pokemon deal 20% more damage. Someone else might want this one.'
-      };
-    }
-
-    // Decent duplicate (both 70%+ IVs)
-    if (sameSpecies.length > 1 && ivPercent >= THRESHOLDS.decentIvPercent) {
-      const otherDecent = sameSpecies.find(other =>
-        other.id !== pokemon.id && (calculateIvPercent(other) || 0) >= THRESHOLDS.decentIvPercent
-      );
-      if (otherDecent) {
+      if (hasTradePartner) {
+        // With trade partner: offer for trade instead of transfer
         return {
           verdict: VERDICTS.TRADE_CANDIDATE,
-          reason: 'Decent duplicate - lucky trade could improve',
-          details: `You have ${sameSpecies.length} ${pokemon.name}. Trading one might get you a lucky version with guaranteed 12/12/12+ IVs.`
+          reason: 'Duplicate - trade for IV reroll?',
+          details: `You have a better ${pokemon.name} (${betterCp} CP). Trade this one for a chance at better IVs.`
+        };
+      } else if (!isSpecial && !isShadowOrPurified) {
+        // No trade partner: safe to transfer (unless special)
+        return {
+          verdict: VERDICTS.SAFE_TRANSFER,
+          reason: 'Duplicate - you have better',
+          details: `Keep your ${betterCp} CP ${pokemon.name} instead.`
         };
       }
     }
 
-    // High CP non-raider (good for trade candy)
-    if (pokemon.cp >= 2000 && !raiderInfo.isTopRaider) {
-      return {
-        verdict: VERDICTS.TRADE_CANDIDATE,
-        reason: 'High CP - good candy bonus from trade',
-        details: `Trading high-CP Pokemon gives extra candy. This ${pokemon.name} isn't one of your top raiders anyway.`
-      };
+    // Step 5: Check for low value Pokemon (only if not special)
+    if (!isSpecial && !isShadowOrPurified) {
+      const lowValue = isLowValuePokemon(pokemon);
+      if (lowValue.isLow) {
+        return {
+          verdict: VERDICTS.SAFE_TRANSFER,
+          reason: lowValue.reason,
+          details: lowValue.details
+        };
+      }
     }
 
-    // Step 8: Default - KEEP
+    // Step 6: TRADE_CANDIDATE checks (only if has trade partner)
+    if (hasTradePartner) {
+      // Shadow Pokemon (valuable to others)
+      if (pokemon.isShadow) {
+        return {
+          verdict: VERDICTS.TRADE_CANDIDATE,
+          reason: 'Shadow Pokemon - valuable to traders',
+          details: 'Shadow Pokemon deal 20% more damage. Someone might want this one.'
+        };
+      }
+
+      // High CP Pokemon (good for trade candy)
+      if (pokemon.cp >= 2000) {
+        return {
+          verdict: VERDICTS.TRADE_CANDIDATE,
+          reason: 'High CP - good candy bonus from trade',
+          details: `Trading high-CP Pokemon gives extra candy.`
+        };
+      }
+    }
+
+    // Step 7: Default - KEEP
     return {
       verdict: VERDICTS.KEEP,
       reason: 'Fine to keep',
@@ -1064,8 +1123,13 @@
 
   /**
    * Triage entire collection
+   * @param {Array} pokemonList - List of Pokemon to triage
+   * @param {Object} options - Options object
+   * @param {boolean} options.hasTradePartner - Whether user has a trade partner
    */
-  async function triageCollection(pokemonList) {
+  async function triageCollection(pokemonList, options = {}) {
+    const hasTradePartner = options.hasTradePartner || false;
+
     await loadMetaData();
 
     if (!metaData) {
@@ -1088,7 +1152,7 @@
 
     const results = pokemonList.map(pokemon => ({
       ...pokemon,
-      triage: triagePokemon(pokemon, pokemonList)
+      triage: triagePokemon(pokemon, pokemonList, hasTradePartner)
     }));
 
     const summary = {
