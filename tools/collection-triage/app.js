@@ -169,10 +169,11 @@
     document.getElementById('countAll').textContent = summary.total;
   }
 
-  function renderTable(pokemon, filter, opponentType, pvpFilters) {
+  function renderTable(pokemon, filter, opponentType, pvpFilters, leagueFilter) {
     filter = filter || 'all';
     opponentType = opponentType || '';
     pvpFilters = pvpFilters || null;
+    leagueFilter = leagueFilter || '';
     const tbody = document.getElementById('resultsBody');
 
     // Filter Pokemon by verdict
@@ -180,6 +181,15 @@
     if (filter !== 'all') {
       filtered = pokemon.filter(function(p) {
         return p.triage.verdict === filter;
+      });
+    }
+
+    // Apply league filter (CP-based filtering for My Teams tab)
+    if (leagueFilter && LEAGUE_PRESETS[leagueFilter]) {
+      var preset = LEAGUE_PRESETS[leagueFilter];
+      filtered = filtered.filter(function(p) {
+        var cp = p.cp || 0;
+        return cp >= preset.min && cp <= preset.max;
       });
     }
 
@@ -923,6 +933,7 @@
     var verdictFilter = document.getElementById('filterVerdict').value;
     var opponentType = document.getElementById('filterOpponentType').value;
     var searchFilter = document.getElementById('searchInput').value.toLowerCase().trim();
+    var leagueFilter = document.getElementById('filterLeague').value;
 
     // Collect PvP filters if on Top PvP view
     var pvpFilters = null;
@@ -939,7 +950,7 @@
     }
 
     // Re-render table with new filters
-    renderTable(currentResults.pokemon, verdictFilter, opponentType, pvpFilters);
+    renderTable(currentResults.pokemon, verdictFilter, opponentType, pvpFilters, leagueFilter);
 
     // Apply search filter on top if present
     if (searchFilter) {
