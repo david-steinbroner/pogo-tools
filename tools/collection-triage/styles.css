@@ -137,6 +137,47 @@ body {
   background: rgba(6, 99, 199, 0.08);
 }
 
+/* Header right section */
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-mode-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  position: relative;
+  background: var(--silver);
+  border-radius: 6px;
+  border: 1px solid var(--grey-blue);
+}
+
+.header-mode-selector:hover {
+  background: var(--white);
+}
+
+.header-mode-current {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.header-mode-chevron {
+  font-size: 10px;
+  color: var(--grey-l);
+}
+
+.header-mode-selector .mode-dropdown {
+  right: 0;
+  left: auto;
+  top: 100%;
+  margin-top: 4px;
+}
+
 /* Upload Section (visible before upload) */
 .upload-section {
   flex: 1;
@@ -831,8 +872,8 @@ button.primary:hover {
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--white);
+  border: 1px solid var(--grey-blue);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   z-index: 1000;
@@ -882,6 +923,7 @@ button.primary:hover {
   padding: 8px 12px;
   cursor: grab;
   user-select: none;
+  touch-action: none;
 }
 
 .column-setting-item:hover {
@@ -898,10 +940,17 @@ button.primary:hover {
 }
 
 .column-drag-handle {
-  color: var(--text-tertiary);
+  color: var(--grey-l);
   font-size: 14px;
   cursor: grab;
-  padding: 0 4px;
+  padding: 12px 8px;
+  margin: -8px -4px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
 }
 
 .column-setting-item input[type="checkbox"] {
@@ -1021,6 +1070,44 @@ th.sortable.sort-desc .sort-indicator {
   color: #6b7280;
   padding: 40px 20px !important;
   font-style: italic;
+}
+
+/* Coming Soon Container */
+.coming-soon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  background: var(--white);
+  border: 1px solid var(--grey-blue);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.coming-soon-container[hidden] {
+  display: none;
+}
+
+.coming-soon-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.coming-soon-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--black);
+  margin: 0 0 8px 0;
+}
+
+.coming-soon-desc {
+  font-size: 14px;
+  color: var(--grey);
+  max-width: 320px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .results-table tr[hidden] {
@@ -1511,8 +1598,7 @@ footer a:hover {
     border-right: none;
   }
 
-  /* Mobile table columns */
-  .col-type,
+  /* Mobile table columns - type controlled by column config */
   .col-tier,
   .col-league {
     display: none;

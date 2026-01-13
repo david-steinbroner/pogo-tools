@@ -392,8 +392,8 @@
         return POKEMON_TYPES[formKey];
       }
     }
-    // Fall back to base name
-    return POKEMON_TYPES[name] || null;
+    // Fall back to base name, or 'Unknown' if not found
+    return POKEMON_TYPES[name] || ['Unknown'];
   }
 
   // Column configuration for table
@@ -541,7 +541,7 @@
     // Reset mode to casual
     currentMode = 'casual';
     var modeSelector = document.getElementById('modeSelector');
-    if (modeSelector) modeSelector.textContent = 'Casual mode';
+    if (modeSelector) modeSelector.textContent = 'Casual';
 
     // Reset segment to transfer-trade
     var segmentBtns = document.querySelectorAll('.segment-btn');
@@ -1267,6 +1267,13 @@
   function initSegmentedControl() {
     var segmentBtns = document.querySelectorAll('.segment-btn');
     var cards = document.querySelectorAll('.summary-card[data-segment]');
+    var comingSoonContainer = document.getElementById('comingSoonContainer');
+    var cardsGrid = document.getElementById('summaryCards');
+    var tableContainer = document.querySelector('.results-table-container');
+    var resultsHeader = document.querySelector('.results-header');
+    var teamFilters = document.getElementById('teamFilters');
+    var tradeToggle = document.getElementById('tradePartnerToggle');
+    var filtersDiv = document.getElementById('filters');
 
     segmentBtns.forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -1279,6 +1286,26 @@
         // Clear any card selections when switching segments
         clearCardSelections();
 
+        // Handle Transfer/Trade coming soon state
+        if (segment === 'transfer-trade') {
+          // Show coming soon, hide cards and table
+          if (comingSoonContainer) comingSoonContainer.hidden = false;
+          if (cardsGrid) cardsGrid.style.display = 'none';
+          if (tableContainer) tableContainer.style.display = 'none';
+          if (resultsHeader) resultsHeader.style.display = 'none';
+          if (teamFilters) teamFilters.hidden = true;
+          if (tradeToggle) tradeToggle.classList.remove('visible');
+          if (filtersDiv) filtersDiv.style.display = 'none';
+          return; // Exit early, don't process filters
+        }
+
+        // Hide coming soon, show cards and table for other segments
+        if (comingSoonContainer) comingSoonContainer.hidden = true;
+        if (cardsGrid) cardsGrid.style.display = '';
+        if (tableContainer) tableContainer.style.display = '';
+        if (resultsHeader) resultsHeader.style.display = '';
+        if (filtersDiv) filtersDiv.style.display = '';
+
         // Show/hide cards based on segment
         cards.forEach(function(card) {
           if (card.dataset.segment === segment) {
@@ -1290,22 +1317,15 @@
 
         // Set default filter for segment
         var filterVerdict = document.getElementById('filterVerdict');
-        if (segment === 'transfer-trade') {
-          filterVerdict.value = 'SAFE_TRANSFER';
-        } else if (segment === 'my-teams') {
+        if (segment === 'my-teams') {
           filterVerdict.value = 'TOP_RAIDER';
         } else {
           filterVerdict.value = 'all';
         }
 
-        // Show/hide trade toggle based on segment
-        var tradeToggle = document.getElementById('tradePartnerToggle');
+        // Hide trade toggle for non-transfer-trade segments
         if (tradeToggle) {
-          if (segment === 'transfer-trade') {
-            tradeToggle.classList.add('visible');
-          } else {
-            tradeToggle.classList.remove('visible');
-          }
+          tradeToggle.classList.remove('visible');
         }
 
         // Update team filters visibility (depends on segment AND card selection)
@@ -1583,13 +1603,17 @@
     const saved = localStorage.getItem('pogo-triage-mode');
     if (saved === 'optimization') {
       currentMode = 'optimization';
-      selector.textContent = 'Optimization mode';
+      selector.textContent = 'Optimization';
       document.querySelector('.mode-option[data-mode="casual"]').classList.remove('active');
       document.querySelector('.mode-option[data-mode="optimization"]').classList.add('active');
     }
 
+    // Get the wrapper element
+    const wrapper = document.getElementById('headerModeSelector');
+    if (!wrapper) return;
+
     // Toggle dropdown on click
-    selector.parentElement.addEventListener('click', function(e) {
+    wrapper.addEventListener('click', function(e) {
       e.stopPropagation();
       dropdown.hidden = !dropdown.hidden;
     });
@@ -1608,7 +1632,7 @@
         btn.classList.add('active');
 
         // Update selector text
-        selector.textContent = mode === 'casual' ? 'Casual mode' : 'Optimization mode';
+        selector.textContent = mode === 'casual' ? 'Casual' : 'Optimization';
         dropdown.hidden = true;
 
         // Save preference
@@ -1766,7 +1790,12 @@
     var draggedItem = null;
     var draggedIndex = null;
 
+    // Touch drag state
+    var touchedItem = null;
+    var touchedIndex = null;
+
     list.querySelectorAll('.column-setting-item[draggable="true"]').forEach(function(item) {
+      // Desktop drag events
       item.addEventListener('dragstart', function(e) {
         draggedItem = item;
         draggedIndex = parseInt(item.dataset.index);
@@ -1816,6 +1845,67 @@
         renderColumnSettings();
         renderTable();
       });
+
+      // Touch events for mobile
+      var handle = item.querySelector('.column-drag-handle');
+      if (handle) {
+        handle.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          touchedItem = item;
+          touchedIndex = parseInt(item.dataset.index);
+          item.classList.add('dragging');
+        }, { passive: false });
+
+        handle.addEventListener('touchmove', function(e) {
+          if (!touchedItem) return;
+          e.preventDefault();
+
+          var touch = e.touches[0];
+          var elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+          var targetItem = elemBelow ? elemBelow.closest('.column-setting-item') : null;
+
+          // Clear all drag-over states
+          list.querySelectorAll('.column-setting-item').forEach(function(i) {
+            i.classList.remove('drag-over');
+          });
+
+          if (targetItem && targetItem !== touchedItem && !targetItem.classList.contains('locked')) {
+            var targetIndex = parseInt(targetItem.dataset.index);
+            if (!(targetIndex === 0 && columnConfig[0].locked)) {
+              targetItem.classList.add('drag-over');
+            }
+          }
+        }, { passive: false });
+
+        handle.addEventListener('touchend', function(e) {
+          if (!touchedItem) return;
+
+          var touch = e.changedTouches[0];
+          var elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+          var targetItem = elemBelow ? elemBelow.closest('.column-setting-item') : null;
+
+          if (targetItem && targetItem !== touchedItem && !targetItem.classList.contains('locked')) {
+            var targetIndex = parseInt(targetItem.dataset.index);
+            if (!(targetIndex === 0 && columnConfig[0].locked)) {
+              // Reorder
+              var moved = columnConfig.splice(touchedIndex, 1)[0];
+              columnConfig.splice(targetIndex, 0, moved);
+
+              saveColumnConfig();
+              renderColumnSettings();
+              renderTable();
+            }
+          }
+
+          // Cleanup
+          touchedItem.classList.remove('dragging');
+          list.querySelectorAll('.column-setting-item').forEach(function(i) {
+            i.classList.remove('drag-over');
+          });
+          touchedItem = null;
+          touchedIndex = null;
+        });
+      }
     });
   }
 

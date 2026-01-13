@@ -17,12 +17,29 @@
         <span class="app-header-title">PoGO Tools</span>
         <span class="app-header-status" id="headerStatus">0 Pokémon loaded</span>
       </div>
-      <button type="button" class="new-upload-btn" id="newUploadBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-        </svg>
-        <span>New upload</span>
-      </button>
+      <div class="app-header-right">
+        <!-- Mode dropdown -->
+        <div class="header-mode-selector" id="headerModeSelector">
+          <span class="header-mode-current" id="modeSelector">Casual</span>
+          <span class="header-mode-chevron">▾</span>
+          <div class="mode-dropdown" id="modeDropdown" hidden>
+            <button type="button" class="mode-option active" data-mode="casual">
+              <span class="mode-option-title">Casual</span>
+              <span class="mode-option-desc">Keep highest IV% per species</span>
+            </button>
+            <button type="button" class="mode-option" data-mode="optimization">
+              <span class="mode-option-title">Optimization</span>
+              <span class="mode-option-desc">Keep top raid/PvP performers only</span>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="new-upload-btn" id="newUploadBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          <span>New upload</span>
+        </button>
+      </div>
     </header>
 
     <!-- Full upload section (visible before upload) -->
@@ -39,21 +56,6 @@
 
     <!-- Results section -->
     <main class="results-section" id="resultsSection">
-      <div class="mode-selector">
-        <span class="mode-current" id="modeSelector">Casual mode</span>
-        <span class="mode-chevron">▾</span>
-        <div class="mode-dropdown" id="modeDropdown" hidden>
-          <button type="button" class="mode-option active" data-mode="casual">
-            <span class="mode-option-title">Casual</span>
-            <span class="mode-option-desc">Keep highest IV% per species</span>
-          </button>
-          <button type="button" class="mode-option" data-mode="optimization">
-            <span class="mode-option-title">Optimization</span>
-            <span class="mode-option-desc">Keep top raid/PvP performers only</span>
-          </button>
-        </div>
-      </div>
-
       <div class="segmented-control" id="segmentedControl">
         <button type="button" class="segment-btn active" data-segment="transfer-trade">Transfer/Trade</button>
         <button type="button" class="segment-btn" data-segment="my-teams">My Teams</button>
@@ -96,6 +98,16 @@
             <div class="card-label">All Pokemon</div>
           </div>
         </div>
+      </div>
+
+      <!-- Coming Soon placeholder for Transfer/Trade -->
+      <div class="coming-soon-container" id="comingSoonContainer" hidden>
+        <div class="coming-soon-icon">🚧</div>
+        <h2 class="coming-soon-title">Coming Soon</h2>
+        <p class="coming-soon-desc">
+          Transfer and trade recommendations are under development.
+          Check back soon!
+        </p>
       </div>
 
       <div class="team-filters" id="teamFilters" hidden>
