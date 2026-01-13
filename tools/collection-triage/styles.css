@@ -1598,17 +1598,26 @@ footer a:hover {
     border-right: none;
   }
 
-  /* Mobile table columns - type controlled by column config */
-  .col-tier,
-  .col-league {
-    display: none;
+  /* Mobile table columns - visibility controlled by JS column config only */
+  /* Smaller fonts for compact display, but NO display:none */
+  .col-type {
+    font-size: 11px;
   }
 
-  .col-pokemon { min-width: 120px; }
-  .col-cp { min-width: 50px; text-align: right; }
-  .col-ivs { min-width: 60px; }
-  .col-verdict { min-width: 90px; }
-  .col-why { display: none; }
+  .col-tier,
+  .col-league {
+    font-size: 11px;
+  }
+
+  .col-why {
+    font-size: 11px;
+    max-width: 150px;
+  }
+
+  .col-pokemon { min-width: 100px; }
+  .col-cp { min-width: 45px; text-align: right; font-size: 12px; }
+  .col-ivs { min-width: 55px; font-size: 12px; }
+  .col-verdict { min-width: 80px; font-size: 12px; }
 
   .results-table {
     font-size: 13px;
