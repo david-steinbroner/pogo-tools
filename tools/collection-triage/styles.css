@@ -433,11 +433,15 @@ body {
   gap: 10px;
 }
 
+.filter-row[hidden] {
+  display: none;
+}
+
 /* Base filter control - consistent for all filter inputs */
 .filter-control {
   height: 44px;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: 16px;  /* Prevents iOS zoom on focus */
   font-family: inherit;
   border: 1px solid var(--grey-blue);
   border-radius: 8px;

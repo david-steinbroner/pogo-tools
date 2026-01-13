@@ -88,21 +88,21 @@
       </div>
 
       <div class="team-filters" id="teamFilters" hidden>
-        <div class="filter-row">
+        <!-- League/CP row - only for PvP -->
+        <div class="filter-row" id="pvpFiltersRow" hidden>
           <select id="filterLeague" class="filter-control">
             <option value="">All Leagues</option>
-            <option value="1500">Great League (&le;1500 CP)</option>
-            <option value="2500">Ultra League (&le;2500 CP)</option>
-            <option value="unlimited">Master League (No limit)</option>
+            <option value="great">Great League (&le;1500 CP)</option>
+            <option value="ultra">Ultra League (&le;2500 CP)</option>
+            <option value="master">Master League (No limit)</option>
           </select>
 
           <select id="filterMaxCP" class="filter-control">
-            <option value="">Max CP</option>
+            <option value="">Max CP: No limit</option>
             <option value="500">&le;500 CP</option>
             <option value="1000">&le;1000 CP</option>
             <option value="1500">&le;1500 CP</option>
             <option value="2500">&le;2500 CP</option>
-            <option value="custom">Custom...</option>
           </select>
         </div>
 
@@ -138,10 +138,9 @@
               </div>
             </div>
           </div>
-
-          <input type="number" id="filterCustomCP" class="filter-control" placeholder="Enter max CP" hidden>
         </div>
 
+        <!-- Fighting Against - for both Raiders and PvP -->
         <div class="filter-row">
           <div class="popup-filter-container">
             <button type="button" class="filter-control" id="fightingAgainstBtn">

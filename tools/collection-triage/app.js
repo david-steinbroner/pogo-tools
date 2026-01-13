@@ -588,17 +588,27 @@
   // Show/hide team filters based on segment and card selection
   function updateTeamFiltersVisibility() {
     var teamFilters = document.getElementById('teamFilters');
+    var pvpFiltersRow = document.getElementById('pvpFiltersRow');
     if (!teamFilters) return;
 
     var currentSegment = document.querySelector('.segment-btn.active');
     var segment = currentSegment ? currentSegment.dataset.segment : '';
-    var anyCardSelected = document.querySelector('.summary-card.selected') !== null;
+    var selectedCard = document.querySelector('.summary-card.selected');
 
     // Show filters on My Teams tab when any card is selected
-    if (segment === 'my-teams' && anyCardSelected) {
+    if (segment === 'my-teams' && selectedCard) {
       teamFilters.hidden = false;
+
+      // Show League/CP only for PvP, hide for Raiders
+      var isPvP = selectedCard.dataset.filter === 'TOP_PVP';
+      if (pvpFiltersRow) {
+        pvpFiltersRow.hidden = !isPvP;
+      }
     } else {
       teamFilters.hidden = true;
+      if (pvpFiltersRow) {
+        pvpFiltersRow.hidden = true;
+      }
       resetTeamFilters();
     }
   }
@@ -607,14 +617,9 @@
   function resetTeamFilters() {
     var leagueSelect = document.getElementById('filterLeague');
     var maxCPSelect = document.getElementById('filterMaxCP');
-    var customCPInput = document.getElementById('filterCustomCP');
 
     if (leagueSelect) leagueSelect.value = '';
     if (maxCPSelect) maxCPSelect.value = '';
-    if (customCPInput) {
-      customCPInput.value = '';
-      customCPInput.hidden = true;
-    }
 
     // Reset type filter checkboxes
     document.querySelectorAll('#typeFilterDropdown .popup-checkbox input').forEach(function(cb) {
@@ -882,7 +887,6 @@
   function initTeamFilters() {
     var leagueSelect = document.getElementById('filterLeague');
     var maxCPSelect = document.getElementById('filterMaxCP');
-    var customCPInput = document.getElementById('filterCustomCP');
 
     // Type filter elements
     var typeFilterBtn = document.getElementById('typeFilterBtn');
@@ -903,29 +907,18 @@
     // League dropdown - also sets max CP automatically
     leagueSelect.addEventListener('change', function() {
       var value = leagueSelect.value;
-      if (value && value !== 'unlimited') {
-        maxCPSelect.value = value;
-        customCPInput.hidden = true;
-      } else if (value === 'unlimited') {
+      if (value === 'great') {
+        maxCPSelect.value = '1500';
+      } else if (value === 'ultra') {
+        maxCPSelect.value = '2500';
+      } else if (value === 'master') {
         maxCPSelect.value = '';
-        customCPInput.hidden = true;
       }
       applyFilters();
     });
 
     // Max CP dropdown
     maxCPSelect.addEventListener('change', function() {
-      if (maxCPSelect.value === 'custom') {
-        customCPInput.hidden = false;
-        customCPInput.focus();
-      } else {
-        customCPInput.hidden = true;
-        applyFilters();
-      }
-    });
-
-    // Custom CP input
-    customCPInput.addEventListener('input', function() {
       applyFilters();
     });
 
@@ -1103,14 +1096,7 @@
 
     // Get team filters (Max CP and Type)
     var maxCPSelect = document.getElementById('filterMaxCP');
-    var customCPInput = document.getElementById('filterCustomCP');
-    var maxCP = null;
-
-    if (maxCPSelect && maxCPSelect.value === 'custom') {
-      maxCP = parseInt(customCPInput.value) || null;
-    } else if (maxCPSelect && maxCPSelect.value) {
-      maxCP = parseInt(maxCPSelect.value);
-    }
+    var maxCP = maxCPSelect && maxCPSelect.value ? parseInt(maxCPSelect.value) : null;
 
     var selectedTypes = getSelectedTypes();
 
