@@ -10,6 +10,7 @@
   let currentFilename = '';
   let currentParsedPokemon = null; // Store parsed data for re-analysis
   let hasTradePartner = false;
+  let currentMode = 'casual'; // 'casual' or 'optimization'
 
   // Sorting state
   let currentSort = {
@@ -25,6 +26,7 @@
     initCardFilters();
     initSortableHeaders();
     initTradeToggle();
+    initModeToggle();
     PogoSources.initSourcesLinks();
   });
 
@@ -126,7 +128,8 @@
     if (!currentParsedPokemon) return;
 
     const results = await PogoTriage.triageCollection(currentParsedPokemon, {
-      hasTradePartner: hasTradePartner
+      hasTradePartner: hasTradePartner,
+      mode: currentMode
     });
     currentResults = results;
 
@@ -464,6 +467,76 @@
         await analyzeAndRender();
       }
     });
+  }
+
+  // ============================================
+  // Mode Toggle (Casual/Optimization)
+  // ============================================
+
+  function initModeToggle() {
+    const casualBtn = document.getElementById('modeCasual');
+    const optimizationBtn = document.getElementById('modeOptimization');
+    const modeHint = document.getElementById('modeHint');
+
+    if (!casualBtn || !optimizationBtn) return;
+
+    // Load saved preference
+    const saved = localStorage.getItem('pogo-triage-mode');
+    if (saved === 'optimization') {
+      currentMode = 'optimization';
+      casualBtn.classList.remove('active');
+      optimizationBtn.classList.add('active');
+      updateModeHint('optimization');
+    }
+
+    // Handle casual button click
+    casualBtn.addEventListener('click', async function() {
+      if (currentMode === 'casual') return;
+
+      currentMode = 'casual';
+      casualBtn.classList.add('active');
+      optimizationBtn.classList.remove('active');
+      updateModeHint('casual');
+
+      // Save preference
+      localStorage.setItem('pogo-triage-mode', 'casual');
+
+      // Re-analyze if we have data
+      if (currentParsedPokemon && currentParsedPokemon.length > 0) {
+        setStatus('Re-analyzing in Casual mode...', 'loading');
+        await analyzeAndRender();
+      }
+    });
+
+    // Handle optimization button click
+    optimizationBtn.addEventListener('click', async function() {
+      if (currentMode === 'optimization') return;
+
+      currentMode = 'optimization';
+      optimizationBtn.classList.add('active');
+      casualBtn.classList.remove('active');
+      updateModeHint('optimization');
+
+      // Save preference
+      localStorage.setItem('pogo-triage-mode', 'optimization');
+
+      // Re-analyze if we have data
+      if (currentParsedPokemon && currentParsedPokemon.length > 0) {
+        setStatus('Re-analyzing in Optimization mode...', 'loading');
+        await analyzeAndRender();
+      }
+    });
+  }
+
+  function updateModeHint(mode) {
+    const modeHint = document.getElementById('modeHint');
+    if (!modeHint) return;
+
+    if (mode === 'casual') {
+      modeHint.textContent = 'Simple storage cleanup - keep highest IV% per species';
+    } else {
+      modeHint.textContent = 'Full PvP ranks and raid analysis';
+    }
   }
 
   window.filterByVerdict = function(verdict) {

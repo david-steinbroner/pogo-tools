@@ -1020,20 +1020,113 @@
   }
 
   /**
-   * Main triage function for a single Pokemon
+   * CASUAL MODE: Simple triage - keep best IV% per species, clear rest
+   * @param {Object} pokemon - The Pokemon to triage
+   * @param {Array} collection - All Pokemon in the collection
+   * @param {Object} speciesBest - Map of species -> best specimen info
+   * @param {boolean} hasTradePartner - Whether user has a trade partner
+   */
+  function triagePokemonCasual(pokemon, collection, speciesBest, hasTradePartner = false) {
+    const isSpecial = pokemon.isShiny || pokemon.isLucky || pokemon.isFavorite;
+    const speciesKey = getSpeciesKey(pokemon);
+    const best = speciesBest[speciesKey];
+    const ivPercent = calculateIvPercent(pokemon) || 0;
+
+    // Shadow Pokemon are always valuable for raids - keep and flag
+    if (pokemon.isShadow) {
+      return {
+        verdict: VERDICTS.TOP_RAIDER,
+        reason: 'Shadow Pokemon - 20% damage bonus',
+        details: 'Shadow Pokemon deal 20% more damage in raids. Keep for raid teams!',
+        isShadow: true
+      };
+    }
+
+    // Special Pokemon (shiny, lucky, favorite) always keep
+    if (isSpecial) {
+      let reasons = [];
+      if (pokemon.isShiny) reasons.push('Shiny');
+      if (pokemon.isLucky) reasons.push('Lucky');
+      if (pokemon.isFavorite) reasons.push('Favorite');
+      return {
+        verdict: VERDICTS.KEEP,
+        reason: reasons.join(', '),
+        details: 'Special Pokemon - keeping regardless of IVs.'
+      };
+    }
+
+    // Check if this is the best specimen of this species
+    if (best && pokemon.id === best.id) {
+      return {
+        verdict: VERDICTS.KEEP,
+        reason: `Best ${pokemon.name} (${ivPercent.toFixed(0)}% IV)`,
+        details: `Highest IV% specimen of this species in your collection.`
+      };
+    }
+
+    // This is a duplicate - not the best
+    if (best) {
+      const bestIv = calculateIvPercent(best) || 0;
+
+      if (hasTradePartner) {
+        return {
+          verdict: VERDICTS.TRADE_CANDIDATE,
+          reason: 'Duplicate - trade it',
+          details: `Your best ${pokemon.name} has ${bestIv.toFixed(0)}% IVs. Trade this one for candy or reroll.`
+        };
+      } else {
+        return {
+          verdict: VERDICTS.SAFE_TRANSFER,
+          reason: 'Duplicate - transfer it',
+          details: `Your best ${pokemon.name} has ${bestIv.toFixed(0)}% IVs. Transfer this one for candy.`
+        };
+      }
+    }
+
+    // Default keep
+    return {
+      verdict: VERDICTS.KEEP,
+      reason: 'Only one of this species',
+      details: null
+    };
+  }
+
+  /**
+   * OPTIMIZATION MODE: Full PvP/Raid analysis
    * @param {Object} pokemon - The Pokemon to triage
    * @param {Array} collection - All Pokemon in the collection
    * @param {boolean} hasTradePartner - Whether user has a trade partner
    */
-  function triagePokemon(pokemon, collection, hasTradePartner = false) {
+  function triagePokemonOptimization(pokemon, collection, hasTradePartner = false) {
     // Step 1: Check if this is a "special" Pokemon (never auto-transfer)
     const isSpecial = pokemon.isShiny || pokemon.isLucky || pokemon.isFavorite;
     const isShadowOrPurified = pokemon.isShadow || pokemon.isPurified;
 
-    // Step 2: Check for Top Raider status (uses new inclusive logic)
+    // Shadow Pokemon get special handling - always valuable for raids
+    if (pokemon.isShadow) {
+      const raiderInfo = getTopRaiderInfo(pokemon);
+      if (raiderInfo.isTopRaider) {
+        return {
+          verdict: VERDICTS.TOP_RAIDER,
+          reason: `Shadow ${raiderInfo.reason}`,
+          details: `Shadow bonus: +20% damage! ${raiderInfo.details}`,
+          attackType: raiderInfo.type,
+          powerTier: raiderInfo.powerTier,
+          isShadow: true
+        };
+      }
+      // Even low CP shadows are valuable
+      return {
+        verdict: VERDICTS.KEEP,
+        reason: 'Shadow Pokemon - raid potential',
+        details: 'Shadow Pokemon deal 20% more damage. Power up for raids!',
+        isShadow: true
+      };
+    }
+
+    // Step 2: Check for Top Raider status
     const raiderInfo = getTopRaiderInfo(pokemon);
     if (raiderInfo.isTopRaider) {
-      const typeDisplay = raiderInfo.type || 'Mixed';
       return {
         verdict: VERDICTS.TOP_RAIDER,
         reason: raiderInfo.reason,
@@ -1043,7 +1136,7 @@
       };
     }
 
-    // Step 3: Check for Top PvP status (uses new inclusive logic)
+    // Step 3: Check for Top PvP status
     const pvpInfo = getTopPvPInfo(pokemon);
     if (pvpInfo.isTopPvP) {
       return {
@@ -1060,18 +1153,15 @@
     const dominated = isDominatedDuplicate(pokemon, collection);
 
     if (dominated.isDominated) {
-      // This is a worse copy of something we have
       const betterCp = dominated.betterCopy.cp || '?';
 
       if (hasTradePartner) {
-        // With trade partner: offer for trade instead of transfer
         return {
           verdict: VERDICTS.TRADE_CANDIDATE,
           reason: 'Duplicate - trade for IV reroll?',
           details: `You have a better ${pokemon.name} (${betterCp} CP). Trade this one for a chance at better IVs.`
         };
       } else if (!isSpecial && !isShadowOrPurified) {
-        // No trade partner: safe to transfer (unless special)
         return {
           verdict: VERDICTS.SAFE_TRANSFER,
           reason: 'Duplicate - you have better',
@@ -1093,24 +1183,12 @@
     }
 
     // Step 6: TRADE_CANDIDATE checks (only if has trade partner)
-    if (hasTradePartner) {
-      // Shadow Pokemon (valuable to others)
-      if (pokemon.isShadow) {
-        return {
-          verdict: VERDICTS.TRADE_CANDIDATE,
-          reason: 'Shadow Pokemon - valuable to traders',
-          details: 'Shadow Pokemon deal 20% more damage. Someone might want this one.'
-        };
-      }
-
-      // High CP Pokemon (good for trade candy)
-      if (pokemon.cp >= 2000) {
-        return {
-          verdict: VERDICTS.TRADE_CANDIDATE,
-          reason: 'High CP - good candy bonus from trade',
-          details: `Trading high-CP Pokemon gives extra candy.`
-        };
-      }
+    if (hasTradePartner && pokemon.cp >= 2000) {
+      return {
+        verdict: VERDICTS.TRADE_CANDIDATE,
+        reason: 'High CP - good candy bonus from trade',
+        details: `Trading high-CP Pokemon gives extra candy.`
+      };
     }
 
     // Step 7: Default - KEEP
@@ -1122,13 +1200,57 @@
   }
 
   /**
+   * Get species key for grouping (name + form)
+   */
+  function getSpeciesKey(pokemon) {
+    const form = pokemon.form || '';
+    return `${pokemon.name}|${form}`;
+  }
+
+  /**
+   * Find best specimen per species (by IV%)
+   */
+  function findBestPerSpecies(collection) {
+    const best = {};
+
+    collection.forEach(pokemon => {
+      // Skip special Pokemon from "best" calculation - they're kept anyway
+      if (pokemon.isShiny || pokemon.isLucky || pokemon.isFavorite || pokemon.isShadow) {
+        return;
+      }
+
+      const key = getSpeciesKey(pokemon);
+      const ivPercent = calculateIvPercent(pokemon) || 0;
+
+      if (!best[key] || ivPercent > (calculateIvPercent(best[key]) || 0)) {
+        best[key] = pokemon;
+      }
+    });
+
+    return best;
+  }
+
+  /**
+   * Main triage dispatch - routes to Casual or Optimization mode
+   */
+  function triagePokemon(pokemon, collection, hasTradePartner = false, mode = 'casual', speciesBest = null) {
+    if (mode === 'casual') {
+      return triagePokemonCasual(pokemon, collection, speciesBest, hasTradePartner);
+    } else {
+      return triagePokemonOptimization(pokemon, collection, hasTradePartner);
+    }
+  }
+
+  /**
    * Triage entire collection
    * @param {Array} pokemonList - List of Pokemon to triage
    * @param {Object} options - Options object
    * @param {boolean} options.hasTradePartner - Whether user has a trade partner
+   * @param {string} options.mode - 'casual' or 'optimization' (default: 'casual')
    */
   async function triageCollection(pokemonList, options = {}) {
     const hasTradePartner = options.hasTradePartner || false;
+    const mode = options.mode || 'casual';
 
     await loadMetaData();
 
@@ -1150,9 +1272,12 @@
       };
     }
 
+    // For casual mode, pre-calculate best specimen per species
+    const speciesBest = mode === 'casual' ? findBestPerSpecies(pokemonList) : null;
+
     const results = pokemonList.map(pokemon => ({
       ...pokemon,
-      triage: triagePokemon(pokemon, pokemonList, hasTradePartner)
+      triage: triagePokemon(pokemon, pokemonList, hasTradePartner, mode, speciesBest)
     }));
 
     const summary = {
