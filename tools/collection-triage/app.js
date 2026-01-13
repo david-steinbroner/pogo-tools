@@ -385,24 +385,15 @@
 
   // Helper function to get Pokemon types
   function getPokemonTypes(name, form) {
-    console.log('=== getPokemonTypes called ===');
-    console.log('Input name:', name, '| type:', typeof name);
-    console.log('Input form:', form, '| type:', typeof form);
-
-    // Try form-specific key first
+    // Try form-specific key first (e.g., "Vulpix (Alola)")
     if (form && form !== 'Normal') {
       var formKey = name + ' (' + form + ')';
-      console.log('Trying form-specific key:', formKey);
       if (POKEMON_TYPES[formKey]) {
-        var result = POKEMON_TYPES[formKey];
-        console.log('Returning form-specific types:', result);
-        return result;
+        return POKEMON_TYPES[formKey];
       }
     }
     // Fall back to base name, or 'Unknown' if not found
-    var result = POKEMON_TYPES[name] || ['Unknown'];
-    console.log('Returning types:', result);
-    return result;
+    return POKEMON_TYPES[name] || ['Unknown'];
   }
 
   // Column configuration for table
@@ -471,14 +462,6 @@
 
   // Initialize on DOM ready
   document.addEventListener('DOMContentLoaded', function() {
-    // DIAGNOSTIC: Log POKEMON_TYPES lookup for test cases
-    console.log('=== POKEMON_TYPES check ===');
-    console.log('Larvitar in POKEMON_TYPES:', POKEMON_TYPES['Larvitar']);
-    console.log('Machop in POKEMON_TYPES:', POKEMON_TYPES['Machop']);
-    console.log('Pikachu in POKEMON_TYPES:', POKEMON_TYPES['Pikachu']);
-    console.log('Total pokemon in POKEMON_TYPES:', Object.keys(POKEMON_TYPES).length);
-    console.log('First 10 keys:', Object.keys(POKEMON_TYPES).slice(0, 10));
-
     initUploadButton();
     initNewUploadButton();
     initFilters();
@@ -677,11 +660,6 @@
     teamFilters = teamFilters || {};
     const tbody = document.getElementById('resultsBody');
 
-    // DIAGNOSTIC: Log column visibility
-    console.log('=== Column visibility check (renderTable) ===');
-    console.log('columnConfig:', JSON.stringify(columnConfig, null, 2));
-    console.log('Visible columns:', columnConfig.filter(function(c) { return c.visible; }).map(function(c) { return c.id; }));
-
     // Render table headers based on column config
     renderTableHeaders();
 
@@ -751,25 +729,6 @@
     if (filtered.length === 0) {
       var visibleCount = getVisibleColumns().length;
       tbody.innerHTML = '<tr><td colspan="' + visibleCount + '" class="empty-state">' + getEmptyStateMessage(filter) + '</td></tr>';
-    }
-
-    // DIAGNOSTIC: Verify type cells in rendered HTML
-    console.log('=== Rendered HTML check ===');
-    var typeCells = document.querySelectorAll('.col-type');
-    console.log('Number of type cells in DOM:', typeCells.length);
-    if (typeCells.length > 0) {
-      console.log('First type cell innerHTML:', typeCells[0].innerHTML);
-      console.log('First type cell textContent:', typeCells[0].textContent);
-      console.log('First type cell offsetWidth:', typeCells[0].offsetWidth);
-      console.log('First type cell computed display:', window.getComputedStyle(typeCells[0]).display);
-      console.log('First type cell computed visibility:', window.getComputedStyle(typeCells[0]).visibility);
-    }
-    // Also check if header exists
-    var typeHeader = document.querySelector('th.col-type');
-    console.log('Type header exists:', !!typeHeader);
-    if (typeHeader) {
-      console.log('Type header textContent:', typeHeader.textContent);
-      console.log('Type header offsetWidth:', typeHeader.offsetWidth);
     }
   }
 
@@ -944,20 +903,14 @@
     // Render league eligibility badges
     var leagueBadges = renderLeagueBadges(pokemon.cp || 0);
 
-    // Get Pokemon types
-    console.log('=== Rendering type cell ===');
-    console.log('pokemon object:', pokemon);
-    console.log('pokemon.name:', pokemon.name);
-    console.log('pokemon.form:', pokemon.form);
-    var types = getPokemonTypes(pokemon.name, pokemon.form);
-    console.log('types result:', types);
-    var typeDisplay = types ? types.join(' / ') : '';
-    console.log('typeDisplay string:', typeDisplay);
+    // Get Pokemon types and render as badges
+    var types = getPokemonTypes(pokemon.name, pokemon.form || '');
+    var typeBadges = types.map(function(t) {
+      return '<span class="type-badge type-' + t.toLowerCase() + '">' + t + '</span>';
+    }).join(' ');
 
     // Get visible columns and render cells dynamically
     var visibleColumns = getVisibleColumns();
-    console.log('=== Visible columns in renderRow ===');
-    console.log('visibleColumns:', visibleColumns.map(function(c) { return c.id; }));
     var cells = visibleColumns.map(function(col) {
       switch (col.id) {
         case 'pokemon':
@@ -966,7 +919,7 @@
             badges +
           '</td>';
         case 'type':
-          return '<td class="col-type">' + typeDisplay + '</td>';
+          return '<td class="col-type">' + typeBadges + '</td>';
         case 'tier':
           return '<td class="col-tier">' + tierBadge + '</td>';
         case 'league':
