@@ -89,14 +89,14 @@
 
       <div class="team-filters" id="teamFilters" hidden>
         <div class="filter-row">
-          <select id="filterLeague" class="filter-dropdown">
+          <select id="filterLeague" class="filter-control">
             <option value="">All Leagues</option>
             <option value="1500">Great League (&le;1500 CP)</option>
             <option value="2500">Ultra League (&le;2500 CP)</option>
             <option value="unlimited">Master League (No limit)</option>
           </select>
 
-          <select id="filterMaxCP" class="filter-dropdown">
+          <select id="filterMaxCP" class="filter-control">
             <option value="">Max CP</option>
             <option value="500">&le;500 CP</option>
             <option value="1000">&le;1000 CP</option>
@@ -108,7 +108,7 @@
 
         <div class="filter-row">
           <div class="type-filter-container">
-            <button type="button" class="filter-dropdown type-filter-btn" id="typeFilterBtn">
+            <button type="button" class="filter-control" id="typeFilterBtn">
               All Types
             </button>
             <div class="type-filter-dropdown" id="typeFilterDropdown" hidden>
@@ -139,11 +139,11 @@
             </div>
           </div>
 
-          <input type="number" id="filterCustomCP" class="filter-dropdown custom-cp-input" placeholder="Enter max CP" hidden>
+          <input type="number" id="filterCustomCP" class="filter-control" placeholder="Enter max CP" hidden>
         </div>
 
         <div class="filter-row">
-          <select id="filterFightingAgainst" class="filter-dropdown">
+          <select id="filterFightingAgainst" class="filter-control">
             <option value="">Fighting against...</option>
             <option value="Bug">Bug</option>
             <option value="Dark">Dark</option>
@@ -182,7 +182,7 @@
           <option value="all">All Pokemon</option>
           <option value="KEEP">Just "Keep" (no action needed)</option>
         </select>
-        <input type="text" id="searchInput" placeholder="Search by name...">
+        <input type="text" id="searchInput" class="filter-control" placeholder="Search by name...">
         <span class="results-count" id="resultsCount"></span>
       </div>
 
