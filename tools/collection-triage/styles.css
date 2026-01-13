@@ -486,10 +486,15 @@ body {
   border: 1px solid var(--grey-blue);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 100;
+  z-index: 1000;
   max-height: 200px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.type-filter-dropdown[hidden] {
+  display: none;
 }
 
 .type-checkbox-list {
