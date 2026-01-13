@@ -424,6 +424,10 @@ body {
   padding: 8px 0;
 }
 
+.league-pills[hidden] {
+  display: none;
+}
+
 .league-pill {
   padding: 8px 10px;
   border: 1px solid var(--grey-blue);
