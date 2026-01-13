@@ -584,9 +584,31 @@
           updateFilterVisibility(filter);
         }
 
+        // Update league pills visibility based on PvP card selection
+        updateLeaguePillsVisibility();
+
         applyFilters();
       });
     });
+  }
+
+  // Show/hide league pills based on segment and PvP card selection
+  function updateLeaguePillsVisibility() {
+    var leaguePills = document.getElementById('leaguePills');
+    if (!leaguePills) return;
+
+    var currentSegment = document.querySelector('.segment-btn.active');
+    var segment = currentSegment ? currentSegment.dataset.segment : '';
+    var pvpCardSelected = document.querySelector('.summary-card.pvp.selected') !== null;
+
+    // Only show on My Teams tab when PvP card is selected
+    if (segment === 'my-teams' && pvpCardSelected) {
+      leaguePills.hidden = false;
+    } else {
+      leaguePills.hidden = true;
+      // Reset filter when hiding
+      resetLeaguePills();
+    }
   }
 
   // Reset league pills to default state
@@ -690,16 +712,8 @@
           }
         }
 
-        // Show/hide league pills based on segment (only on My Teams)
-        var leaguePills = document.getElementById('leaguePills');
-        if (leaguePills) {
-          if (segment === 'my-teams') {
-            leaguePills.hidden = false;
-          } else {
-            leaguePills.hidden = true;
-            resetLeaguePills();
-          }
-        }
+        // Update league pills visibility (depends on segment AND PvP card selection)
+        updateLeaguePillsVisibility();
 
         applyFilters();
       });
