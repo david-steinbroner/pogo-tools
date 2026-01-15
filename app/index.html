@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="gba-ds">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PoGO Pal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="./styles/app.css">
+</head>
+<body>
+
+<div class="app">
+<!-- APP BAR -->
+<header id="appBar" class="appbar">
+  <div class="appbar-left">
+    <div class="title">PoGO Pal</div>
+  </div>
+  <div class="appbar-right">
+    <button id="infoBtn" class="icon-btn gbp-q" type="button" aria-label="Info" title="Glossary">?</button>
+  </div>
+</header>
+
+<!-- MODE TABS -->
+<div id="modeTabs" class="modebar" role="tablist" aria-label="Mode">
+  <div class="modebar-inner">
+    <button id="modeVsBtn" class="mode-tab" role="tab" aria-selected="false" type="button"><span class="vs-mark" aria-hidden="true">VS</span> Versus</button>
+    <button id="modeCollectionBtn" class="mode-tab is-active" role="tab" aria-selected="true" type="button">Collection</button>
+    <button id="modeTradeBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Trade</button>
+  </div>
+</div>
+
+<!-- UTILITY ROW -->
+<div id="utilityRow" class="utility-row" aria-label="Utility">
+  <div class="utility-left">
+    <input accept=".csv" class="hidden-file" id="fileInput" type="file"/>
+    <button id="uploadBtn" class="util-btn" type="button" aria-label="Upload CSV" title="Upload CSV">
+      <span class="util-icon" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
+        </svg>
+      </span>
+      <span class="util-label">Upload</span>
+    </button>
+  </div>
+  <div class="utility-right"></div>
+</div>
+
+<div id="collectionSticky">
+  <div aria-label="Collection summary" class="collectionbar" id="collectionBar">
+    <div class="collection-left">
+      <div class="collection-stat">Pokemon: <strong id="collectionCount">-</strong></div>
+      <div class="collection-stat">Type coverage: <strong id="collectionCoverage">-/18</strong></div>
+    </div>
+    <div class="collection-note" title="Updates after CSV upload">Collection</div>
+  </div>
+
+  <!-- Filters -->
+  <div aria-label="Filters" class="filterzone" id="filterZone">
+    <div aria-label="Active filters" class="active-strip">
+      <div class="active-left">
+        <button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
+          <span aria-hidden="true" class="types-open-icon">+</span>
+          <span>Types</span>
+        </button>
+        <div aria-label="Selected types" class="active-icons" id="activeIcons">
+          <span class="active-all" id="activeAll">All types</span>
+        </div>
+      </div>
+      <button class="clear-btn" hidden="" id="clearBtn" type="button">Clear</button>
+    </div>
+  </div>
+
+  <!-- Bottom sheet: Type picker -->
+  <div class="sheet-backdrop" hidden="" id="sheetBackdrop"></div>
+  <section aria-label="Choose types" aria-modal="true" class="sheet" hidden="" id="typesSheet" role="dialog">
+    <div class="sheet-header">
+      <div class="sheet-title">Choose types</div>
+      <div class="sheet-actions">
+        <button class="sheet-btn ghost" id="selectAllBtn" type="button">All</button>
+        <button class="sheet-btn ghost" id="sheetClearBtn" type="button">Clear</button>
+        <button class="sheet-btn" id="sheetDoneBtn" type="button">Done</button>
+      </div>
+    </div>
+    <div class="sheet-body">
+      <div aria-label="Type grid" class="type-grid" id="typeGrid"></div>
+      <div class="sheet-hint mono">Tap types to toggle. Selected types show as icons above.</div>
+    </div>
+  </section>
+</div>
+
+<main class="main">
+  <!-- VIEW: VERSUS -->
+  <div id="viewVersus">
+    <section id="vsView" class="vs-view" hidden>
+      <div class="vs-panel">
+        <div class="vs-panel-header">
+          <div class="vs-panel-title">VS Assistant</div>
+          <div class="vs-panel-sub mono" id="vsSub">Pick opponent type(s). We'll surface your best picks, plus what to bring/avoid.</div>
+        </div>
+
+        <div class="vs-block">
+          <div class="vs-block-h">
+            <span class="vs-k">Opponent types</span>
+            <span class="vs-k mono" id="vsCountNote">0/3</span>
+          </div>
+
+          <div class="battle-selected-wrap" aria-label="Selected opponent types">
+            <div class="battle-selected" id="vsSelected"></div>
+            <div class="battle-selected-note mono" id="vsSelectedNote">Pick up to 3 types.</div>
+          </div>
+
+          <details class="vs-details" id="vsTypePicker" open>
+            <summary class="vs-summary"><span class="mono">Change opponent types</span></summary>
+            <div class="type-grid" id="vsTypeGrid" aria-label="Opponent type grid"></div>
+          </details>
+
+          <div class="vs-actions">
+            <button class="sheet-btn ghost" id="vsClearBtn" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="vs-hero" id="vsHero" hidden>
+          <div class="vs-hero-grid">
+            <div class="vs-hero-card">
+              <div class="vs-h">Top picks</div>
+              <div class="vs-picks" id="vsTopPicks"></div>
+              <div class="vs-empty mono" id="vsTopEmpty">Upload a CSV in Collection mode to see roster picks.</div>
+            </div>
+
+            <div class="vs-hero-card">
+              <div class="vs-h">Risky picks</div>
+              <div class="vs-picks" id="vsRiskyPicks"></div>
+              <div class="vs-empty mono" id="vsRiskyEmpty">These are strong CP options that take big damage here.</div>
+            </div>
+          </div>
+
+          <div class="vs-note mono" id="vsRosterNote" hidden></div>
+
+          <div class="vs-brief">
+            <div class="brief-row">
+              <div class="brief-k">Bring (moves)</div>
+              <div class="brief-v" id="vsBringMoves"></div>
+            </div>
+            <div class="brief-row">
+              <div class="brief-k">Avoid (moves)</div>
+              <div class="brief-v" id="vsAvoidMoves"></div>
+            </div>
+            <div class="brief-row">
+              <div class="brief-k">Don't bring (bodies)</div>
+              <div class="brief-v" id="vsAvoidBodies"></div>
+            </div>
+            <div class="brief-row">
+              <div class="brief-k">Watch out for</div>
+              <div class="brief-v" id="vsWatchOut"></div>
+            </div>
+          </div>
+
+          <div class="battle-tiprow">
+            <div class="tip-label mono">Rule of thumb</div>
+            <button class="tip-btn" id="vsTipBtn" type="button" aria-label="Show rule of thumb">?</button>
+          </div>
+
+          <div class="battle-tooltip" id="vsTooltip" hidden>
+            <div class="t"><strong>Moves matter most.</strong> Your Pokemon's type is the "body", but damage is mostly about the <em>move type</em> you're using.</div>
+            <div class="t">Casual shortcut: if your Pokemon's body matches a "Bring (moves)" type, it <em>often</em> has a good move... but not always. (TMs and move pools get spicy.)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VIEW: COLLECTION -->
+  <div id="viewCollection">
+    <section id="collectionView" class="collection-view">
+      <div class="showing-row">
+        <div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(-)</span></div>
+      </div>
+      <div id="parseError" class="error-panel" hidden></div>
+      <details id="csvDebug" class="debug-details" hidden>
+        <summary>
+          <span>CSV detected</span>
+          <span id="csvDebugSummary" class="mono"></span>
+        </summary>
+        <div class="debug-body">
+          <div class="debug-block">
+            <div class="debug-label">Headers</div>
+            <div id="csvHeaders" class="debug-chipwrap"></div>
+          </div>
+          <div class="debug-block">
+            <div class="debug-label">Mapping (what we used)</div>
+            <div id="csvMapping" class="debug-mapping"></div>
+          </div>
+          <div class="debug-block">
+            <div class="debug-label">Sample row (first row)</div>
+            <div id="csvSample" class="debug-sample"></div>
+          </div>
+        </div>
+      </details>
+      <p class="hint">Option C layout: type filters stay pinned, results live directly beneath.</p>
+      <section aria-label="Results" class="panel">
+        <div class="panel-header">
+          <h2>Results</h2>
+          <div class="sub">Tap a type pill to filter</div>
+        </div>
+        <div id="resultsScroll" class="table-wrap">
+          <table id="resultsTable">
+            <thead>
+              <tr>
+                <th class="sortable" data-key="name"><span class="th-inner">Pokemon <span class="sort-ind" aria-hidden="true"></span></span></th>
+                <th class="mono sortable" data-key="score"><span class="th-inner">Score <span class="sort-ind" aria-hidden="true"></span></span></th>
+                <th class="sortable" data-key="grade"><span class="th-inner">Grade <span class="sort-ind" aria-hidden="true"></span></span></th>
+                <th class="mono sortable" data-key="cp"><span class="th-inner">CP <span class="sort-ind" aria-hidden="true"></span></span></th>
+                <th class="mono sortable" data-key="iv"><span class="th-inner">IV% <span class="sort-ind" aria-hidden="true"></span></span></th>
+                <th class="sortable" data-key="types"><span class="th-inner">Types <span class="sort-ind" aria-hidden="true"></span></span></th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody">
+              <!-- rows rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <!-- VIEW: TRADE -->
+  <div id="viewTrade">
+    <section id="tradeView" class="trade-view" hidden>
+      <div class="vs-panel">
+        <div class="vs-panel-header">
+          <div class="vs-panel-title">Trade</div>
+          <div class="vs-panel-sub mono">Coming soon. This tab will help you pick safe trades, prioritize distance/lucky odds, and export lists.</div>
+        </div>
+        <div class="vs-block">
+          <div class="hint">Placeholder screen. No behavior yet.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
+
+<aside id="infoDrawer" class="drawer" aria-hidden="true" aria-label="Glossary drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">Glossary</div>
+    <button id="drawerCloseBtn" class="icon-btn" aria-label="Close glossary" title="Close">
+      <span aria-hidden="true" class="close-x">X</span>
+    </button>
+  </div>
+
+  <div class="drawer-content">
+    <div class="gloss">
+      This panel is intentionally practical: it describes what this prototype is calculating <em>right now</em>, plus the assumptions behind it.
+    </div>
+
+    <details open>
+      <summary>Score</summary>
+      <div class="gloss">
+        <strong>Current definition (prototype):</strong> <code>Score = IV%</code>.
+        This is a "good enough" stand-in so sorting and filtering are meaningful while we build.
+      </div>
+    </details>
+
+    <details open>
+      <summary>IV%</summary>
+      <div class="gloss">
+        <strong>IV%</strong> is the Pokemon's individual values (IVs) normalized to a percentage:
+        <br/><br/>
+        <code>IV% = ((AtkIV + DefIV + StaIV) / 45) x 100</code>
+        <br/><br/>
+        Each IV ranges 0-15, so the max total is 45.
+      </div>
+    </details>
+
+    <details open>
+      <summary>Grade</summary>
+      <div class="gloss">
+        A quick letter grade derived from Score/IV%. Thresholds are adjustable; these are the current defaults:
+        <div class="grade-grid" aria-label="Grade thresholds">
+          <div><span class="grade-pill">S</span> Excellent</div><div>>= 98%</div>
+          <div><span class="grade-pill">A</span> Great</div><div>>= 90%</div>
+          <div><span class="grade-pill">B</span> Solid</div><div>>= 80%</div>
+          <div><span class="grade-pill">C</span> OK</div><div>>= 65%</div>
+          <div><span class="grade-pill">D</span> Meh</div><div>>= 50%</div>
+          <div><span class="grade-pill">F</span> Low</div><div>< 50%</div>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Type coverage</summary>
+      <div class="gloss">
+        <strong>Collection type coverage</strong> counts how many of the 18 Pokemon types appear anywhere in your uploaded collection.
+        <br/><br/>
+        <code>(unique types found in collection) / 18</code>
+      </div>
+    </details>
+  </div>
+</aside>
+
+</div>
+
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>
