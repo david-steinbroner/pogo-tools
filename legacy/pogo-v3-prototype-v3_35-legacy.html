@@ -1,0 +1,3750 @@
+<!DOCTYPE html>
+
+<!--
+================================================================================
+PoGO Pal — Code Map
+Version: v35-handoff-delivery-protocol
+
+CHANGELOG (update here first):
+- v35: Added a delivery protocol to the embedded handoff doc (file-first output + receipt + savepoints) to prevent truncated responses corrupting large HTML changes
+- v30: Hardened CSV parsing (PokéGenie header variants + locale number parsing) and gated CSV debug panel (debug mode or failures only)
+- v29e: Added fast-find tokens + moved embedded handoff doc near top (<head>) for instant updates
+- v29d: Updated embedded handoff doc to assume a **single-file** workflow (no separate .md handoff file)
+- v29c: Embedded full continuity/handoff doc inside this HTML (hidden): #handoffDoc
+- v29a–v29b: Added Code Map + SECTION markers + stable IDs and documented scaffolding changes
+- v29: Reframed nav to Versus | Collection | Trade; added persistent Utility Row; moved Upload into Utility Row; restyled app bar Info button
+
+Quick anchors / IDs:
+* Fast find tokens: `HANDOFFDOC:BEGIN` (handoff doc), `HANDOFF:CHANGELOG` (changelog), `HANDOFF:JOURNEY` (journey log)
+* `HANDOFF DOC (embedded): #handoffDoc`
+- APP BAR:            #appBar
+- TABS:               #modeTabs
+- UTILITY ROW:        #utilityRow
+- VS ROOT (wrapper):  #viewVersus   (actual view section: #vsView)
+- COLLECTION ROOT:    #viewCollection (actual view section: #collectionView)
+- TRADE ROOT:         #viewTrade    (actual view section: #tradeView)
+- PARSER:             // SECTION: PARSER
+- TABLE SCROLL:       #resultsScroll
+- TABLE:              #resultsTable
+
+Notes:
+- Existing IDs used by JS (vsView/collectionView/tradeView) were preserved.
+- New view* wrapper IDs are display: contents (see CSS UTILITIES) to avoid layout impact.
+================================================================================
+-->
+<html lang="en" data-skin="gba-ds">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PoGO Pal</title>
+
+
+<!-- SECTION: HANDOFF DOC (hidden) -->
+<!-- HANDOFFDOC:BEGIN -->
+<script type="text/plain" id="handoffDoc" hidden>
+# PoGO Pal (Prototype v3) — Continuity + Product Journey Log
+
+This is the **one file** a new chat should read to pick up work seamlessly **and** to preserve a clean story of how the product evolved.
+
+**Design direction headline:** Pokémon handheld UI vibes (**Game Boy → GBA → Nintendo DS**), with the ability to shift era deliberately as the project evolves. **Current baseline:** **GBP-inspired** (pixelated uppercase headers, tactile borders, and the “?”/info icon style).
+
+---
+
+## Next Up (read this first when you return)
+
+### Immediate next chunk (do this next)
+- **Filtering + sorting correctness (Collection):**
+  - Filtering operates on uploaded rows (type filtering matches Pokémon types)
+  - “Showing X of Y” is correct (Y = uploaded total, X = filtered count)
+  - Sorting applies to the filtered subset (and doesn’t desync when filters change)
+- Keep the “Collection” experience stable: no sticky overlap/tap-blocking regressions; Versus still works.
+
+**Definition of done (Immediate next chunk)**
+- Type filter affects the rows shown (and the count line updates)
+- “Showing X of Y” is accurate
+- Sorting affects the filtered rows (not the full list)
+- No regressions: Collection still uploads + renders; Versus still works; sticky stack still doesn’t block taps
+
+### Big rocks (this phase)
+1) ✅ **Harden CSV parsing + gate debug panel** (PokéGenie variants/locales; clear UI errors; debug only on failures or debug mode) — **done in v30**
+2) **Filtering + sorting correctness** (operate on uploaded rows; “Showing X of Y”; sorting on filtered subset)
+3) **Versus hierarchy tightening** (scan-first; Top Picks hero; compact opponent input)
+
+### Backlog ideas (groom periodically)
+- Trade/Transfer full workflow (criteria, “safe to transfer”, “trade candidates”, CSV export)
+- Versus roster-aware v2: include **moves** (fast/charged) and STAB; suggest “best picks you own” per recommended move type
+- Search by name/species; favorites; tags
+- Debug mode toggle (URL param + localStorage) and a small “Report parsing issue” output
+- Safari testing checklist + lightweight test harness improvements
+
+**Backlog grooming reminder:** when backlog hits ~10–15 items or at least **weekly** during active work, do a quick groom (merge duplicates, clarify, reprioritize, drop stale).
+
+---
+
+## Operating procedure (always follow)
+
+**Definition of Done for any chunk**
+1) Make changes in **small chunks** (avoid browser freezes).
+2) Output a **new versioned single-file HTML** (never overwrite the prior version).
+3) Update this doc:
+   - Append **2–3 bullets** to **Changelog**
+   - Add **one short entry** to **Product Journey Log** (problem → decision → outcome)
+   - Update **Next Up** if priorities changed
+4) Keep constraints: **single-file HTML**, Safari-safe JS, no official Pokémon/Nintendo assets.
+
+**Delivery protocol (mandatory, prevents cut-off)**
+- **Never paste the full HTML** into chat when it’s large. Always **write a new versioned HTML file to disk** and return it as a downloadable link.
+- End every chunk with a **Receipt**:
+  1) **File:** `pogo-v3-prototype-v3_XX-<short-slug>.html` (download link)
+  2) **What changed:** 3–8 bullets
+  3) **What to test:** 3–8 bullets
+  4) **Known risks:** 0–3 bullets (optional)
+  5) **Next:** 1 bullet that maps to **Next Up**
+- **Savepoint rule:** If output is interrupted/truncated, ensure the new HTML is already saved, then reply **only** with the Receipt + file link (no long prose).
+- Optional: include a small patch/diff summary when helpful, but keep it short.
+
+**Naming convention**
+- HTML: `pogo-v3-prototype-v3_XX-<short-slug>.html`
+- Increment `XX` by 1 each chunk.
+- Slug is 2–5 words, lowercase, hyphenated (e.g. `nav-utility-row`).
+
+---
+
+---
+## Fast navigation (no hunting)
+
+**Do not scroll or grep.** Use in-page find:
+- `HANDOFFDOC:BEGIN` jumps to this embedded doc in the HTML
+- `HANDOFF:CHANGELOG` jumps to the append-only changelog
+- `HANDOFF:JOURNEY` jumps to the product journey log
+
+---
+## Changelog (append-only; update every version)
+HANDOFF:CHANGELOG
+- v35 — Added a mandatory delivery protocol to the embedded handoff doc (file-first output + receipt + savepoints) to prevent truncated responses from corrupting large HTML changes.
+- v30 — Hardened CSV parsing across PokéGenie variants/locales (header mapping + locale number handling) and gated CSV debug panel (debug mode or failures only).
+- v29e — Added fast-find tokens (`HANDOFFDOC:BEGIN`, `HANDOFF:CHANGELOG`, `HANDOFF:JOURNEY`) and moved embedded handoff doc near the top of the HTML for instant access.
+- v29d — Made the embedded handoff doc the single source of truth (no separate .md); clarified “single-file only” workflow.
+- v29c — Embedded the full continuity/handoff doc inside the HTML (`#handoffDoc`) so a new chat can pick up from one file.
+- v29b — Added explicit changelog bullets for the code-map mini-step (scaffolding only).
+- v29a — Added Code Map + SECTION markers + stable IDs to make surgical edits safe and fast.
+- v29 — Reframed nav to **Versus | Collection | Trade**; added persistent Utility Row; moved Upload into Utility Row; restyled app bar Info button.
+
+---
+## Product Journey Log (append-only)
+HANDOFF:JOURNEY
+- **Problem:** PokéGenie CSV exports vary (headers/locales), and the debug panel was always visible/noisy.
+  **Decision:** Add header mapping + locale-tolerant number parsing; show CSV debug only in debug mode or on failures.
+  **Outcome:** More CSV variants parse cleanly, and the default Collection UI stays uncluttered.
+- **Problem:** Finding the handoff/changelog was taking too many searches.
+  **Decision:** Add unique find tokens and keep the embedded handoff doc near the top of the file.
+  **Outcome:** Updating the doc is now a single Cmd/Ctrl+F.
+
+- **Problem:** It was taking too long to re-orient in the file and safely edit.  
+  **Decision:** Add a Code Map, SECTION markers, and stable IDs; embed the handoff doc in-file.  
+  **Outcome:** Navigation is now “Ctrl/Cmd+F first”, and continuity survives chat resets with a single HTML.
+
+- **Problem:** Large single-file updates were getting cut off mid-response (Continue / truncated output), risking corrupted copies.
+  **Decision:** Adopt a file-first delivery protocol: always write a new versioned HTML to disk and return a short receipt (file link + what changed + what to test + next).
+  **Outcome:** Each chunk reliably produces a usable artifact even if the chat UI truncates output.
+
+## One “handoff to new chat” prompt (copy/paste)
+
+Paste this into a **new chat** and attach:
+- the latest versioned HTML file (it contains this embedded handoff doc under `#handoffDoc`)
+- optionally: `pogo-pal-design-system-v3.html` and `pogo-pal-typography-reference.html` for style guardrails
+
+> You are continuing **PoGO Pal (Prototype v3)**, a **single-file HTML** mobile-first web tool for Pokémon GO.  
+>  
+> **Design direction:** Pokémon handheld UI vibes (**Game Boy → GBA → Nintendo DS**). Current baseline is **GBP-inspired** (pixelated uppercase headers + tactile borders + “?” icon style).  
+>  
+> **Hard constraints:** keep it single-file (no separate JS/CSS), Safari-safe JS (avoid syntax that breaks Safari), no official Pokémon/Nintendo assets (lookalike icons only). Keep Option C sticky UX in Collection mode.  
+>  
+> **Project operating procedure (mandatory):** Work in **small chunks**. For each chunk: (1) create a new versioned HTML file `..._XX-<slug>.html` (do not overwrite), (2) append 2–3 bullets to the **Changelog** in this file, (3) add one entry to the **Product Journey Log** (problem → decision → outcome), and (4) update the **Next Up** section if priorities changed.  
+>  
+> **Now do this:**  
+> 1) Open the latest attached HTML and read the embedded handoff doc (`#handoffDoc`).  
+> 2) Locate the “Code Map / SECTION markers” near the top (use them for surgical edits).  
+> 3) Implement **only the next approved chunk**.  
+> 4) Sanity check: no console errors, Collection still works, Versus still works, no new heavy rerender loops.  
+> 5) Export the new HTML file + update this doc.
+
+---
+
+## 1) One-paragraph product summary
+
+**PoGO Pal** is a mobile-first, single-file HTML prototype for Pokémon GO collection management and quick battle guidance, styled with a **Pokémon handheld** design language (Game Boy → GBA → Nintendo DS). It supports CSV upload (PokéGenie / Calcy IV variants), type filtering, sortable results table, and a **Versus** mode that provides roster-aware recommendations and scan-friendly battle guidance.
+
+The UI may be dark, but the *identity* is the **handheld-era game UI**: tactile surfaces, crisp borders, and pixel-leaning headers (era-adjustable).
+
+---
+
+## 2) IA / layout rules (do not break)
+
+### Global structure (target)
+1) **App bar**: left “PoGO Pal”, right **Info icon** (GBP/handheld-styled icon treatment).
+2) **Mode tabs**: **Versus | Collection | Trade** (tactile, clear active state).
+3) **Utility row** (consistent location across modes): **Upload** lives here (same slot every mode).
+4) Mode content begins below.
+
+### Option C sticky behavior (Collection mode)
+- Sticky app bar
+- Sticky collection summary bar (global stats)
+- Sticky filter zone: “Types” button opens a bottom sheet selector
+- Selected types render as a **wrapping icon strip** (no sideways scrolling)
+- Results render inline directly beneath filters
+- Results table is horizontally scrollable with a sticky header row and sortable headers
+
+### Design constraints
+- Type colors aligned with Pokémon GO types
+- No official assets; only “lookalike” icons
+- Safari-safe JS
+
+### Design system direction (era-adjustable)
+**Era range (allowed inspiration):** Game Boy Pocket/Color → Game Boy Advance → Nintendo DS  
+**Current baseline (stick to this now):** **GBP-inspired**
+- Pixelated **uppercase header** font for headings/labels (small, punchy)
+- Readable sans for body/data
+- Tactile borders, tight spacing, “menu UI” feel
+- Icon style matches the **GBP “?”** tooltip/info treatment (no generic web icon set)
+
+**Design system references (keep in repo / project files):**
+- `pogo-pal-design-system-v3.html` (era palettes + component vibe)
+- `pogo-pal-typography-reference.html` (hierarchy rules)
+- `pogo-pal-battle-icons.html` (lookalike icon inspirations)
+
+---
+
+## 3) Versus mode rules (v1)
+
+**When users use it:** they’re typically already on GO’s pre-battle team-select screen and need fast choices.
+
+**Primary output priority**
+1) **Top Picks (3–6)** from roster
+2) **Risky Picks (3–6)** from roster
+3) Then scan blocks:
+   - BRING (moves)
+   - AVOID (moves)
+   - DON’T BRING (bodies)
+   - WATCH OUT FOR (likely STAB)
+
+**Ranking philosophy**
+Survive first → offense proxy second (with a minimum offense floor) → CP third.
+
+**Human-readable categories only**
+Super effective / OK / Not very effective.  
+No raw multipliers anywhere. No tap-to-reveal multipliers.
+
+**Nuance**
+Small “rule of thumb + generally true” note is behind a handheld-styled tooltip icon.
+
+---
+
+## 4) CSV parsing status + target
+
+### Current
+- Upload wired; CSV loads and displays rows.
+- Parser detects format using marker columns (PokéGenie vs Calcy IV).
+- Debug panel exists but should be gated.
+
+### Target (priority)
+Harden PokéGenie parsing across variants/locales:
+- Robust header detection
+- Parse: name/species, CP, IV% (IV% OR “15/14/13” OR Atk/Def/Sta columns), shadow/purified, quick move
+- Types: from CSV if present OR species→type mapping
+- Clear in-UI errors on failures
+- Debug panel hidden by default; shown only in debug mode or parse/mapping failures
+
+---
+
+## 5) Filtering + sorting correctness (priority)
+
+- Type filtering matches Pokémon types
+- “Showing X of Y” correct
+- Sorting applies to filtered subset
+
+---
+
+## 6) Version ledger (append)
+
+Latest known files in workspace (keep most recent at top):
+- v30: pogo-v3-prototype-v3_30-csv-parse-debug-gate.html
+- v29e: pogo-v3-prototype-v3_29e-handoff-find-tokens.html
+- v28: pogo-v3-prototype-v3_28-vs-mode-tune1.html
+- v27: pogo-v3-prototype-v3_27-vs-mode-roster.html
+- v26: pogo-v3-prototype-v3_26-battleassistant-coach-tooltip.html
+- v25: pogo-v3-prototype-v3_25-skin-toggle-typography.html
+- v24: pogo-v3-prototype-v3_24-skin-toggle.html
+- v23: pogo-v3-prototype-v3_23-battleassistant.html
+
+---
+
+## 7) Changelog (append only)
+
+**Template (every version)**
+- Changed: 2–3 bullets (user-visible)
+- Outcome: 1 bullet (what improved / what we learned)
+- Next (Immediate): the next chunk
+- Next (Big picture): which big rock this advances
+
+### v29d (mini) — Handoff doc becomes single-file source of truth
+- Changed: Updated the embedded handoff instructions to assume **one artifact** (the HTML) is the only required handoff.
+- Changed: Updated the “handoff to new chat” prompt to stop referencing a separate `.md` file (design system files are optional attachments).
+- Outcome: New chats can resume by uploading the latest HTML alone, with zero ambiguity about where the changelog lives.
+- Next (Immediate): Robust CSV parsing across PokéGenie variants + gate the CSV debug panel (show only in debug or on parse/mapping failure).
+- Next (Big picture): Reduce continuity friction so we spend time shipping features, not reconstructing context.
+
+### v29
+- Added: Mode tabs reordered to **Versus | Collection | Trade** and introduced a **Trade** placeholder screen.
+- Changed: Moved **Upload CSV** out of the app bar into an always-present **Utility Row** under the tabs (consistent placement across modes).
+- Changed: Restyled the app bar **Info** control as a GBP-style **“?”** icon button and tightened drawer close affordances.
+- Outcome: Cleaner IA and safer sticky stacking, setting up the next phase (CSV parsing hardening + filter/sort correctness).
+- Next (Immediate): Robust CSV parsing across PokéGenie variants + gate the CSV debug panel (show only in debug or on parse/mapping failure).
+- Next (Big picture): Establish stable IA so parsing + filter/sort work can land without UI churn.
+
+### v29a (mini) — Code Map + section markers (navigation scaffolding only)
+- Added: Top-of-file **Code Map** comment with version/slug, last changes, and quick anchor pointers (App Bar, Tabs, Utility Row, Views, Parser, Table).
+- Added: HTML `<!-- SECTION: ... -->` markers above major UI blocks + CSS/JS section headers inside `<style>`/`<script>`.
+- Added: Stable IDs: `#appBar`, `#modeTabs`, `#utilityRow`, `#viewVersus`, `#viewCollection`, `#viewTrade`, `#resultsScroll`, `#resultsTable` (kept existing JS IDs intact).
+- Outcome: Future edits become surgical (find the section, change the thing, avoid accidental regressions).
+- Next (Immediate): Robust CSV parsing + debug gating (no UI changes until parsing is stable).
+- Next (Big picture): Reduce “where is X?” time cost; keep momentum across chats.
+
+### v28
+- Changed: Removed DS toggle; committed to one handheld style
+- Changed: Renamed VS → Versus; unified mode pill styling
+- Changed: Hid Collection summary line while in Versus
+- Outcome: Versus reads like a distinct mode and is less confusing
+- Next (Immediate): Add Trade tab + utility row; move Upload into utility row; restyle Info icon
+- Next (Big picture): Establish stable IA before VS hierarchy tightening + parser work
+
+### v27
+- Changed: Introduced Versus mode with roster-aware Top/Risky picks
+- Changed: Shifted guidance to scan-friendly blocks (no multiplier pills)
+- Outcome: Versus became usable “in the moment” for casual players
+- Next (Immediate): Tighten mode navigation + consistent upload placement
+- Next (Big picture): Make the tool feel like a cohesive product (IA + system rules)
+
+### v26
+- Changed: Coach language + tooltip nuance; removed multipliers entirely
+- Outcome: Guidance became accessible and less “mathy”
+- Next (Immediate): Promote Versus to a coherent mode (entry point + hierarchy)
+- Next (Big picture): Build toward roster-aware recommendations
+
+### v25
+- Changed: Added typography rules to handheld skin (display/body/pixel label accents)
+- Outcome: Directional move toward handheld UI readability
+- Next (Immediate): Iterate battle assistant UX to game-language labels
+- Next (Big picture): Establish a consistent design system
+
+### v24
+- Changed: Added skin toggle experiment (Classic ⇄ GBA/DS)
+- Outcome: Validated handheld-inspired tokenization without refactoring layout
+- Next (Immediate): Apply typography reference and refine icons
+- Next (Big picture): Choose a single design direction
+
+### v23
+- Changed: Added Battle Assistant (initial entry point) with opponent type selection and best/avoid outputs
+- Outcome: First functional battle guidance feature landed
+- Next (Immediate): Translate multipliers into game language + improve UX hierarchy
+- Next (Big picture): Make guidance actionable for casual players
+
+---
+
+## 8) Product Journey Log (append one entry per version)
+
+**Template**
+- Version: vXX
+- Moment: (date/label)
+- Problem:
+- Decision:
+- Outcome:
+- Next (Immediate):
+- Next (Big picture):
+
+### v29d
+- Problem: Two "sources of truth" (HTML + separate handoff markdown) created avoidable confusion about what to update.
+- Decision: Make the HTML the single handoff artifact by embedding the continuity doc inside it and updating the handoff prompt accordingly.
+- Outcome: Faster resumes across chats with fewer missed updates.
+- Next (Immediate): Robust CSV parsing across PokéGenie variants + gate the CSV debug panel.
+- Next (Big picture): Keep continuity friction near-zero so every session ships.
+
+### v29
+- Problem: Upload was living in the app bar and the mode nav didn’t have room to grow (Trade coming soon).
+- Decision: Reframe nav to **Versus | Collection | Trade** and add a persistent **Utility Row** for core actions like Upload.
+- Outcome: More predictable layout and a stable place for global utilities, with fewer future refactors.
+
+### v28
+- Version: v28
+- Moment: Versus UX tightened
+- Problem: Mode controls and summary content felt confusing in Versus
+- Decision: Renamed VS to Versus, unified pills, hid Collection summary in Versus
+- Outcome: Navigation feels clearer; Versus reads like a distinct mode
+- Next (Immediate): Add Trade tab + utility row + move Upload; restyle Info
+- Next (Big picture): Stable IA before deeper VS hierarchy + parsing correctness work
+
+### v27
+- Version: v27
+- Moment: Versus becomes roster-aware
+- Problem: “Bring these move types” isn’t actionable if you can’t inspect moves mid-battle
+- Decision: Lead with Top Picks / Risky Picks from roster; keep scan blocks as explanation
+- Outcome: Users can pick Pokémon quickly in the GO team-select screen
+- Next (Immediate): Reframe navigation so Versus is a true mode; consistent Upload placement
+- Next (Big picture): Productize the prototype into coherent modes
+
+### v26
+- Version: v26
+- Moment: Multipliers removed
+- Problem: Users didn’t understand x1.6/x0.63 pills; felt like meaningless math
+- Decision: Use only “Super effective / OK / Not very effective” and a small nuance tooltip
+- Outcome: Guidance became accessible to casual players
+- Next (Immediate): Improve Versus entry point + hierarchy
+- Next (Big picture): Move toward roster-aware picks
+
+### v25
+- Version: v25
+- Moment: Typography direction
+- Problem: Typography hierarchy felt inconsistent; handheld vibe needed rules
+- Decision: Adopt a hierarchy (display/body/pixel accents) and tighten token usage
+- Outcome: More consistent look; easier scanning
+- Next (Immediate): Rework battle assistant output hierarchy
+- Next (Big picture): Commit to a single handheld-inspired system
+
+### v24
+- Version: v24
+- Moment: Skin toggle experiment
+- Problem: Needed a safe way to explore new design system without risky refactors
+- Decision: Introduced a skin toggle powered by CSS variables
+- Outcome: Enabled rapid iteration and comparison
+- Next (Immediate): Apply typography reference; update icons
+- Next (Big picture): Choose one design direction and simplify
+
+### v23
+- Version: v23
+- Moment: Battle assistant lands
+- Problem: Users needed quick type guidance inside battles
+- Decision: Added battle assistant with opponent type selection and best/avoid outputs
+- Outcome: First battle guidance capability existed
+- Next (Immediate): Translate to game language and improve scanability
+- Next (Big picture): Make guidance roster-aware and actionable
+
+---
+
+## Code hygiene rules (mandatory)
+
+**In the HTML (top of file):**
+- Keep a **Code Map** comment block with:
+  - current version + slug
+  - 5–10 bullets of what changed last
+  - anchors/IDs for APP BAR, TABS, UTILITY ROW, VS ROOT, COLLECTION ROOT, PARSER, TABLE
+- Add `SECTION:` markers in HTML/CSS/JS for surgical edits.
+
+**Engineering discipline:**
+- One chunk per version bump. Keep diffs small.
+- Avoid heavy rerender loops (especially table renders).
+- Shared CTAs used across modes must live in the **same UI slot** across modes; only emphasis may change.
+- If you intentionally shift “era” (GBP → GBA/DS), document it in **Next Up**, the **Changelog**, and the HTML **Code Map**.
+
+---
+
+## Known gotchas
+- Safari: one syntax error can break everything
+- Avoid heavy rerender loops; be careful with table rendering
+- No official icon assets; only lookalikes
+
+</script>
+<!-- HANDOFFDOC:END -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Keeping PapaParse for later chunks (upload + parsing). Not used yet in Chunk 1. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+    /* SECTION: TOKENS */
+    :root {
+      /* Keep the existing dark-ish scheme */
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-card: #0f3460;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --border-color: #2a2a4a;
+      --accent: #e94560;
+
+      /* Typography tokens (skin can override) */
+      --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      /* Layout constants */
+      --appbar-h: 52px;
+      --appbar-real-h: var(--appbar-h);
+      --modebar-h: 44px;
+      --modebar-real-h: 44px;
+      --utilbar-h: 44px;
+      --utilbar-real-h: var(--utilbar-h);
+      --typebar-h: 48px;
+      /* Collection summary is a permanent tier: give it real breathing room */
+      --collectionbar-h: 60px;
+      --collectionbar-real-h: var(--collectionbar-h);
+      --filterzone-real-h: 0px;
+      --sticky-offset: 0px;
+      --table-sticky-top: 0px;
+      --sticky-stack-h: 0px;
+
+      /* Type colors (close to common PoGO/Pokémon palette) */
+      --t-normal: #A8A77A;
+      --t-fire: #EE8130;
+      --t-water: #6390F0;
+      --t-electric: #F7D02C;
+      --t-grass: #7AC74C;
+      --t-ice: #96D9D6;
+      --t-fighting: #C22E28;
+      --t-poison: #A33EA1;
+      --t-ground: #E2BF65;
+      --t-flying: #A98FF3;
+      --t-psychic: #F95587;
+      --t-bug: #A6B91A;
+      --t-rock: #B6A136;
+      --t-ghost: #735797;
+      --t-dragon: #6F35FC;
+      --t-dark: #705746;
+      --t-steel: #B7B7CE;
+      --t-fairy: #D685AD;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+      /* SECTION: TYPOGRAPHY */
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.35;
+    }
+
+    button { font-family: inherit; }
+
+    /* App shell */
+    /* SECTION: LAYOUT */
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Sticky top nav (Option C) */
+    .appbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--appbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      background: rgba(22, 33, 62, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .appbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    /* SECTION: COMPONENTS */
+
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .icon-btn:active {
+      transform: translateY(1px);
+    }
+
+    .close-x{ font-weight: 900; font-size: 16px; line-height: 1; }
+
+    
+    /* Skin + icon marks */
+    .vs-mark{
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: -0.8px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+      user-select: none;
+    }
+    .skin-mark{
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.6px;
+      opacity: 0.95;
+      user-select: none;
+    }
+
+    /* Skin overrides: GBA/DS hybrid */
+    html[data-skin="gba-ds"]{
+      --bg-primary: #0b0c14;
+      --bg-secondary: #14162a;
+      --bg-card: #1f2342;
+      --text-primary: rgba(255,255,255,0.96);
+      --text-secondary: rgba(255,255,255,0.72);
+      --border-color: rgba(255,255,255,0.14);
+      --accent: #7B68EE;
+
+      /* Typography (from PoGO Pal typography reference: GBA + DS hybrid) */
+      --font-ui: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-display: var(--font-ui);
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-pixel: "Press Start 2P", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --font-size-display: 18px;      /* DS display: 18–20px */
+      --font-weight-display: 700;     /* DS display weight: 600–700 */
+      --font-size-body: 15px;         /* DS body: 14–15px (slightly roomy) */
+      --line-height-body: 1.7;        /* DS body: ~1.7 */
+      --font-size-label: 10px;        /* GBA display: 9–10px */
+      --letter-spacing-label: 0.9px;  /* crunchy handheld UI vibe */
+    }
+
+    html[data-skin="gba-ds"] body{
+      background: radial-gradient(1200px 600px at 30% -10%, rgba(123,104,238,0.22), transparent 55%),
+                  radial-gradient(900px 500px at 110% 10%, rgba(33,150,243,0.14), transparent 55%),
+                  var(--bg-primary);
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+    }
+
+    html[data-skin="gba-ds"] .appbar{
+      background: rgba(20, 22, 42, 0.80);
+      border-bottom-color: rgba(255,255,255,0.10);
+    }
+
+    html[data-skin="gba-ds"] .collectionbar{
+      background: rgba(20, 22, 42, 0.62);
+      border-bottom-color: rgba(255,255,255,0.10);
+    }
+
+    html[data-skin="gba-ds"] .filterzone{
+      background: rgba(31, 35, 66, 0.78);
+      border-bottom-color: rgba(255,255,255,0.10);
+    }
+
+    html[data-skin="gba-ds"] .icon-btn{
+      border-radius: 12px;
+      border-color: rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    html[data-skin="gba-ds"] .icon-btn .vs-mark{
+      border: none;
+      background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+      box-shadow: 0 4px 14px rgba(229,57,53,0.30);
+      border-radius: 8px;
+      width: 26px;
+      height: 26px;
+      font-size: 12px;
+      letter-spacing: -0.6px;
+    }
+
+    html[data-skin="gba-ds"] .title{
+      font-family: var(--font-pixel);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      font-size: 12px;
+      color: #EAF7FF;
+      text-shadow: 0 1px 0 rgba(0,0,0,.35);
+    }
+
+    html[data-skin="gba-ds"] .sheet{
+      background: rgba(20, 22, 42, 0.96);
+      border-top-color: rgba(255,255,255,0.12);
+    }
+
+    html[data-skin="gba-ds"] .sheet-header{
+      border-bottom-color: rgba(255,255,255,0.10);
+    }
+
+    html[data-skin="gba-ds"] .sheet-btn{
+      border-radius: 12px;
+    }
+    html[data-skin="gba-ds"] .collection-note,
+    html[data-skin="gba-ds"] .sheet-title,
+    html[data-skin="gba-ds"] .panel-header h2{
+      font-family: var(--font-pixel);
+      font-size: var(--font-size-label);
+      letter-spacing: var(--letter-spacing-label);
+      text-transform: uppercase;
+      line-height: 1.6;
+    }
+
+    html[data-skin="gba-ds"] .collection-stat{
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    html[data-skin="gba-ds"] .types-open-btn,
+    html[data-skin="gba-ds"] .sheet-btn{
+      font-family: var(--font-ui);
+      font-weight: 600;
+    }
+
+    html[data-skin="gba-ds"] .vs-mark,
+    html[data-skin="gba-ds"] .skin-mark{
+      font-family: var(--font-pixel);
+    }
+
+    html[data-skin="gba-ds"] .battle-tiprow .tip-btn{
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      letter-spacing: -0.6px;
+      border: none;
+      background: linear-gradient(135deg, rgba(33,150,243,0.30), rgba(123,104,238,0.28));
+      box-shadow: 0 4px 14px rgba(123,104,238,0.18);
+    }
+
+
+.title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 54vw;
+    }
+
+    .appbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hidden-file {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+
+
+/* Mode switch (Collection | Versus) */
+.modebar{
+  position: sticky;
+  top: var(--appbar-real-h);
+  z-index: 190;
+  height: var(--modebar-h);
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(20, 22, 42, 0.82);
+  backdrop-filter: blur(10px);
+}
+.modebar-inner{
+  display: inline-flex;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.mode-tab{
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.78);
+  font-family: var(--font-ui, var(--font-body));
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.mode-tab .vs-mark{
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  font-size: 11px;
+}
+.mode-tab.is-active{
+  color: rgba(0,0,0,0.86);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+.mode-tab.is-active .vs-mark{
+  border-color: rgba(0,0,0,0.22);
+  background: rgba(0,0,0,0.12);
+  color: rgba(0,0,0,0.82);
+
+.utility-row{
+  position: sticky;
+  top: calc(var(--appbar-real-h) + var(--modebar-real-h));
+  z-index: 195;
+  height: var(--utilbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(20, 22, 42, 0.82);
+  backdrop-filter: blur(10px);
+}
+.utility-left{ display:flex; align-items:center; gap:10px; }
+.utility-right{ display:flex; align-items:center; gap:10px; }
+
+.util-btn{
+  appearance:none;
+  border: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  border-radius: 12px;
+  height: 34px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.util-btn:active{ transform: translateY(1px); }
+.util-icon .icon{ width: 18px; height: 18px; opacity: 0.95; }
+.util-label{ font-weight: 800; letter-spacing: 0.2px; }
+
+.icon-btn.gbp-q{
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1;
+  background: rgba(155,188,15,0.14);
+  border-color: rgba(155,188,15,0.40);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+}
+
+/* Filter zone (Selected row + Type bar stay pinned together) */
+
+.collectionbar {
+  position: sticky;
+  top: calc(var(--appbar-real-h) + var(--modebar-real-h) + var(--utilbar-real-h));
+  z-index: 200;
+  min-height: var(--collectionbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(10, 30, 56, 0.75);
+  backdrop-filter: blur(10px);
+}
+
+.collection-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.collection-stat {
+  font-size: 14.5px;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.82);
+  white-space: nowrap;
+}
+
+.collection-stat strong {
+  color: rgba(255,255,255,0.95);
+}
+
+.collection-note {
+  font-size: 13px;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+}
+
+.filterzone {
+  position: sticky;
+  /* Stack directly under the collectionbar (no sticky overlap) */
+  top: calc(var(--appbar-real-h) + var(--modebar-real-h) + var(--utilbar-real-h) + var(--collectionbar-real-h));
+  z-index: 80;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(15, 52, 96, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+/* Active filters strip (icons-only when active) */
+.active-strip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+}
+
+
+.active-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.types-open-btn {
+  touch-action: manipulation;
+  z-index: 2;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.types-open-btn:active { transform: translateY(1px); }
+.types-open-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(233, 69, 96, 0.18);
+  border: 1px solid rgba(233, 69, 96, 0.35);
+  color: var(--accent);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.active-icons {
+  z-index: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;          /* wrap instead of horizontal scrolling */
+  overflow: visible;        /* no side-scroll */
+  padding: 2px 0;
+}
+
+
+.active-all {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.icon-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.25) inset;
+  flex: 0 0 auto;
+}
+.icon-chip.is-selected {
+  border-color: rgba(233, 69, 96, 0.55);
+  box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.18), 0 0 0 2px rgba(0,0,0,0.25) inset;
+}
+.icon-chip svg {
+  width: 18px;
+  height: 18px;
+  fill: rgba(255,255,255,0.92);
+  opacity: 0.95;
+}
+
+.icon-chip-btn{
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-chip-btn:active{ transform: translateY(1px); }
+
+/* Bottom sheet */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 90;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 210;
+  background: rgba(22, 33, 62, 0.98);
+  border-top: 1px solid rgba(255,255,255,0.10);
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  max-height: 78vh;
+  box-shadow: 0 -14px 40px rgba(0,0,0,0.35);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sheet-title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.sheet-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sheet-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.sheet-btn.ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.sheet-body {
+  padding: 12px;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 520px) {
+  .type-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+.type-grid-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  color: var(--text-primary);
+  text-align: left;
+  min-width: 0;
+}
+
+.type-grid-btn .icon-chip {
+  width: 30px;
+  height: 30px;
+}
+
+.type-grid-btn .type-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-grid-btn.is-selected {
+  border-color: rgba(233, 69, 96, 0.55);
+  background: rgba(233, 69, 96, 0.12);
+}
+
+.sheet-hint {
+  margin-top: 10px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* Battle assistant */
+.battle-hint{
+  margin: 6px 0 10px 0;
+  opacity: 0.85;
+}
+.battle-selected-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom: 10px;
+}
+.battle-selected{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.battle-selected .battle-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  cursor:pointer;
+  user-select:none;
+}
+.battle-selected .battle-chip .icon-chip{
+  width:22px;
+  height:22px;
+}
+.battle-selected-note{
+  opacity: 0.75;
+  font-size: 12px;
+}
+.battle-recs{
+  margin-top: 12px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.battle-section{
+  border-top: 1px solid rgba(255,255,255,0.10);
+  padding-top: 10px;
+}
+.battle-section h4{
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+.battle-pillrow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.battle-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.battle-pill .icon-chip{
+  width:22px;
+  height:22px;
+}
+
+/* Battle assistant coach + tip */
+.battle-coachline{
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.battle-coachline .coach-title{
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: 0.95;
+}
+.battle-coachline .coach-text{
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.92;
+}
+.battle-coachline .coach-text strong{ font-weight: 900; }
+
+.battle-tiprow{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:10px;
+  margin-top: 6px;
+  position: relative;
+}
+.battle-tiprow .tip-label{
+  font-size: 12px;
+  opacity: 0.75;
+}
+.battle-tiprow .tip-btn{
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.20);
+  color: var(--text-primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+}
+.battle-tooltip{
+  position: absolute;
+  right: 0;
+  bottom: 38px;
+  width: min(320px, calc(100vw - 56px));
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(9, 11, 20, 0.96);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  padding: 12px 12px;
+  color: var(--text-primary);
+}
+.battle-tooltip .t{
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.92;
+}
+.battle-tooltip .t + .t{ margin-top: 8px; opacity: 0.86; }
+
+
+/* Selected types row (Option 1) */
+.selected-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px 8px;
+  border-bottom: 1px solid rgba(42, 42, 74, 0.55);
+  /* Multi-line selected chips: wrap to additional lines instead of overlapping */
+  /* Keep the whole filter zone sticky; constrain chip area if it grows too tall */
+}
+
+.selected-row[hidden] { display: none; }
+
+.selected-row::-webkit-scrollbar { height: 8px; }
+.selected-row::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
+  border-radius: 999px;
+}
+
+.selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Up to ~2 lines visible; beyond that, scroll inside this little zone */
+  max-height: 64px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.selected-chips::-webkit-scrollbar { width: 8px; }
+.selected-chips::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.10);
+  border-radius: 999px;
+}
+
+.sel-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.12);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.sel-chip .x {
+  opacity: 0.9;
+  font-weight: 800;
+  margin-left: 2px;
+}
+
+.clear-btn {
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.10);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.88rem;
+  align-self: flex-start;
+}
+
+    /* Sticky type bar (horizontal scroll pills) */
+    
+.typebar {
+  height: var(--typebar-h);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+}
+
+    .typebar::-webkit-scrollbar {
+      height: 8px;
+    }
+    .typebar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+    }
+
+    .type-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.12);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .type-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--text-secondary);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.2) inset;
+    }
+
+    /* Placeholder selected state (real logic comes later) */
+    .type-pill.is-selected {
+      border-color: rgba(233, 69, 96, 0.8);
+      box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.25);
+    }
+
+
+.type-pill.is-selected::after {
+  content: "✓";
+  font-weight: 900;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-left: 2px;
+}
+
+    /* Content */
+    .main {
+      padding: 12px;
+    }
+
+    .showing-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0 10px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .showing-row strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .hint {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin: 0 0 10px;
+    }
+
+    /* Results placeholder card */
+    .panel {
+      background: rgba(15, 52, 96, 0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-header h2 {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .panel-header .sub {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* Table container (side-scroll comes in Chunk 2) */
+    /* SECTION: TABLE */
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px; /* intentionally wider than mobile */
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(42, 42, 74, 0.6);
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      position: sticky;
+      top: var(--table-sticky-top);
+      z-index: 20;
+      /* stick below the app's sticky bars */
+      background: rgba(22, 33, 62, 0.92);
+      color: var(--text-secondary);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    th.sortable:active { transform: translateY(1px); }
+    .th-inner{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sort-ind{
+      font-size: 0.8em;
+      opacity: 0.75;
+      letter-spacing: 0;
+    }
+
+
+    .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+    /* Mobile density tweaks */
+    @media (max-width: 480px) {
+      :root {
+        --appbar-h: 50px;
+        --typebar-h: 46px;
+      }
+      .title { max-width: 52vw; }
+      th, td { padding: 9px 10px; font-size: 0.9rem; }
+      .main { padding: 10px; }
+    }
+
+    /* Tiny SVG icons look nicer if slightly muted */
+    .icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.95;
+      fill: currentColor;
+    }
+  
+    /* CSV parse / upload error panel */
+    .error-panel {
+      margin: 10px 12px 0 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(233,69,96,0.55);
+      background: rgba(233,69,96,0.12);
+      color: rgba(255,255,255,0.92);
+      font-size: 13.5px;
+      line-height: 1.3;
+    }
+    .error-panel .error-title {
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+    .error-panel .error-meta {
+      color: rgba(255,255,255,0.75);
+      font-size: 12.5px;
+    }
+    .error-panel code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+    }
+
+  
+    /* Info drawer (glossary) */
+    body.no-scroll { overflow: hidden; }
+
+    .drawer-backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 2100;
+    }
+
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(380px, 92vw);
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      box-shadow: -18px 0 40px rgba(0,0,0,0.35);
+      transform: translateX(104%);
+      transition: transform 180ms ease;
+      z-index: 2200;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open{ transform: translateX(0); }
+
+    .drawer-header{
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(22,33,62,1) 0%, rgba(22,33,62,0.92) 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .drawer-title{
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.2px;
+    }
+    .drawer-content{
+      padding: 12px 12px 20px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .drawer-content details{
+      border: 1px solid var(--border-color);
+      background: rgba(15,52,96,0.35);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin: 10px 0;
+    }
+    .drawer-content summary{
+      cursor: pointer;
+      font-weight: 650;
+      color: var(--text-primary);
+      list-style: none;
+    }
+    .drawer-content summary::-webkit-details-marker{ display: none; }
+    .drawer-content .gloss{
+      margin-top: 8px;
+      color: var(--text-secondary);
+      line-height: 1.35;
+      font-size: 13.5px;
+    }
+    .drawer-content code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12.5px;
+      background: rgba(0,0,0,0.25);
+      padding: 1px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .grade-grid{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .grade-pill{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.18);
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 42px;
+    }
+
+    /* CSV debug panel (headers + mapping) */
+    .debug-details{
+      margin: 10px 12px 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .debug-details > summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+    }
+    .debug-details > summary::-webkit-details-marker{ display: none; }
+    .debug-details > summary .mono{ opacity: 0.8; font-size: 12px; }
+    .debug-body{
+      padding: 10px 12px 12px 12px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+    .debug-block + .debug-block{ margin-top: 10px; }
+    .debug-label{ font-size: 12px; opacity: 0.72; margin-bottom: 6px; }
+    .debug-chipwrap{ display: flex; flex-wrap: wrap; gap: 6px; }
+    .debug-chip{
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.15);
+      opacity: 0.92;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .debug-mapping, .debug-sample{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      word-break: break-word;
+      opacity: 0.92;
+    }
+
+    /* SECTION: UTILITIES */
+    /* Navigation-only wrappers: preserve layout */
+    #viewVersus,
+    #viewCollection,
+    #viewTrade { display: contents; }
+
+</style>
+</head>
+<body>
+
+<!-- SECTION: HANDOFF DOC (EMBEDDED) -->
+
+
+<div class="app">
+<!-- SECTION: APP BAR -->
+<!-- Sticky App Bar (Option C) -->
+<header id="appBar" class="appbar">
+  <div class="appbar-left">
+    <div class="title">PoGO Pal</div>
+  </div>
+  <div class="appbar-right">
+    <button id="infoBtn" class="icon-btn gbp-q" type="button" aria-label="Info" title="Glossary">?</button>
+  </div>
+</header>
+
+<!-- SECTION: MODE TABS -->
+<div id="modeTabs" class="modebar" role="tablist" aria-label="Mode">
+  <div class="modebar-inner">
+    <button id="modeVsBtn" class="mode-tab" role="tab" aria-selected="false" type="button"><span class="vs-mark" aria-hidden="true">VS</span> Versus</button>
+    <button id="modeCollectionBtn" class="mode-tab is-active" role="tab" aria-selected="true" type="button">Collection</button>
+    <button id="modeTradeBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Trade</button>
+  </div>
+</div>
+
+<!-- SECTION: UTILITY ROW -->
+<div id="utilityRow" class="utility-row" aria-label="Utility">
+  <div class="utility-left">
+    <input accept=".csv" class="hidden-file" id="fileInput" type="file"/>
+    <button id="uploadBtn" class="util-btn" type="button" aria-label="Upload CSV" title="Upload CSV">
+      <span class="util-icon" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
+        </svg>
+      </span>
+      <span class="util-label">Upload</span>
+    </button>
+  </div>
+  <div class="utility-right"></div>
+</div>
+
+<div id="collectionSticky">
+
+<div aria-label="Collection summary" class="collectionbar" id="collectionBar"><div class="collection-left"><div class="collection-stat">Pokémon: <strong id="collectionCount">—</strong></div><div class="collection-stat">Type coverage: <strong id="collectionCoverage">—/18</strong></div></div><div class="collection-note" title="Updates after CSV upload">Collection</div></div>
+<!-- Filters (Option C + Compact Active Icons + Type Picker Sheet) -->
+<div aria-label="Filters" class="filterzone" id="filterZone">
+<div aria-label="Active filters" class="active-strip">
+<div class="active-left">
+<button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
+<span aria-hidden="true" class="types-open-icon">+</span>
+<span>Types</span>
+</button>
+<div aria-label="Selected types" class="active-icons" id="activeIcons">
+<span class="active-all" id="activeAll">All types</span>
+</div>
+</div>
+<button class="clear-btn" hidden="" id="clearBtn" type="button">Clear</button>
+</div>
+</div>
+<!-- Bottom sheet: Type picker -->
+<!-- SECTION: DRAWERS / SHEETS -->
+<div class="sheet-backdrop" hidden="" id="sheetBackdrop"></div>
+<section aria-label="Choose types" aria-modal="true" class="sheet" hidden="" id="typesSheet" role="dialog">
+<div class="sheet-header">
+<div class="sheet-title">Choose types</div>
+<div class="sheet-actions">
+<button class="sheet-btn ghost" id="selectAllBtn" type="button">All</button>
+<button class="sheet-btn ghost" id="sheetClearBtn" type="button">Clear</button>
+<button class="sheet-btn" id="sheetDoneBtn" type="button">Done</button>
+</div>
+</div>
+<div class="sheet-body">
+<div aria-label="Type grid" class="type-grid" id="typeGrid"></div>
+<div class="sheet-hint mono">Tap types to toggle. Selected types show as icons above.</div>
+</div>
+</section>
+</div>
+
+<!-- VS mode (Collection sticky stack ends above) -->
+</div>
+<main class="main">
+<!-- SECTION: VIEW: VERSUS -->
+<div id="viewVersus">
+<section id="vsView" class="vs-view" hidden>
+  <div class="vs-panel">
+    <div class="vs-panel-header">
+      <div class="vs-panel-title">VS Assistant</div>
+      <div class="vs-panel-sub mono" id="vsSub">Pick opponent type(s). We’ll surface your best picks, plus what to bring/avoid.</div>
+    </div>
+
+    <div class="vs-block">
+      <div class="vs-block-h">
+        <span class="vs-k">Opponent types</span>
+        <span class="vs-k mono" id="vsCountNote">0/3</span>
+      </div>
+
+      <div class="battle-selected-wrap" aria-label="Selected opponent types">
+        <div class="battle-selected" id="vsSelected"></div>
+        <div class="battle-selected-note mono" id="vsSelectedNote">Pick up to 3 types.</div>
+      </div>
+
+      <details class="vs-details" id="vsTypePicker" open>
+        <summary class="vs-summary"><span class="mono">Change opponent types</span></summary>
+        <div class="type-grid" id="vsTypeGrid" aria-label="Opponent type grid"></div>
+      </details>
+
+      <div class="vs-actions">
+        <button class="sheet-btn ghost" id="vsClearBtn" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="vs-hero" id="vsHero" hidden>
+      <div class="vs-hero-grid">
+        <div class="vs-hero-card">
+          <div class="vs-h">Top picks</div>
+          <div class="vs-picks" id="vsTopPicks"></div>
+          <div class="vs-empty mono" id="vsTopEmpty">Upload a CSV in Collection mode to see roster picks.</div>
+        </div>
+
+        <div class="vs-hero-card">
+          <div class="vs-h">Risky picks</div>
+          <div class="vs-picks" id="vsRiskyPicks"></div>
+          <div class="vs-empty mono" id="vsRiskyEmpty">These are strong CP options that take big damage here.</div>
+        </div>
+      </div>
+
+      <div class="vs-note mono" id="vsRosterNote" hidden></div>
+
+      <div class="vs-brief">
+        <div class="brief-row">
+          <div class="brief-k">Bring (moves)</div>
+          <div class="brief-v" id="vsBringMoves"></div>
+        </div>
+        <div class="brief-row">
+          <div class="brief-k">Avoid (moves)</div>
+          <div class="brief-v" id="vsAvoidMoves"></div>
+        </div>
+        <div class="brief-row">
+          <div class="brief-k">Don’t bring (bodies)</div>
+          <div class="brief-v" id="vsAvoidBodies"></div>
+        </div>
+        <div class="brief-row">
+          <div class="brief-k">Watch out for</div>
+          <div class="brief-v" id="vsWatchOut"></div>
+        </div>
+      </div>
+
+      <div class="battle-tiprow">
+        <div class="tip-label mono">Rule of thumb</div>
+        <button class="tip-btn" id="vsTipBtn" type="button" aria-label="Show rule of thumb">?</button>
+      </div>
+
+      <div class="battle-tooltip" id="vsTooltip" hidden>
+        <div class="t"><strong>Moves matter most.</strong> Your Pokémon’s type is the “body”, but damage is mostly about the <em>move type</em> you’re using.</div>
+        <div class="t">Casual shortcut: if your Pokémon’s body matches a “Bring (moves)” type, it <em>often</em> has a good move… but not always. (TMs and move pools get spicy.)</div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- SECTION: VIEW: COLLECTION -->
+<div id="viewCollection">
+<section id="collectionView" class="collection-view">
+
+<div class="showing-row">
+<div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(—)</span></div>
+</div>
+<div id="parseError" class="error-panel" hidden></div>
+<details id="csvDebug" class="debug-details" hidden>
+  <summary>
+    <span>CSV detected</span>
+    <span id="csvDebugSummary" class="mono"></span>
+  </summary>
+  <div class="debug-body">
+    <div class="debug-block">
+      <div class="debug-label">Headers</div>
+      <div id="csvHeaders" class="debug-chipwrap"></div>
+    </div>
+    <div class="debug-block">
+      <div class="debug-label">Mapping (what we used)</div>
+      <div id="csvMapping" class="debug-mapping"></div>
+    </div>
+    <div class="debug-block">
+      <div class="debug-label">Sample row (first row)</div>
+      <div id="csvSample" class="debug-sample"></div>
+    </div>
+  </div>
+</details>
+<p class="hint">Option C layout: type filters stay pinned, results live directly beneath. (Sorting + multi-select + real counts come next.)</p>
+<section aria-label="Results" class="panel">
+<div class="panel-header">
+<h2>Results</h2>
+<div class="sub">Tap a type pill to filter (wired up in later chunks)</div>
+</div>
+<div id="resultsScroll" class="table-wrap">
+<table id="resultsTable">
+<thead>
+<tr>
+<th class="sortable" data-key="name"><span class="th-inner">Pokémon <span class="sort-ind" aria-hidden="true"></span></span></th>
+<th class="mono sortable" data-key="score"><span class="th-inner">Score <span class="sort-ind" aria-hidden="true"></span></span></th>
+<th class="sortable" data-key="grade"><span class="th-inner">Grade <span class="sort-ind" aria-hidden="true"></span></span></th>
+<th class="mono sortable" data-key="cp"><span class="th-inner">CP <span class="sort-ind" aria-hidden="true"></span></span></th>
+<th class="mono sortable" data-key="iv"><span class="th-inner">IV% <span class="sort-ind" aria-hidden="true"></span></span></th>
+<th class="sortable" data-key="types"><span class="th-inner">Types <span class="sort-ind" aria-hidden="true"></span></span></th>
+</tr>
+</thead>
+<tbody id="resultsBody">
+<!-- rows rendered by JS -->
+</tbody>
+</table>
+</div>
+</section>
+</div>
+
+<!-- SECTION: VIEW: TRADE -->
+<div id="viewTrade">
+<section id="tradeView" class="trade-view" hidden>
+  <div class="vs-panel">
+    <div class="vs-panel-header">
+      <div class="vs-panel-title">Trade</div>
+      <div class="vs-panel-sub mono">Coming soon. This tab will help you pick safe trades, prioritize distance/lucky odds, and export lists you can send to Rachel.</div>
+    </div>
+    <div class="vs-block">
+      <div class="hint">Placeholder screen. No behavior yet.</div>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+
+<div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
+
+<aside id="infoDrawer" class="drawer" aria-hidden="true" aria-label="Glossary drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">Glossary</div>
+    <button id="drawerCloseBtn" class="icon-btn" aria-label="Close glossary" title="Close">
+      <span aria-hidden="true" class="close-x">✕</span>
+    </button>
+  </div>
+
+  <div class="drawer-content">
+    <div class="gloss">
+      This panel is intentionally practical: it describes what this prototype is calculating <em>right now</em>, plus the assumptions behind it.
+      We can refine definitions later, but the UI shouldn’t feel like it’s making up math behind your back.
+    </div>
+
+    <details open>
+      <summary>Score</summary>
+      <div class="gloss">
+        <strong>Current definition (prototype):</strong> <code>Score = IV%</code>.
+        This is a “good enough” stand‑in so sorting and filtering are meaningful while we build.
+        Later, we can introduce separate scores (PvP rank, raid DPS, gym defense, etc.) without confusing them.
+      </div>
+    </details>
+
+    <details open>
+      <summary>IV%</summary>
+      <div class="gloss">
+        <strong>IV%</strong> is the Pokémon’s individual values (IVs) normalized to a percentage:
+        <br/><br/>
+        <code>IV% = ((AtkIV + DefIV + StaIV) / 45) × 100</code>
+        <br/><br/>
+        Each IV ranges 0–15, so the max total is 45.
+        If your CSV includes <code>IV%</code> directly we’ll use that; otherwise we compute from IVs.
+      </div>
+    </details>
+
+    <details open>
+      <summary>Grade</summary>
+      <div class="gloss">
+        A quick letter grade derived from Score/IV%. Thresholds are adjustable; these are the current defaults:
+        <div class="grade-grid" aria-label="Grade thresholds">
+          <div><span class="grade-pill">S</span> Excellent</div><div>≥ 98%</div>
+          <div><span class="grade-pill">A</span> Great</div><div>≥ 90%</div>
+          <div><span class="grade-pill">B</span> Solid</div><div>≥ 80%</div>
+          <div><span class="grade-pill">C</span> OK</div><div>≥ 65%</div>
+          <div><span class="grade-pill">D</span> Meh</div><div>≥ 50%</div>
+          <div><span class="grade-pill">F</span> Low</div><div>&lt; 50%</div>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Tier</summary>
+      <div class="gloss">
+        Not implemented yet in this prototype.
+        The plan is to make “Tier” context‑aware (Ultra League viability, Great League viability, raid attacker, gym defender, etc.).
+        Right now, we avoid pretending we know the “best” without a ruleset.
+      </div>
+    </details>
+
+    <details>
+      <summary>CP%</summary>
+      <div class="gloss">
+        Not implemented yet.
+        “CP%” can mean a few different things (percent of max for its level, percent of species max, percent of league cap).
+        When we add it, we’ll label which one we mean and show the formula.
+      </div>
+    </details>
+
+    <details open>
+      <summary>Type coverage</summary>
+      <div class="gloss">
+        <strong>Collection type coverage</strong> counts how many of the 18 Pokémon types appear anywhere in your uploaded collection.
+        A Pokémon contributes its primary and secondary types.
+        <br/><br/>
+        Coverage is computed as:
+        <br/>
+        <code>(unique types found in collection) / 18</code>
+        <br/><br/>
+        Unknown / malformed values (like “—”) are ignored, so coverage can’t exceed 18.
+      </div>
+    </details>
+
+    <details>
+      <summary>Sources + assumptions</summary>
+      <div class="gloss">
+        - Type colors are approximate PoGO-style palettes.<br/>
+        - Type icons are lookalikes (no official assets).<br/>
+        - If your CSV doesn’t include types, we infer types using a built‑in species→type map (incomplete by design, we’ll expand it).<br/>
+        - Safari is the strictest parser here; if it runs in Safari, it’ll probably run everywhere.
+      </div>
+    </details>
+  </div>
+</aside>
+
+<script>
+// SECTION: CONSTANTS (types, multipliers)
+  const POKEDEX_TYPES={"bulbasaur":["Grass","Poison"],"ivysaur":["Grass","Poison"],"venusaur":["Grass","Poison"],"charmander":["Fire"],"charmeleon":["Fire"],"charizard":["Fire","Flying"],"squirtle":["Water"],"wartortle":["Water"],"blastoise":["Water"],"caterpie":["Bug"],"metapod":["Bug"],"butterfree":["Bug","Flying"],"weedle":["Bug","Poison"],"kakuna":["Bug","Poison"],"beedrill":["Bug","Poison"],"pidgey":["Normal","Flying"],"pidgeotto":["Normal","Flying"],"pidgeot":["Normal","Flying"],"rattata":["Normal"],"raticate":["Normal"],"spearow":["Normal","Flying"],"fearow":["Normal","Flying"],"ekans":["Poison"],"arbok":["Poison"],"pikachu":["Electric"],"raichu":["Electric"],"sandshrew":["Ground"],"sandslash":["Ground"],"nidoranfemale":["Poison"],"nidoranf":["Poison"],"nidoran\u2640":["Poison"],"nidorina":["Poison"],"nidoqueen":["Poison","Ground"],"nidoranmale":["Poison"],"nidoranm":["Poison"],"nidoran\u2642":["Poison"],"nidorino":["Poison"],"nidoking":["Poison","Ground"],"clefairy":["Fairy"],"clefable":["Fairy"],"vulpix":["Fire"],"ninetales":["Fire"],"jigglypuff":["Normal","Fairy"],"wigglytuff":["Normal","Fairy"],"zubat":["Poison","Flying"],"golbat":["Poison","Flying"],"oddish":["Grass","Poison"],"gloom":["Grass","Poison"],"vileplume":["Grass","Poison"],"paras":["Bug","Grass"],"parasect":["Bug","Grass"],"venonat":["Bug","Poison"],"venomoth":["Bug","Poison"],"diglett":["Ground"],"dugtrio":["Ground"],"meowth":["Normal"],"persian":["Normal"],"psyduck":["Water"],"golduck":["Water"],"mankey":["Fighting"],"primeape":["Fighting"],"growlithe":["Fire"],"arcanine":["Fire"],"poliwag":["Water"],"poliwhirl":["Water"],"poliwrath":["Water","Fighting"],"abra":["Psychic"],"kadabra":["Psychic"],"alakazam":["Psychic"],"machop":["Fighting"],"machoke":["Fighting"],"machamp":["Fighting"],"bellsprout":["Grass","Poison"],"weepinbell":["Grass","Poison"],"victreebel":["Grass","Poison"],"tentacool":["Water","Poison"],"tentacruel":["Water","Poison"],"geodude":["Rock","Ground"],"graveler":["Rock","Ground"],"golem":["Rock","Ground"],"ponyta":["Fire"],"rapidash":["Fire"],"slowpoke":["Water","Psychic"],"slowbro":["Water","Psychic"],"magnemite":["Electric","Steel"],"magneton":["Electric","Steel"],"farfetchd":["Normal","Flying"],"doduo":["Normal","Flying"],"dodrio":["Normal","Flying"],"seel":["Water"],"dewgong":["Water","Ice"],"grimer":["Poison"],"muk":["Poison"],"shellder":["Water"],"cloyster":["Water","Ice"],"gastly":["Ghost","Poison"],"haunter":["Ghost","Poison"],"gengar":["Ghost","Poison"],"onix":["Rock","Ground"],"drowzee":["Psychic"],"hypno":["Psychic"],"krabby":["Water"],"kingler":["Water"],"voltorb":["Electric"],"electrode":["Electric"],"exeggcute":["Grass","Psychic"],"exeggutor":["Grass","Psychic"],"cubone":["Ground"],"marowak":["Ground"],"hitmonlee":["Fighting"],"hitmonchan":["Fighting"],"lickitung":["Normal"],"koffing":["Poison"],"weezing":["Poison"],"rhyhorn":["Ground","Rock"],"rhydon":["Ground","Rock"],"chansey":["Normal"],"tangela":["Grass"],"kangaskhan":["Normal"],"horsea":["Water"],"seadra":["Water"],"goldeen":["Water"],"seaking":["Water"],"staryu":["Water"],"starmie":["Water","Psychic"],"mrmime":["Psychic","Fairy"],"scyther":["Bug","Flying"],"jynx":["Ice","Psychic"],"electabuzz":["Electric"],"magmar":["Fire"],"pinsir":["Bug"],"tauros":["Normal"],"magikarp":["Water"],"gyarados":["Water","Flying"],"lapras":["Water","Ice"],"ditto":["Normal"],"eevee":["Normal"],"vaporeon":["Water"],"jolteon":["Electric"],"flareon":["Fire"],"porygon":["Normal"],"omanyte":["Rock","Water"],"omastar":["Rock","Water"],"kabuto":["Rock","Water"],"kabutops":["Rock","Water"],"aerodactyl":["Rock","Flying"],"snorlax":["Normal"],"articuno":["Ice","Flying"],"zapdos":["Electric","Flying"],"moltres":["Fire","Flying"],"dratini":["Dragon"],"dragonair":["Dragon"],"dragonite":["Dragon","Flying"],"mewtwo":["Psychic"],"mew":["Psychic"],"chikorita":["Grass"],"bayleef":["Grass"],"meganium":["Grass"],"cyndaquil":["Fire"],"quilava":["Fire"],"typhlosion":["Fire"],"totodile":["Water"],"croconaw":["Water"],"feraligatr":["Water"],"sentret":["Normal"],"furret":["Normal"],"hoothoot":["Normal","Flying"],"noctowl":["Normal","Flying"],"ledyba":["Bug","Flying"],"ledian":["Bug","Flying"],"spinarak":["Bug","Poison"],"ariados":["Bug","Poison"],"crobat":["Poison","Flying"],"chinchou":["Water","Electric"],"lanturn":["Water","Electric"],"pichu":["Electric"],"cleffa":["Fairy"],"igglybuff":["Normal","Fairy"],"togepi":["Fairy"],"togetic":["Fairy","Flying"],"natu":["Psychic","Flying"],"xatu":["Psychic","Flying"],"mareep":["Electric"],"flaaffy":["Electric"],"ampharos":["Electric"],"bellossom":["Grass"],"marill":["Water","Fairy"],"azumarill":["Water","Fairy"],"sudowoodo":["Rock"],"politoed":["Water"],"hoppip":["Grass","Flying"],"skiploom":["Grass","Flying"],"jumpluff":["Grass","Flying"],"aipom":["Normal"],"sunkern":["Grass"],"sunflora":["Grass"],"yanma":["Bug","Flying"],"wooper":["Water","Ground"],"quagsire":["Water","Ground"],"espeon":["Psychic"],"umbreon":["Dark"],"murkrow":["Dark","Flying"],"slowking":["Water","Psychic"],"misdreavus":["Ghost"],"unown":["Psychic"],"wobbuffet":["Psychic"],"girafarig":["Normal","Psychic"],"pineco":["Bug"],"forretress":["Bug","Steel"],"dunsparce":["Normal"],"gligar":["Ground","Flying"],"steelix":["Steel","Ground"],"snubbull":["Fairy"],"granbull":["Fairy"],"qwilfish":["Water","Poison"],"scizor":["Bug","Steel"],"shuckle":["Bug","Rock"],"heracross":["Bug","Fighting"],"sneasel":["Dark","Ice"],"teddiursa":["Normal"],"ursaring":["Normal"],"slugma":["Fire"],"magcargo":["Fire","Rock"],"swinub":["Ice","Ground"],"piloswine":["Ice","Ground"],"corsola":["Water","Rock"],"remoraid":["Water"],"octillery":["Water"],"delibird":["Ice","Flying"],"mantine":["Water","Flying"],"skarmory":["Steel","Flying"],"houndour":["Dark","Fire"],"houndoom":["Dark","Fire"],"kingdra":["Water","Dragon"],"phanpy":["Ground"],"donphan":["Ground"],"porygon2":["Normal"],"stantler":["Normal"],"smeargle":["Normal"],"tyrogue":["Fighting"],"hitmontop":["Fighting"],"smoochum":["Ice","Psychic"],"elekid":["Electric"],"magby":["Fire"],"miltank":["Normal"],"blissey":["Normal"],"raikou":["Electric"],"entei":["Fire"],"suicune":["Water"],"larvitar":["Rock","Ground"],"pupitar":["Rock","Ground"],"tyranitar":["Rock","Dark"],"lugia":["Psychic","Flying"],"hooh":["Fire","Flying"],"celebi":["Psychic","Grass"],"treecko":["Grass"],"grovyle":["Grass"],"sceptile":["Grass"],"torchic":["Fire"],"combusken":["Fire","Fighting"],"blaziken":["Fire","Fighting"],"mudkip":["Water"],"marshtomp":["Water","Ground"],"swampert":["Water","Ground"],"poochyena":["Dark"],"mightyena":["Dark"],"zigzagoon":["Normal"],"linoone":["Normal"],"wurmple":["Bug"],"silcoon":["Bug"],"beautifly":["Bug","Flying"],"cascoon":["Bug"],"dustox":["Bug","Poison"],"lotad":["Water","Grass"],"lombre":["Water","Grass"],"ludicolo":["Water","Grass"],"seedot":["Grass"],"nuzleaf":["Grass","Dark"],"shiftry":["Grass","Dark"],"taillow":["Normal","Flying"],"swellow":["Normal","Flying"],"wingull":["Water","Flying"],"pelipper":["Water","Flying"],"ralts":["Psychic","Fairy"],"kirlia":["Psychic","Fairy"],"gardevoir":["Psychic","Fairy"],"surskit":["Bug","Water"],"masquerain":["Bug","Flying"],"shroomish":["Grass"],"breloom":["Grass","Fighting"],"slakoth":["Normal"],"vigoroth":["Normal"],"slaking":["Normal"],"nincada":["Bug","Ground"],"ninjask":["Bug","Flying"],"shedinja":["Bug","Ghost"],"whismur":["Normal"],"loudred":["Normal"],"exploud":["Normal"],"makuhita":["Fighting"],"hariyama":["Fighting"],"azurill":["Normal","Fairy"],"nosepass":["Rock"],"skitty":["Normal"],"delcatty":["Normal"],"sableye":["Dark","Ghost"],"mawile":["Steel","Fairy"],"aron":["Steel","Rock"],"lairon":["Steel","Rock"],"aggron":["Steel","Rock"],"meditite":["Fighting","Psychic"],"medicham":["Fighting","Psychic"],"electrike":["Electric"],"manectric":["Electric"],"plusle":["Electric"],"minun":["Electric"],"volbeat":["Bug"],"illumise":["Bug"],"roselia":["Grass","Poison"],"gulpin":["Poison"],"swalot":["Poison"],"carvanha":["Water","Dark"],"sharpedo":["Water","Dark"],"wailmer":["Water"],"wailord":["Water"],"numel":["Fire","Ground"],"camerupt":["Fire","Ground"],"torkoal":["Fire"],"spoink":["Psychic"],"grumpig":["Psychic"],"spinda":["Normal"],"trapinch":["Ground"],"vibrava":["Ground","Dragon"],"flygon":["Ground","Dragon"],"cacnea":["Grass"],"cacturne":["Grass","Dark"],"swablu":["Normal","Flying"],"altaria":["Dragon","Flying"],"zangoose":["Normal"],"seviper":["Poison"],"lunatone":["Rock","Psychic"],"solrock":["Rock","Psychic"],"barboach":["Water","Ground"],"whiscash":["Water","Ground"],"corphish":["Water"],"crawdaunt":["Water","Dark"],"baltoy":["Ground","Psychic"],"claydol":["Ground","Psychic"],"lileep":["Rock","Grass"],"cradily":["Rock","Grass"],"anorith":["Rock","Bug"],"armaldo":["Rock","Bug"],"feebas":["Water"],"milotic":["Water"],"castform":["Normal"],"kecleon":["Normal"],"shuppet":["Ghost"],"banette":["Ghost"],"duskull":["Ghost"],"dusclops":["Ghost"],"tropius":["Grass","Flying"],"chimecho":["Psychic"],"absol":["Dark"],"wynaut":["Psychic"],"snorunt":["Ice"],"glalie":["Ice"],"spheal":["Ice","Water"],"sealeo":["Ice","Water"],"walrein":["Ice","Water"],"clamperl":["Water"],"huntail":["Water"],"gorebyss":["Water"],"relicanth":["Water","Rock"],"luvdisc":["Water"],"bagon":["Dragon"],"shelgon":["Dragon"],"salamence":["Dragon","Flying"],"beldum":["Steel","Psychic"],"metang":["Steel","Psychic"],"metagross":["Steel","Psychic"],"regirock":["Rock"],"regice":["Ice"],"registeel":["Steel"],"latias":["Dragon","Psychic"],"latios":["Dragon","Psychic"],"kyogre":["Water"],"groudon":["Ground"],"rayquaza":["Dragon","Flying"],"jirachi":["Steel","Psychic"],"deoxys":["Psychic"],"turtwig":["Grass"],"grotle":["Grass"],"torterra":["Grass","Ground"],"chimchar":["Fire"],"monferno":["Fire","Fighting"],"infernape":["Fire","Fighting"],"piplup":["Water"],"prinplup":["Water"],"empoleon":["Water","Steel"],"starly":["Normal","Flying"],"staravia":["Normal","Flying"],"staraptor":["Normal","Flying"],"bidoof":["Normal"],"bibarel":["Normal","Water"],"kricketot":["Bug"],"kricketune":["Bug"],"shinx":["Electric"],"luxio":["Electric"],"luxray":["Electric"],"budew":["Grass","Poison"],"roserade":["Grass","Poison"],"cranidos":["Rock"],"rampardos":["Rock"],"shieldon":["Rock","Steel"],"bastiodon":["Rock","Steel"],"burmy":["Bug"],"wormadam":["Bug","Grass"],"mothim":["Bug","Flying"],"combee":["Bug","Flying"],"vespiquen":["Bug","Flying"],"pachirisu":["Electric"],"buizel":["Water"],"floatzel":["Water"],"cherubi":["Grass"],"cherrim":["Grass"],"shellos":["Water"],"gastrodon":["Water","Ground"],"ambipom":["Normal"],"drifloon":["Ghost","Flying"],"drifblim":["Ghost","Flying"],"buneary":["Normal"],"lopunny":["Normal"],"mismagius":["Ghost"],"honchkrow":["Dark","Flying"],"glameow":["Normal"],"purugly":["Normal"],"chingling":["Psychic"],"stunky":["Poison","Dark"],"skuntank":["Poison","Dark"],"bronzor":["Steel","Psychic"],"bronzong":["Steel","Psychic"],"bonsly":["Rock"],"mimejr":["Psychic","Fairy"],"happiny":["Normal"],"chatot":["Normal","Flying"],"spiritomb":["Ghost","Dark"],"gible":["Dragon","Ground"],"gabite":["Dragon","Ground"],"garchomp":["Dragon","Ground"],"munchlax":["Normal"],"riolu":["Fighting"],"lucario":["Fighting","Steel"],"hippopotas":["Ground"],"hippowdon":["Ground"],"skorupi":["Poison","Bug"],"drapion":["Poison","Dark"],"croagunk":["Poison","Fighting"],"toxicroak":["Poison","Fighting"],"carnivine":["Grass"],"finneon":["Water"],"lumineon":["Water"],"mantyke":["Water","Flying"],"snover":["Grass","Ice"],"abomasnow":["Grass","Ice"],"weavile":["Dark","Ice"],"magnezone":["Electric","Steel"],"lickilicky":["Normal"],"rhyperior":["Ground","Rock"],"tangrowth":["Grass"],"electivire":["Electric"],"magmortar":["Fire"],"togekiss":["Fairy","Flying"],"yanmega":["Bug","Flying"],"leafeon":["Grass"],"glaceon":["Ice"],"gliscor":["Ground","Flying"],"mamoswine":["Ice","Ground"],"porygonz":["Normal"],"gallade":["Psychic","Fighting"],"probopass":["Rock","Steel"],"dusknoir":["Ghost"],"froslass":["Ice","Ghost"],"rotom":["Electric","Ghost"],"uxie":["Psychic"],"mesprit":["Psychic"],"azelf":["Psychic"],"dialga":["Steel","Dragon"],"palkia":["Water","Dragon"],"heatran":["Fire","Steel"],"regigigas":["Normal"],"giratina":["Ghost","Dragon"],"cresselia":["Psychic"],"phione":["Water"],"manaphy":["Water"],"darkrai":["Dark"],"shaymin":["Grass"],"arceus":["Normal"],"victini":["Psychic","Fire"],"snivy":["Grass"],"servine":["Grass"],"serperior":["Grass"],"tepig":["Fire"],"pignite":["Fire","Fighting"],"emboar":["Fire","Fighting"],"oshawott":["Water"],"dewott":["Water"],"samurott":["Water"],"patrat":["Normal"],"watchog":["Normal"],"lillipup":["Normal"],"herdier":["Normal"],"stoutland":["Normal"],"purrloin":["Dark"],"liepard":["Dark"],"pansage":["Grass"],"simisage":["Grass"],"pansear":["Fire"],"simisear":["Fire"],"panpour":["Water"],"simipour":["Water"],"munna":["Psychic"],"musharna":["Psychic"],"pidove":["Normal","Flying"],"tranquill":["Normal","Flying"],"unfezant":["Normal","Flying"],"blitzle":["Electric"],"zebstrika":["Electric"],"roggenrola":["Rock"],"boldore":["Rock"],"gigalith":["Rock"],"woobat":["Psychic","Flying"],"swoobat":["Psychic","Flying"],"drilbur":["Ground"],"excadrill":["Ground","Steel"],"audino":["Normal"],"timburr":["Fighting"],"gurdurr":["Fighting"],"conkeldurr":["Fighting"],"tympole":["Water"],"palpitoad":["Water","Ground"],"seismitoad":["Water","Ground"],"throh":["Fighting"],"sawk":["Fighting"],"sewaddle":["Bug","Grass"],"swadloon":["Bug","Grass"],"leavanny":["Bug","Grass"],"venipede":["Bug","Poison"],"whirlipede":["Bug","Poison"],"scolipede":["Bug","Poison"],"cottonee":["Grass","Fairy"],"whimsicott":["Grass","Fairy"],"petilil":["Grass"],"lilligant":["Grass"],"basculin":["Water"],"sandile":["Ground","Dark"],"krokorok":["Ground","Dark"],"krookodile":["Ground","Dark"],"darumaka":["Fire"],"darmanitan":["Fire"],"maractus":["Grass"],"dwebble":["Bug","Rock"],"crustle":["Bug","Rock"],"scraggy":["Dark","Fighting"],"scrafty":["Dark","Fighting"],"sigilyph":["Psychic","Flying"],"yamask":["Ghost"],"cofagrigus":["Ghost"],"tirtouga":["Water","Rock"],"carracosta":["Water","Rock"],"archen":["Rock","Flying"],"archeops":["Rock","Flying"],"trubbish":["Poison"],"garbodor":["Poison"],"zorua":["Dark"],"zoroark":["Dark"],"minccino":["Normal"],"cinccino":["Normal"],"gothita":["Psychic"],"gothorita":["Psychic"],"gothitelle":["Psychic"],"solosis":["Psychic"],"duosion":["Psychic"],"reuniclus":["Psychic"],"ducklett":["Water","Flying"],"swanna":["Water","Flying"],"vanillite":["Ice"],"vanillish":["Ice"],"vanilluxe":["Ice"],"deerling":["Normal","Grass"],"sawsbuck":["Normal","Grass"],"emolga":["Electric","Flying"],"karrablast":["Bug"],"escavalier":["Bug","Steel"],"foongus":["Grass","Poison"],"amoonguss":["Grass","Poison"],"frillish":["Water","Ghost"],"jellicent":["Water","Ghost"],"alomomola":["Water"],"joltik":["Bug","Electric"],"galvantula":["Bug","Electric"],"ferroseed":["Grass","Steel"],"ferrothorn":["Grass","Steel"],"klink":["Steel"],"klang":["Steel"],"klinklang":["Steel"],"tynamo":["Electric"],"eelektrik":["Electric"],"eelektross":["Electric"],"elgyem":["Psychic"],"beheeyem":["Psychic"],"litwick":["Ghost","Fire"],"lampent":["Ghost","Fire"],"chandelure":["Ghost","Fire"],"axew":["Dragon"],"fraxure":["Dragon"],"haxorus":["Dragon"],"cubchoo":["Ice"],"beartic":["Ice"],"cryogonal":["Ice"],"shelmet":["Bug"],"accelgor":["Bug"],"stunfisk":["Ground","Electric"],"mienfoo":["Fighting"],"mienshao":["Fighting"],"druddigon":["Dragon"],"golett":["Ground","Ghost"],"golurk":["Ground","Ghost"],"pawniard":["Dark","Steel"],"bisharp":["Dark","Steel"],"bouffalant":["Normal"],"rufflet":["Normal","Flying"],"braviary":["Normal","Flying"],"vullaby":["Dark","Flying"],"mandibuzz":["Dark","Flying"],"heatmor":["Fire"],"durant":["Bug","Steel"],"deino":["Dark","Dragon"],"zweilous":["Dark","Dragon"],"hydreigon":["Dark","Dragon"],"larvesta":["Bug","Fire"],"volcarona":["Bug","Fire"],"cobalion":["Steel","Fighting"],"terrakion":["Rock","Fighting"],"virizion":["Grass","Fighting"],"tornadus":["Flying"],"thundurus":["Electric","Flying"],"reshiram":["Dragon","Fire"],"zekrom":["Dragon","Electric"],"landorus":["Ground","Flying"],"kyurem":["Dragon","Ice"],"keldeo":["Water","Fighting"],"meloetta":["Normal","Psychic"],"genesect":["Bug","Steel"],"chespin":["Grass"],"quilladin":["Grass"],"chesnaught":["Grass","Fighting"],"fennekin":["Fire"],"braixen":["Fire"],"delphox":["Fire","Psychic"],"froakie":["Water"],"frogadier":["Water"],"greninja":["Water","Dark"],"bunnelby":["Normal"],"diggersby":["Normal","Ground"],"fletchling":["Normal","Flying"],"fletchinder":["Fire","Flying"],"talonflame":["Fire","Flying"],"scatterbug":["Bug"],"spewpa":["Bug"],"vivillon":["Bug","Flying"],"litleo":["Fire","Normal"],"pyroar":["Fire","Normal"],"flabebe":["Fairy"],"floette":["Fairy"],"florges":["Fairy"],"skiddo":["Grass"],"gogoat":["Grass"],"pancham":["Fighting"],"pangoro":["Fighting","Dark"],"furfrou":["Normal"],"espurr":["Psychic"],"meowstic":["Psychic"],"honedge":["Steel","Ghost"],"doublade":["Steel","Ghost"],"aegislash":["Steel","Ghost"],"spritzee":["Fairy"],"aromatisse":["Fairy"],"swirlix":["Fairy"],"slurpuff":["Fairy"],"inkay":["Dark","Psychic"],"malamar":["Dark","Psychic"],"binacle":["Rock","Water"],"barbaracle":["Rock","Water"],"skrelp":["Poison","Water"],"dragalge":["Poison","Dragon"],"clauncher":["Water"],"clawitzer":["Water"],"helioptile":["Electric","Normal"],"heliolisk":["Electric","Normal"],"tyrunt":["Rock","Dragon"],"tyrantrum":["Rock","Dragon"],"amaura":["Rock","Ice"],"aurorus":["Rock","Ice"],"sylveon":["Fairy"],"hawlucha":["Fighting","Flying"],"dedenne":["Electric","Fairy"],"carbink":["Rock","Fairy"],"goomy":["Dragon"],"sliggoo":["Dragon"],"goodra":["Dragon"],"klefki":["Steel","Fairy"],"phantump":["Ghost","Grass"],"trevenant":["Ghost","Grass"],"pumpkaboo":["Ghost","Grass"],"gourgeist":["Ghost","Grass"],"bergmite":["Ice"],"avalugg":["Ice"],"noibat":["Flying","Dragon"],"noivern":["Flying","Dragon"],"xerneas":["Fairy"],"yveltal":["Dark","Flying"],"zygarde":["Dragon","Ground"],"diancie":["Rock","Fairy"],"hoopa":["Psychic","Ghost"],"volcanion":["Fire","Water"],"rowlet":["Grass","Flying"],"dartrix":["Grass","Flying"],"decidueye":["Grass","Ghost"],"litten":["Fire"],"torracat":["Fire"],"incineroar":["Fire","Dark"],"popplio":["Water"],"brionne":["Water"],"primarina":["Water","Fairy"],"pikipek":["Normal","Flying"],"trumbeak":["Normal","Flying"],"toucannon":["Normal","Flying"],"yungoos":["Normal"],"gumshoos":["Normal"],"grubbin":["Bug"],"charjabug":["Bug","Electric"],"vikavolt":["Bug","Electric"],"crabrawler":["Fighting"],"crabominable":["Fighting","Ice"],"oricorio":["Fire","Flying"],"cutiefly":["Bug","Fairy"],"ribombee":["Bug","Fairy"],"rockruff":["Rock"],"lycanroc":["Rock"],"wishiwashi":["Water"],"mareanie":["Poison","Water"],"toxapex":["Poison","Water"],"mudbray":["Ground"],"mudsdale":["Ground"],"dewpider":["Water","Bug"],"araquanid":["Water","Bug"],"fomantis":["Grass"],"lurantis":["Grass"],"morelull":["Grass","Fairy"],"shiinotic":["Grass","Fairy"],"salandit":["Poison","Fire"],"salazzle":["Poison","Fire"],"stufful":["Normal","Fighting"],"bewear":["Normal","Fighting"],"bounsweet":["Grass"],"steenee":["Grass"],"tsareena":["Grass"],"comfey":["Fairy"],"oranguru":["Normal","Psychic"],"passimian":["Fighting"],"wimpod":["Bug","Water"],"golisopod":["Bug","Water"],"sandygast":["Ghost","Ground"],"palossand":["Ghost","Ground"],"pyukumuku":["Water"],"typenull":["Normal"],"silvally":["Normal"],"minior":["Rock","Flying"],"komala":["Normal"],"turtonator":["Fire","Dragon"],"togedemaru":["Electric","Steel"],"mimikyu":["Ghost","Fairy"],"bruxish":["Water","Psychic"],"drampa":["Normal","Dragon"],"dhelmise":["Ghost","Grass"],"jangmoo":["Dragon"],"hakamoo":["Dragon","Fighting"],"kommoo":["Dragon","Fighting"],"tapukoko":["Electric","Fairy"],"tapulele":["Psychic","Fairy"],"tapubulu":["Grass","Fairy"],"tapufini":["Water","Fairy"],"cosmog":["Psychic"],"cosmoem":["Psychic"],"solgaleo":["Psychic","Steel"],"lunala":["Psychic","Ghost"],"nihilego":["Rock","Poison"],"buzzwole":["Bug","Fighting"],"pheromosa":["Bug","Fighting"],"xurkitree":["Electric"],"celesteela":["Steel","Flying"],"kartana":["Grass","Steel"],"guzzlord":["Dark","Dragon"],"necrozma":["Psychic"],"magearna":["Steel","Fairy"],"marshadow":["Fighting","Ghost"],"poipole":["Poison"],"naganadel":["Poison","Dragon"],"stakataka":["Rock","Steel"],"blacephalon":["Fire","Ghost"],"zeraora":["Electric"],"meltan":["Steel"],"melmetal":["Steel"]};
+  
+  // Chunk 1.6 + 1.7 (lookalike icons):
+  // - Replace horizontal type rail + chip row with:
+  //   (1) compact active icon strip (icons only)
+  //   (2) bottom-sheet type picker (6x3-ish grid with names + icons)
+  // - Uses simple “lookalike” SVGs (not official assets).
+
+  // Debug helpers (remove once stable)
+
+// SECTION: EVENTS / HANDLERS
+  window.addEventListener('error', (e) => {
+    console.log('[global] error', e.message, e.filename, e.lineno, e.colno, e.error);
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    console.log('[global] unhandledrejection', e.reason);
+  });
+  // Skin is fixed to GBA/DS (no toggle).
+
+  const TYPES = [
+    { name: 'Normal',  colorVar: '--t-normal'  },
+    { name: 'Fire',    colorVar: '--t-fire'    },
+    { name: 'Water',   colorVar: '--t-water'   },
+    { name: 'Electric',colorVar: '--t-electric'},
+    { name: 'Grass',   colorVar: '--t-grass'   },
+    { name: 'Ice',     colorVar: '--t-ice'     },
+    { name: 'Fighting',colorVar: '--t-fighting'},
+    { name: 'Poison',  colorVar: '--t-poison'  },
+    { name: 'Ground',  colorVar: '--t-ground'  },
+    { name: 'Flying',  colorVar: '--t-flying'  },
+    { name: 'Psychic', colorVar: '--t-psychic' },
+    { name: 'Bug',     colorVar: '--t-bug'     },
+    { name: 'Rock',    colorVar: '--t-rock'    },
+    { name: 'Ghost',   colorVar: '--t-ghost'   },
+    { name: 'Dragon',  colorVar: '--t-dragon'  },
+    { name: 'Dark',    colorVar: '--t-dark'    },
+    { name: 'Steel',   colorVar: '--t-steel'   },
+    { name: 'Fairy',   colorVar: '--t-fairy'   },
+  ];
+
+
+  // Type effectiveness chart (Pokemon GO multipliers)
+  // super effective: 1.6, resisted: 0.625, immune-ish: 0.39
+  const TYPE_CHART = {
+    Normal:   { super: [], resist: ['Rock','Steel'], immune: ['Ghost'] },
+    Fire:     { super: ['Grass','Ice','Bug','Steel'], resist: ['Fire','Water','Rock','Dragon'], immune: [] },
+    Water:    { super: ['Fire','Ground','Rock'], resist: ['Water','Grass','Dragon'], immune: [] },
+    Electric: { super: ['Water','Flying'], resist: ['Electric','Grass','Dragon'], immune: ['Ground'] },
+    Grass:    { super: ['Water','Ground','Rock'], resist: ['Fire','Grass','Poison','Flying','Bug','Dragon','Steel'], immune: [] },
+    Ice:      { super: ['Grass','Ground','Flying','Dragon'], resist: ['Fire','Water','Ice','Steel'], immune: [] },
+    Fighting: { super: ['Normal','Ice','Rock','Dark','Steel'], resist: ['Poison','Flying','Psychic','Bug','Fairy'], immune: ['Ghost'] },
+    Poison:   { super: ['Grass','Fairy'], resist: ['Poison','Ground','Rock','Ghost'], immune: ['Steel'] },
+    Ground:   { super: ['Fire','Electric','Poison','Rock','Steel'], resist: ['Grass','Bug'], immune: ['Flying'] },
+    Flying:   { super: ['Grass','Fighting','Bug'], resist: ['Electric','Rock','Steel'], immune: [] },
+    Psychic:  { super: ['Fighting','Poison'], resist: ['Psychic','Steel'], immune: ['Dark'] },
+    Bug:      { super: ['Grass','Psychic','Dark'], resist: ['Fire','Fighting','Poison','Flying','Ghost','Steel','Fairy'], immune: [] },
+    Rock:     { super: ['Fire','Ice','Flying','Bug'], resist: ['Fighting','Ground','Steel'], immune: [] },
+    Ghost:    { super: ['Psychic','Ghost'], resist: ['Dark'], immune: ['Normal'] },
+    Dragon:   { super: ['Dragon'], resist: ['Steel'], immune: ['Fairy'] },
+    Dark:     { super: ['Psychic','Ghost'], resist: ['Fighting','Dark','Fairy'], immune: [] },
+    Steel:    { super: ['Ice','Rock','Fairy'], resist: ['Fire','Water','Electric','Steel'], immune: [] },
+    Fairy:    { super: ['Fighting','Dragon','Dark'], resist: ['Fire','Poison','Steel'], immune: [] },
+  };
+
+  const activeIconsEl = document.getElementById('activeIcons');
+  const activeAllEl   = document.getElementById('activeAll');
+  const clearBtn      = document.getElementById('clearBtn');
+  const typesOpenBtn  = document.getElementById('typesOpenBtn');
+  const sheet         = document.getElementById('typesSheet');
+  const backdrop      = document.getElementById('sheetBackdrop');
+  const gridEl        = document.getElementById('typeGrid');
+  const doneBtn       = document.getElementById('sheetDoneBtn');
+  const sheetClearBtn = document.getElementById('sheetClearBtn');
+  const selectAllBtn  = document.getElementById('selectAllBtn');
+  // VS mode elements
+  const modeCollectionBtn = document.getElementById('modeCollectionBtn');
+  const modeVsBtn         = document.getElementById('modeVsBtn');
+  const modeTradeBtn      = document.getElementById('modeTradeBtn');
+
+  const uploadBtn         = document.getElementById('uploadBtn');
+  const fileInput         = document.getElementById('fileInput');
+  const collectionBar     = document.getElementById('collectionBar');
+  const collectionSticky = document.getElementById("collectionSticky");
+  const filterZone        = document.getElementById('filterZone');
+  const collectionView    = document.getElementById('collectionView');
+  const vsView            = document.getElementById('vsView');
+  const tradeView         = document.getElementById('tradeView');
+
+  const vsGridEl          = document.getElementById('vsTypeGrid');
+  const vsSelectedEl      = document.getElementById('vsSelected');
+  const vsSelectedNoteEl  = document.getElementById('vsSelectedNote');
+  const vsCountNoteEl     = document.getElementById('vsCountNote');
+  const vsClearBtn        = document.getElementById('vsClearBtn');
+  const vsHeroEl          = document.getElementById('vsHero');
+  const vsTopPicksEl      = document.getElementById('vsTopPicks');
+  const vsRiskyPicksEl    = document.getElementById('vsRiskyPicks');
+  const vsTopEmptyEl      = document.getElementById('vsTopEmpty');
+  const vsRiskyEmptyEl    = document.getElementById('vsRiskyEmpty');
+  const vsBringMovesEl    = document.getElementById('vsBringMoves');
+  const vsAvoidMovesEl    = document.getElementById('vsAvoidMoves');
+  const vsAvoidBodiesEl   = document.getElementById('vsAvoidBodies');
+  const vsWatchOutEl      = document.getElementById('vsWatchOut');
+  const vsRosterNoteEl    = document.getElementById('vsRosterNote');
+  const vsTipBtn          = document.getElementById('vsTipBtn');
+  const vsTooltipEl       = document.getElementById('vsTooltip');
+
+  const collectionCountEl = document.getElementById('collectionCount');
+  const collectionCoverageEl = document.getElementById('collectionCoverage');
+
+  const showingTypesEl = document.getElementById('showingTypes');
+  const showingCountEl = document.getElementById('showingCount');
+
+// SECTION: PARSER
+
+  const parseErrorEl  = document.getElementById('parseError');
+
+  function hideParseError(){ if(parseErrorEl) parseErrorEl.hidden = true; }
+
+  function showParseError(title, meta){
+    if(!parseErrorEl) return;
+    const metaHtml = meta ? `<div class="error-meta">${meta}</div>` : '';
+    parseErrorEl.innerHTML = `<div class="error-title">${title}</div>${metaHtml}`;
+    parseErrorEl.hidden = false;
+  }
+
+
+  // Selection model: empty set = “All types”
+  const selected = new Set();
+
+  function svgForType(type) {
+    // Simple, original-ish icons. They’re “vibes”, not official.
+    const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+    const wrap = (inner) => `<svg ${common}>${inner}</svg>`;
+
+    switch (type) {
+      case 'Water':
+        return wrap('<path d="M12 2C9 6.6 6 10 6 14.2A6 6 0 0 0 12 20a6 6 0 0 0 6-5.8C18 10 15 6.6 12 2z"/>');
+      case 'Fire':
+        return wrap('<path d="M12 2c1.6 3.2.8 5.4-.6 6.9C9.7 10.7 9 12 9 13.6A3.2 3.2 0 0 0 12.2 17c1.9 0 3.4-1.4 3.4-3.3 0-1.4-.7-2.4-1.8-3.8.2 1.2-.6 2.1-1.6 2.3-.6-2.4.4-4.1 2.1-5.8C15.4 4.9 15.1 3.4 12 2z"/>');
+      case 'Grass':
+        return wrap('<path d="M20 4c-6 0-10 3-12 8-1 3-1 6-1 8h3c0-2 .1-3.7.6-5.4C12.6 10.5 15.6 8 20 8V4z"/><path d="M4 12c4.2.2 7.2 2.4 8.8 6.6.2.5.3 1 .4 1.4H9c-.2-.5-.4-1.1-.7-1.7C7.3 16 5.8 14.7 4 14.3V12z"/>');
+      case 'Electric':
+        return wrap('<path d="M13 2 4 13h7l-1 9 10-13h-7l0-7z"/>');
+      case 'Ice':
+        return wrap('<path d="M12 2v20M4 6l16 12M4 18 20 6" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6 5l2 1M18 19l-2-1M6 19l2-1M18 5l-2 1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>');
+      case 'Fighting':
+        return wrap('<path d="M7 12c0-2 1.5-3.5 3.5-3.5h1C14.4 8.5 16 10 16 12v7H7v-7z"/><path d="M9 7c0-1.2 1-2 2.2-2H14c1.2 0 2 .8 2 2v2H9V7z"/>');
+      case 'Poison':
+        return wrap('<path d="M12 3c3 2 5 4.7 5 7.7A5 5 0 0 1 12 16a5 5 0 0 1-5-5.3C7 7.7 9 5 12 3z"/><path d="M8 19h8" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>');
+      case 'Ground':
+        return wrap('<path d="M3 18h18v2H3z"/><path d="M6 18c1.4-4.5 3.7-7 6-7s4.6 2.5 6 7H6z"/>');
+      case 'Flying':
+        return wrap('<path d="M4 13c5-6 11-6 16 0-3-1.3-5.8-.8-8 1.6C9.8 12.2 7 11.7 4 13z"/><path d="M12 14c.5 2.5 2.2 4.6 5 6-2.9-.6-5.1-1.9-6.6-3.6C8.6 17.7 6.5 19 4 19c3.5-1.2 6.2-2.9 8-5z"/>');
+      case 'Psychic':
+        return wrap('<path d="M12 4c4.2 0 7 2.9 7 6.7S16.2 19 12 19s-7-4.4-7-8.3C5 6.9 7.8 4 12 4z"/><circle cx="12" cy="11" r="2.2" fill="#000" opacity="0.22"/><path d="M8 11c1.2-1.8 2.6-2.7 4-2.7s2.8.9 4 2.7c-1.2 1.8-2.6 2.7-4 2.7S9.2 12.8 8 11z" fill="#000" opacity="0.22"/>');
+      case 'Bug':
+        return wrap('<path d="M12 6c2.2 0 4 1.8 4 4v8H8v-8c0-2.2 1.8-4 4-4z"/><path d="M8 11H4M20 11h-4M9 5 7 3m8 2 2-2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 6c0-1.1.9-2 2-2s2 .9 2 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>');
+      case 'Rock':
+        return wrap('<path d="M7 21 3 14l4-8h10l4 8-4 7H7z"/><path d="M7 6l5 4 5-4" fill="#000" opacity="0.18"/>');
+      case 'Ghost':
+        return wrap('<path d="M12 3c3.3 0 6 2.7 6 6v12l-2-1-2 1-2-1-2 1-2-1-2 1V9c0-3.3 2.7-6 6-6z"/><circle cx="10" cy="10" r="1.2" fill="#000" opacity="0.25"/><circle cx="14" cy="10" r="1.2" fill="#000" opacity="0.25"/>');
+      case 'Dragon':
+        return wrap('<path d="M19 6c-3.5 0-6.5 2.2-8.3 5.3L9 10l1 3-3 1 2 2-1 4 4-2 2 2 1-3 3-1-2-2 1-4 2-1c.3-.8.4-1.6.4-2.4C20 6.6 19.6 6 19 6z"/>');
+      case 'Dark':
+        return wrap('<path d="M14.5 3.5A8 8 0 0 0 8 18.5 7 7 0 1 1 14.5 3.5z"/>');
+      case 'Steel':
+        return wrap('<path d="M12 2 21 7v10l-9 5-9-5V7l9-5z"/><path d="M12 7v10M7.5 9.5 16.5 14.5" stroke="#000" opacity="0.18" stroke-width="2"/>');
+      case 'Fairy':
+        return wrap('<path d="M12 2l2.2 6.6H21l-5.4 3.9 2.1 6.5L12 15.6 6.3 19l2.1-6.5L3 8.6h6.8L12 2z"/>');
+      case 'Normal':
+      default:
+        return wrap('<circle cx="12" cy="12" r="7"/>');
+    }
+  }
+
+  function typeMeta(name) {
+    return TYPES.find(t => t.name === name);
+  }
+
+
+  // Generic sheet control (Types + Battle)
+  let activeSheet = null;
+  let activeTrigger = null;
+
+  function openSheetFor(sheetEl, triggerEl) {
+    activeSheet = sheetEl;
+    activeTrigger = triggerEl || null;
+    sheetEl.hidden = false;
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const firstBtn = sheetEl.querySelector('button');
+    if (firstBtn) {
+      try { firstBtn.focus(); } catch (_) {}
+    }
+  }
+
+  function closeActiveSheet() {
+    if (activeSheet) activeSheet.hidden = true;
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+    if (activeTrigger) {
+      try { activeTrigger.focus(); } catch (_) {}
+    }
+    activeSheet = null;
+    activeTrigger = null;
+  }
+
+  function openSheet() {
+    console.log('[types] openSheet() called', {sheetHidden: sheet?.hidden, backdropHidden: backdrop?.hidden});
+    openSheetFor(sheet, typesOpenBtn);
+    try {
+      const cs = window.getComputedStyle(sheet);
+      console.log('[types] openSheet() after', {sheetHidden: sheet.hidden, display: cs.display, opacity: cs.opacity, transform: cs.transform, zIndex: cs.zIndex, rect: sheet.getBoundingClientRect()});
+    } catch (err) { console.log('[types] openSheet() style check failed', err); }
+    // Focus first button for accessibility-ish behavior
+    const firstBtn = gridEl.querySelector('button');
+    if (firstBtn) firstBtn.focus();
+  }
+
+  function closeSheet() {
+    console.log('[types] closeSheet() called', {sheetHidden: sheet?.hidden});
+    closeActiveSheet();
+  }
+
+// SECTION: RENDER
+
+  function renderGrid() {
+    gridEl.innerHTML = '';
+
+    TYPES.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'type-grid-btn';
+      btn.dataset.type = t.name;
+
+      const icon = document.createElement('span');
+      icon.className = 'icon-chip';
+      icon.style.background = `var(${t.colorVar})`;
+      icon.innerHTML = svgForType(t.name);
+
+      const label = document.createElement('span');
+      label.className = 'type-name';
+      label.textContent = t.name;
+
+      btn.appendChild(icon);
+      btn.appendChild(label);
+
+      btn.addEventListener('click', () => {
+        toggleType(t.name);
+      });
+
+      gridEl.appendChild(btn);
+    });
+
+    syncGridSelectionUI();
+  }
+
+
+
+    // -----------------------------
+  // Mode switch (Collection ⇄ VS)
+  // -----------------------------
+  let currentMode = 'collection';
+
+  function setMode(mode) {
+    const m = (mode === 'vs' || mode === 'collection' || mode === 'trade') ? mode : 'collection';
+    const isVS = m === 'vs';
+    const isCollection = m === 'collection';
+    const isTrade = m === 'trade';
+
+    // Tabs
+    const setTab = (btn, on) => {
+      if (!btn) return;
+      btn.classList.toggle('is-active', !!on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    };
+    setTab(modeVsBtn, isVS);
+    setTab(modeCollectionBtn, isCollection);
+    setTab(modeTradeBtn, isTrade);
+
+    // Views + sticky tiers
+    if (collectionBar) collectionBar.hidden = !isCollection;
+    if (collectionSticky) collectionSticky.hidden = !isCollection;
+    if (filterZone) filterZone.hidden = !isCollection;
+    if (collectionView) collectionView.hidden = !isCollection;
+
+    if (vsView) vsView.hidden = !isVS;
+    if (tradeView) tradeView.hidden = !isTrade;
+
+    // Close the type sheet if we leave Collection mode.
+    if (!isCollection && activeSheet && !activeSheet.hidden) closeSheet();
+
+    updateStickyMetrics();
+  }
+
+  modeVsBtn && modeVsBtn.addEventListener('click', () => setMode('vs'));
+  modeCollectionBtn && modeCollectionBtn.addEventListener('click', () => setMode('collection'));
+  modeTradeBtn && modeTradeBtn.addEventListener('click', () => setMode('trade'));
+
+  uploadBtn && uploadBtn.addEventListener('click', () => fileInput && fileInput.click());
+
+  // Start in Collection mode.
+  setMode('collection');
+
+
+  // -----------------------------
+  // VS assistant (roster-aware v1)
+  // “Survive first → offense second → CP third”
+  // -----------------------------
+  const vsSelected = new Set();
+  let _vsAutoCollapsed = false;
+
+  function eff(att, def){
+    const ch = TYPE_CHART[att];
+    if(!ch) return 1.0;
+    if(ch.super.includes(def)) return 1.6;
+    if(ch.resist.includes(def)) return 0.625;
+    if(ch.immune.includes(def)) return 0.39;
+    return 1.0;
+  }
+
+  function mult(att, defs){
+    let m = 1.0;
+    for(const d of defs){
+      m *= eff(att, d);
+    }
+    return m;
+  }
+
+  function combinedAttackMult(attType, oppTypes){
+    // Previous “stacking across selected types” approach:
+    // pick attack types that stay broadly good across the selected opponent types.
+    let m = 1.0;
+    for(const t of oppTypes){
+      m *= eff(attType, t);
+    }
+    return m;
+  }
+
+  function toggleVsType(type){
+    if (vsSelected.has(type)) {
+      vsSelected.delete(type);
+    } else {
+      if (vsSelected.size >= 3) return;
+      vsSelected.add(type);
+    }
+    syncVsUI();
+  }
+
+  function renderVsGrid(){
+    if(!vsGridEl) return;
+    vsGridEl.innerHTML = '';
+
+    TYPES.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'type-grid-btn';
+      btn.dataset.type = t.name;
+
+      const icon = document.createElement('span');
+      icon.className = 'icon-chip';
+      icon.style.background = `var(${t.colorVar})`;
+      icon.innerHTML = svgForType(t.name);
+
+      const label = document.createElement('span');
+      label.className = 'type-name';
+      label.textContent = t.name;
+
+      btn.appendChild(icon);
+      btn.appendChild(label);
+
+      btn.addEventListener('click', () => toggleVsType(t.name));
+      vsGridEl.appendChild(btn);
+    });
+
+    syncVsGridSelectionUI();
+  }
+
+  function syncVsGridSelectionUI(){
+    if(!vsGridEl) return;
+    vsGridEl.querySelectorAll('button.type-grid-btn').forEach(btn => {
+      const t = btn.dataset.type;
+      const on = vsSelected.has(t);
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  function renderVsSelectedChips(){
+    if(!vsSelectedEl || !vsSelectedNoteEl) return;
+    vsSelectedEl.innerHTML = '';
+
+    const list = Array.from(vsSelected);
+    if(!list.length){
+      vsSelectedNoteEl.hidden = false;
+      return;
+    }
+    vsSelectedNoteEl.hidden = true;
+
+    list.forEach(t => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'battle-chip';
+      chip.title = 'Remove';
+      chip.dataset.type = t;
+
+      const icon = document.createElement('span');
+      icon.className = 'icon-chip';
+      const meta = typeMeta(t);
+      if(meta) icon.style.background = `var(${meta.colorVar})`;
+      icon.innerHTML = svgForType(t);
+
+      const label = document.createElement('span');
+      label.textContent = t;
+
+      chip.appendChild(icon);
+      chip.appendChild(label);
+
+      chip.addEventListener('click', () => toggleVsType(t));
+      vsSelectedEl.appendChild(chip);
+    });
+  }
+
+  function renderTypePills(container, types){
+    if(!container) return;
+    container.innerHTML = '';
+    if(!types || !types.length){
+      container.innerHTML = '<span class="mono" style="opacity:.8">—</span>';
+      return;
+    }
+
+    types.forEach(t => {
+      const pill = document.createElement('span');
+      pill.className = 'battle-pill';
+      const meta = typeMeta(t);
+
+      const icon = document.createElement('span');
+      icon.className = 'icon-chip';
+      if(meta) icon.style.background = `var(${meta.colorVar})`;
+      icon.innerHTML = svgForType(t);
+
+      const label = document.createElement('span');
+      label.textContent = t;
+
+      pill.appendChild(icon);
+      pill.appendChild(label);
+      container.appendChild(pill);
+    });
+  }
+
+  function computeMoveGuidance(oppTypes){
+    const scored = TYPES.map(t => {
+      const m = combinedAttackMult(t.name, oppTypes);
+      return { type: t.name, mult: m };
+    }).sort((a,b) => b.mult - a.mult);
+
+    const bring = scored.slice(0, 5).map(s => s.type);
+    const avoid = scored.slice(-5).reverse().map(s => s.type);
+    return { bring, avoid, scored };
+  }
+
+  function computeAvoidBodies(oppTypes){
+    // Which *body types* take big damage from the opponent’s likely STAB move types?
+    const scored = TYPES.map(t => {
+      // incoming worst-case across selected opponent types
+      let worst = 1.0;
+      for(const opp of oppTypes){
+        worst = Math.max(worst, eff(opp, t.name));
+      }
+      return { type: t.name, worst };
+    }).sort((a,b) => b.worst - a.worst);
+
+    const bad = scored.filter(s => s.worst >= 1.6).slice(0, 6).map(s => s.type);
+    return bad;
+  }
+
+  function scoreRosterAgainst(oppTypes){
+    const roster = Array.isArray(allResults) ? allResults : [];
+    const scored = [];
+
+    for(const row of roster){
+      const defTypes = rowTypeList(row);
+      if(!defTypes.length) continue;
+
+      // Survive-first: how hard the opponent’s likely STAB hits you (worst-case).
+      let incomingWorst = 1.0;
+      for(const opp of oppTypes){
+        incomingWorst = Math.max(incomingWorst, mult(opp, defTypes));
+      }
+
+      // Offense proxy: if your body type matches a good move type, you *often* have access to that move.
+      let offenseBest = 1.0;
+      for(const myT of defTypes){
+        offenseBest = Math.max(offenseBest, combinedAttackMult(myT, oppTypes));
+      }
+
+      const cp = Number(row.cp) || 0;
+
+      scored.push({
+        row,
+        defTypes,
+        incomingWorst,
+        offenseBest,
+        cp
+      });
+    }
+
+    // Rank: survive-first (lower incoming is better), then offense (higher), then CP (higher).
+    scored.sort((a,b) => {
+      if(a.incomingWorst !== b.incomingWorst) return a.incomingWorst - b.incomingWorst;
+      if(a.offenseBest !== b.offenseBest) return b.offenseBest - a.offenseBest;
+      return b.cp - a.cp;
+    });
+
+    return scored;
+  }
+
+  function renderRosterPicks(oppTypes){
+    if(!vsTopPicksEl || !vsRiskyPicksEl) return;
+
+    const hasRoster = Array.isArray(allResults) && allResults.length > 0;
+
+    vsTopPicksEl.innerHTML = '';
+    vsRiskyPicksEl.innerHTML = '';
+
+    if(vsRosterNoteEl){
+      vsRosterNoteEl.hidden = true;
+      vsRosterNoteEl.textContent = '';
+    }
+
+    if(!hasRoster){
+      if(vsTopEmptyEl) vsTopEmptyEl.hidden = false;
+      if(vsRiskyEmptyEl) vsRiskyEmptyEl.hidden = false;
+      return;
+    }
+
+    if(vsTopEmptyEl) vsTopEmptyEl.hidden = true;
+    if(vsRiskyEmptyEl) vsRiskyEmptyEl.hidden = true;
+
+    const scored = scoreRosterAgainst(oppTypes);
+
+    // Offense floor: avoid recommending “tickle” picks unless we truly have nothing.
+    const offenseOk = scored.filter(s => s.offenseBest >= 1.0);
+    const source = offenseOk.length >= 3 ? offenseOk : scored;
+
+    const top = source.slice(0, 6);
+
+    // Risky: high CP that either takes big damage OR is likely to be resisted
+    const topKeys = new Set(top.map(s => `${s.row.name}||${s.cp}||${s.defTypes.join(',')}`));
+    const risky = scored
+      .filter(s => !topKeys.has(`${s.row.name}||${s.cp}||${s.defTypes.join(',')}`))
+      .filter(s => s.incomingWorst >= 1.6 || s.offenseBest < 1.0)
+      .sort((a,b) => b.cp - a.cp)
+      .slice(0, 6);
+
+    // Limited counters note
+    if(vsRosterNoteEl){
+      const weakRoster = offenseOk.length < 3;
+      if(weakRoster){
+        vsRosterNoteEl.hidden = false;
+        vsRosterNoteEl.textContent = 'Limited counters found: showing your safest picks (plus CP) even if damage may be neutral.';
+      }
+    }
+
+    top.forEach(s => vsTopPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp)));
+    risky.forEach(s => vsRiskyPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp)));
+  }
+
+  function makePokePickCard(row, typesArr, cp){
+    const card = document.createElement('div');
+    card.className = 'poke-card';
+
+    const name = document.createElement('div');
+    name.className = 'poke-name';
+    name.textContent = row.name || '—';
+
+    const meta = document.createElement('div');
+    meta.className = 'poke-meta mono';
+    meta.textContent = `CP ${cp || 0}`;
+
+    const types = document.createElement('div');
+    types.className = 'poke-types';
+
+    (typesArr || []).forEach(t => {
+      const chip = document.createElement('span');
+      chip.className = 'poke-type';
+
+      const icon = document.createElement('span');
+      icon.className = 'icon-chip';
+      const m = typeMeta(t);
+      if(m) icon.style.background = `var(${m.colorVar})`;
+      icon.innerHTML = svgForType(t);
+
+      const label = document.createElement('span');
+      label.className = 'poke-type-name';
+      label.textContent = t;
+
+      chip.appendChild(icon);
+      chip.appendChild(label);
+      types.appendChild(chip);
+    });
+
+    card.appendChild(name);
+    card.appendChild(meta);
+    card.appendChild(types);
+
+    return card;
+  }
+
+  function renderVsBrief(oppTypes){
+    const guidance = computeMoveGuidance(oppTypes);
+    const avoidBodies = computeAvoidBodies(oppTypes);
+
+    renderTypePills(vsBringMovesEl, guidance.bring);
+    renderTypePills(vsAvoidMovesEl, guidance.avoid);
+    renderTypePills(vsAvoidBodiesEl, avoidBodies);
+    renderTypePills(vsWatchOutEl, oppTypes);
+  }
+
+  function syncVsUI(){
+    const oppTypes = Array.from(vsSelected);
+
+    if(vsCountNoteEl) vsCountNoteEl.textContent = `${oppTypes.length}/3`;
+
+    renderVsSelectedChips();
+    syncVsGridSelectionUI();
+
+    // Reduce “type grid dominance” once the user has selected at least one type.
+    const det = document.getElementById('vsTypePicker');
+    if(det && oppTypes.length > 0 && !_vsAutoCollapsed){
+      det.open = false;
+      _vsAutoCollapsed = true;
+    }
+    if(det && oppTypes.length === 0){
+      det.open = true;
+    }
+
+    if(vsHeroEl) vsHeroEl.hidden = oppTypes.length === 0;
+
+    if(oppTypes.length === 0){
+      // Clear outputs
+      renderTypePills(vsBringMovesEl, []);
+      renderTypePills(vsAvoidMovesEl, []);
+      renderTypePills(vsAvoidBodiesEl, []);
+      renderTypePills(vsWatchOutEl, []);
+      if(vsTopPicksEl) vsTopPicksEl.innerHTML = '';
+      if(vsRiskyPicksEl) vsRiskyPicksEl.innerHTML = '';
+      if(vsTopEmptyEl) vsTopEmptyEl.hidden = false;
+      if(vsRiskyEmptyEl) vsRiskyEmptyEl.hidden = false;
+      if(vsRosterNoteEl){ vsRosterNoteEl.hidden = true; vsRosterNoteEl.textContent = ''; }
+      return;
+    }
+
+    renderVsBrief(oppTypes);
+    renderRosterPicks(oppTypes);
+  }
+
+  // VS events
+  vsClearBtn && vsClearBtn.addEventListener('click', () => {
+    vsSelected.clear();
+    _vsAutoCollapsed = false;
+    syncVsUI();
+  });
+
+  vsTipBtn && vsTipBtn.addEventListener('click', () => {
+    if(!vsTooltipEl) return;
+    vsTooltipEl.hidden = !vsTooltipEl.hidden;
+  });
+
+  // Initial VS UI render
+  renderVsGrid();
+  syncVsUI();
+
+  selectAllBtn.addEventListener('click', () => {
+    // Treat “All” as no filters, because it’s the least noisy state.
+    selected.clear();
+    renderActiveStrip();
+    syncGridSelectionUI();
+    updateView();
+    // Refresh VS recommendations (roster-aware)
+    try { syncVsUI(); } catch (_) {}
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && activeSheet && !activeSheet.hidden) closeSheet();
+  });
+
+
+  // -----------------------------
+  // Chunk 2: Results table UX
+  // - Horizontal scroll (CSS already)
+  // - Sticky header that respects the app's sticky bars
+  // - Tappable column headers for sorting (▲/▼)
+  // -----------------------------
+
+  const tableBody = document.getElementById('resultsBody');
+  const tableHeaders = Array.from(document.querySelectorAll('th.sortable'));
+
+  // Placeholder dataset for now (later chunks will feed this from CSV + scoring)
+  let allResults = [
+    { name: 'Gyarados',   score: 78, grade: 'B+', cp: 2488, iv: 84, types: 'Water / Flying' },
+    { name: 'Araquanid',  score: 82, grade: 'A',  cp: 1475, iv: 91, types: 'Water / Bug' }
+  ];
+  let rawPokemon = null; // set after CSV upload
+
+  function canonKey(name){
+    if(!name) return '';
+    // Make matching tolerant of forms, punctuation, and "Shadow/Purified" prefixes.
+    // Keep gender symbols (♀/♂) because the pokedex map includes them.
+    const cleaned = normalizeSpeciesName(String(name));
+    const noAccents = cleaned.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+    return noAccents
+      .toLowerCase()
+      .replace(/[’']/g,'')
+      .replace(/[\(\)\[\]\{\}\.!,]/g,'')
+      .replace(/[\s\-_:]+/g,'')
+      .trim();
+  }
+
+  function normalizeSpeciesName(raw){
+    let s = String(raw || '').trim();
+
+    // Common prefixes / tags
+    s = s.replace(/^shadow\s+/i,'').replace(/^purified\s+/i,'');
+    s = s.replace(/\bshadow\b/i,'').replace(/\bpurified\b/i,'').trim();
+
+    // Remove form/costume in parentheses: "Giratina (Altered)"
+    s = s.replace(/\s*\([^\)]*\)\s*/g,' ').trim();
+
+    // Normalize separators
+    s = s.replace(/\s+–\s+/g,' - ').replace(/\s+—\s+/g,' - ');
+
+    // If the string contains a form after a dash, keep the base species before the dash.
+    if (s.includes(' - ')) {
+      s = s.split(' - ')[0].trim();
+    }
+
+    // Strip stray symbols
+    s = s.replace(/[★☆]/g,'').trim();
+
+    return s;
+  }
+
+  function typesForName(name){
+    const key = canonKey(name);
+    const t = POKEDEX_TYPES[key];
+    return Array.isArray(t) ? t : [];
+  }
+
+  function parseNumber(v){
+    if(v==null) return null;
+    let s = String(v).trim();
+    if(!s) return null;
+
+    // Locale tolerance:
+    // - "93,3" -> 93.3
+    // - "1.234,5" -> 1234.5
+    // - "1,234.5" -> 1234.5
+    if (s.includes(',') && !s.includes('.')) {
+      s = s.replace(',', '.');
+    } else if (s.includes(',') && s.includes('.')) {
+      const lastComma = s.lastIndexOf(',');
+      const lastDot = s.lastIndexOf('.');
+      if (lastComma > lastDot) {
+        // dot as thousands, comma as decimal
+        s = s.replace(/\./g,'').replace(',', '.');
+      } else {
+        // comma as thousands
+        s = s.replace(/,/g,'');
+      }
+    }
+
+    const n = Number(s.replace(/[^0-9.\-]/g,''));
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function computeIVPct(row, mapping){
+    // Prefer mapped headers (if we detected them), then fall back to common names.
+    const ivPctRaw = (mapping && mapping.ivPercent) ? row[mapping.ivPercent] : null;
+    const ivStrRaw = (mapping && mapping.ivString)  ? row[mapping.ivString]  : null;
+
+    // Some exports include an explicit IV% column
+    const ivCol =
+      ivPctRaw ??
+      row['IV%'] ?? row['IV %'] ?? row['IV Percent'] ?? row['IVPercent'] ?? row['IV Percentage'] ??
+      row['iv%'] ?? row['iv percent'];
+
+    // Some exports put a combined IV string like "15/14/13"
+    const ivMaybeCombined =
+      ivStrRaw ??
+      row['IVs'] ?? row['IV'] ?? row['Iv'] ?? row['iv'];
+
+    const combined = (v) => {
+      if(v == null) return null;
+      const s = String(v).trim();
+      const mm = s.match(/^\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*$/);
+      if(!mm) return null;
+      const a = Number(mm[1]), d = Number(mm[2]), st = Number(mm[3]);
+      if(!Number.isFinite(a) || !Number.isFinite(d) || !Number.isFinite(st)) return null;
+      return Math.round(((a + d + st) / 45) * 100);
+    };
+
+    const combinedPct = combined(ivMaybeCombined);
+    if(combinedPct != null) return Math.max(0, Math.min(100, combinedPct));
+
+    // Percent column if present (handles "93.3%" or "93,3%")
+    const ivPct = parseNumber(ivCol);
+    if(ivPct != null) return Math.max(0, Math.min(100, ivPct));
+
+    // If combined field looks like a percent already (e.g. 93.3), accept it.
+    const ivLoose = parseNumber(ivMaybeCombined);
+    if(ivLoose != null && ivLoose > 15 && ivLoose <= 100) return Math.max(0, Math.min(100, ivLoose));
+
+    // Otherwise, try separate atk/def/sta IV columns
+    const atkRaw = (mapping && mapping.atkIV) ? row[mapping.atkIV] : null;
+    const defRaw = (mapping && mapping.defIV) ? row[mapping.defIV] : null;
+    const staRaw = (mapping && mapping.staIV) ? row[mapping.staIV] : null;
+
+    const atk = parseNumber(
+      atkRaw ??
+      row['Atk'] ?? row['ATK'] ?? row['Attack'] ??
+      row['Atk IV'] ?? row['ATK IV'] ?? row['Attack IV'] ??
+      row['IV Atk'] ?? row['IV ATK'] ?? row['IV Attack']
+    );
+    const def = parseNumber(
+      defRaw ??
+      row['Def'] ?? row['DEF'] ?? row['Defense'] ??
+      row['Def IV'] ?? row['DEF IV'] ?? row['Defense IV'] ??
+      row['IV Def'] ?? row['IV DEF'] ?? row['IV Defense']
+    );
+    const sta = parseNumber(
+      staRaw ??
+      row['Sta'] ?? row['STA'] ?? row['Stamina'] ??
+      row['Sta IV'] ?? row['STA IV'] ?? row['Stamina IV'] ??
+      row['IV Sta'] ?? row['IV STA'] ?? row['IV Stamina'] ??
+      row['HP IV']
+    );
+
+    if(atk==null || def==null || sta==null) return null;
+    return Math.round(((atk + def + sta) / 45) * 100);
+  };
+
+    const combinedPct = combined(ivMaybeCombined);
+    if(combinedPct != null) return Math.max(0, Math.min(100, combinedPct));
+
+    // Percent column if present (handles "93.3%" etc)
+    const ivPct = parseNumber(ivCol);
+    if(ivPct != null) return Math.max(0, Math.min(100, ivPct));
+
+    // If "IV" looks like a percent already (e.g. 93.3), accept it.
+    const ivLoose = parseNumber(ivMaybeCombined);
+    if(ivLoose != null && ivLoose > 15 && ivLoose <= 100) return Math.max(0, Math.min(100, ivLoose));
+
+    // 3) Otherwise, try separate atk/def/sta IV columns (PokéGenie variants are… creative)
+    const atk = parseNumber(
+      row['Atk'] ?? row['ATK'] ?? row['Attack'] ??
+      row['Atk IV'] ?? row['ATK IV'] ?? row['Attack IV'] ??
+      row['IV Atk'] ?? row['IV ATK'] ?? row['IV Attack']
+    );
+    const def = parseNumber(
+      row['Def'] ?? row['DEF'] ?? row['Defense'] ??
+      row['Def IV'] ?? row['DEF IV'] ?? row['Defense IV'] ??
+      row['IV Def'] ?? row['IV DEF'] ?? row['IV Defense']
+    );
+    const sta = parseNumber(
+      row['Sta'] ?? row['STA'] ?? row['Stamina'] ??
+      row['Sta IV'] ?? row['STA IV'] ?? row['Stamina IV'] ??
+      row['IV Sta'] ?? row['IV STA'] ?? row['IV Stamina'] ??
+      row['HP IV']
+    );
+
+    if(atk==null || def==null || sta==null) return null;
+
+    // Pokemon GO IVs are 0-15 each, total 45
+    return Math.round(((atk + def + sta) / 45) * 100);
+  }
+
+  function gradeForScore(score){
+    const s = Number(score);
+    if(!Number.isFinite(s)) return '—';
+    if(s >= 98) return 'S';
+    if(s >= 95) return 'A+';
+    if(s >= 90) return 'A';
+    if(s >= 85) return 'B+';
+    if(s >= 80) return 'B';
+    if(s >= 75) return 'C+';
+    if(s >= 70) return 'C';
+    if(s >= 60) return 'D';
+    return 'F';
+  }
+
+  function parseCSV(text){
+    const raw = String(text || '');
+
+    // Prefer PapaParse if available (more robust: quotes, commas, odd delimiters).
+    if (window.Papa && typeof window.Papa.parse === 'function') {
+      const res = window.Papa.parse(raw, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: false,
+        transformHeader: (h) => String(h || '').replace(/^\uFEFF/,'').trim()
+      });
+
+      if (res.errors && res.errors.length) {
+        const sample = res.errors.slice(0, 3)
+          .map(e => `${e.code || 'Error'} at row ${e.row}: ${e.message}`)
+          .join(' • ');
+        throw new Error(`CSV parse error: ${sample}`);
+      }
+
+      const headers = (res.meta && Array.isArray(res.meta.fields))
+        ? res.meta.fields
+        : Object.keys((res.data && res.data[0]) || {});
+
+      window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+        headers,
+        delimiter: (res.meta && res.meta.delimiter) ? res.meta.delimiter : null,
+        rows: Array.isArray(res.data) ? res.data.length : 0,
+        parseEngine: 'papaparse'
+      });
+
+      return Array.isArray(res.data) ? res.data : [];
+    }
+
+    // Fallback: small, quote-aware CSV parser (enough for simple exports)
+    const rows = [];
+    const lines = raw.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length);
+
+    if(!lines.length){
+      window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+        headers: [],
+        delimiter: ',',
+        rows: 0,
+        parseEngine: 'fallback'
+      });
+      return [];
+    }
+
+    function splitLine(line){
+      const out = [];
+      let cur = '';
+      let inQ = false;
+      for(let i=0;i<line.length;i++){
+        const ch = line[i];
+        if(ch === '"'){
+          if(inQ && line[i+1] === '"'){ cur += '"'; i++; }
+          else { inQ = !inQ; }
+          continue;
+        }
+        if(ch === ',' && !inQ){
+          out.push(cur);
+          cur = '';
+          continue;
+        }
+        cur += ch;
+      }
+      out.push(cur);
+      return out.map(s => String(s).trim());
+    }
+
+    const headers = splitLine(lines[0]).map(h=>h.replace(/^\uFEFF/,''));
+    window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+      headers,
+      delimiter: ',',
+      rows: Math.max(0, lines.length - 1),
+      parseEngine: 'fallback'
+    });
+
+    for(let i=1;i<lines.length;i++){
+      const parts = splitLine(lines[i]);
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = parts[idx] ?? ''; });
+      rows.push(obj);
+    }
+    return rows;
+  });
+
+      if (res.errors && res.errors.length) {
+        // Keep the first few errors for UI visibility
+        const sample = res.errors.slice(0, 3).map(e => `${e.code || 'Error'} at row ${e.row}: ${e.message}`).join(' • ');
+        throw new Error(`CSV parse error: ${sample}`);
+      }
+
+            {
+        const headers = (res.meta && Array.isArray(res.meta.fields)) ? res.meta.fields : Object.keys((res.data && res.data[0]) || {});
+        window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+          headers,
+          delimiter: (res.meta && res.meta.delimiter) ? res.meta.delimiter : null,
+          rows: Array.isArray(res.data) ? res.data.length : 0,
+          parseEngine: 'papaparse'
+        });
+      }
+      return Array.isArray(res.data) ? res.data : [];
+    }
+
+    // Fallback: small, quote-aware CSV parser (enough for simple exports)
+    const rows = [];
+    const lines = raw.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim().length);
+    if(!lines.length){
+      window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+        headers: [],
+        delimiter: ',',
+        rows: 0,
+        parseEngine: 'fallback'
+      });
+      return [];
+    }
+
+    function splitLine(line){
+      const out = [];
+      let cur = '';
+      let inQ = false;
+      for(let i=0;i<line.length;i++){
+        const ch = line[i];
+        if(ch === '"'){
+          if(inQ && line[i+1] === '"'){ cur += '"'; i++; }
+          else { inQ = !inQ; }
+        } else if(ch === ',' && !inQ){
+          out.push(cur);
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      out.push(cur);
+      return out.map(s=>s.trim());
+    }
+
+    const headers = splitLine(lines[0]).map(h=>h.replace(/^\uFEFF/,''));
+    window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, {
+      headers,
+      delimiter: ',',
+      rows: Math.max(0, lines.length - 1),
+      parseEngine: 'fallback'
+    });
+    for(let li=1; li<lines.length; li++){
+      const cols = splitLine(lines[li]);
+      if(cols.length===1 && !cols[0]) continue;
+      const obj = {};
+      for(let i=0;i<headers.length;i++){
+        obj[headers[i]] = cols[i] ?? '';
+      }
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  // ===== CSV meta + mapping debug =====
+  window.__pogoCSVMeta = window.__pogoCSVMeta || null;
+
+
+  function getDebugMode(){
+    try{
+      const qs = new URLSearchParams(window.location.search);
+      const q = String(qs.get('debug') || '').toLowerCase();
+      if(q === '1' || q === 'true' || q === 'yes') return true;
+    }catch(e){}
+
+    try{
+      const ls = String(localStorage.getItem('pogoDebug') || '').toLowerCase();
+      if(ls === '1' || ls === 'true' || ls === 'yes') return true;
+    }catch(e){}
+
+    return false;
+  }
+
+  const DEBUG_MODE = getDebugMode();
+
+
+  function _stripDiacritics(s){
+    try{ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+    catch(e){ return String(s||''); }
+  }
+  function _normHeader(s){
+    return _stripDiacritics(s).trim().toLowerCase().replace(/[^a-z0-9%]/g,'');
+  }
+  function _firstHeaderMatch(headers, candidates){
+    const normed = headers.map(h => ({h, n:_normHeader(h)}));
+    for(const cand of candidates){
+      if(cand instanceof RegExp){
+        const hit = headers.find(h => cand.test(String(h)));
+        if(hit) return hit;
+        continue;
+      }
+      const cn = _normHeader(cand);
+      // exact
+      let hit = normed.find(x => x.n === cn);
+      if(hit) return hit.h;
+      // contains
+      hit = normed.find(x => x.n.includes(cn) || cn.includes(x.n));
+      if(hit) return hit.h;
+    }
+    return null;
+  }
+
+  function detectCSVMapping(headers){
+    const h = Array.isArray(headers) ? headers : [];
+    const m = {};
+    m.name = _firstHeaderMatch(h, ['Pokémon','Pokemon','Name','Species','Pokémon Name','Pokemon Name', /pokemon/i, /species/i, /name/i]);
+    m.cp = _firstHeaderMatch(h, ['CP','Combat Power','CombatPower', /\bcp\b/i]);
+    m.ivPercent = _firstHeaderMatch(h, ['IV%','IV %','IV Percent','IVPercent','IV Percentage', /iv\s*%/i]);
+    m.ivString = _firstHeaderMatch(h, ['IVs','IVs (Atk/Def/Sta)','IVs (A/D/S)','IV Spread','IV (A/D/S)', /\bivs\b/i, /atk\s*\/\s*def\s*\/\s*sta/i, /atk\/def\/sta/i]);
+    m.atkIV = _firstHeaderMatch(h, ['Atk IV','Attack IV','ATK IV','IV Atk','IV Attack', /atk\s*iv/i, /attack\s*iv/i]);
+    m.defIV = _firstHeaderMatch(h, ['Def IV','Defense IV','DEF IV','IV Def','IV Defense', /def\s*iv/i, /defense\s*iv/i]);
+    m.staIV = _firstHeaderMatch(h, ['Sta IV','Stamina IV','STA IV','IV Sta','IV Stamina','HP IV','IV HP', /sta\s*iv/i, /stamina\s*iv/i, /hp\s*iv/i]);
+
+    m.type1 = _firstHeaderMatch(h, ['Type 1','Type1','Primary Type','PrimaryType', /type\s*1/i, /primary\s*type/i]);
+    m.type2 = _firstHeaderMatch(h, ['Type 2','Type2','Secondary Type','SecondaryType', /type\s*2/i, /secondary\s*type/i]);
+    m.types = _firstHeaderMatch(h, ['Types','Typing', /\btypes\b/i, /typing/i]);
+
+    // Moves (for future roster-aware vs + trade tooling)
+    m.fastMove = _firstHeaderMatch(h, ['Fast Move','Quick Move','Fast Attack','Fast', /fast\s*move/i, /quick\s*move/i]);
+    m.chargedMove = _firstHeaderMatch(h, ['Charged Move','Charge Move','Charge', 'Charged', /charged\s*move/i, /charge\s*move/i]);
+
+    return m;
+  }
+
+  function renderCSVMetaDebug(meta, firstRow, opts){
+    const el = document.getElementById('csvDebug');
+    if(!el) return;
+
+    const force = !!(opts && opts.force);
+    const reason = (opts && opts.reason) ? String(opts.reason) : '';
+
+    if(!meta || !meta.headers || !meta.headers.length){
+      el.hidden = true;
+      return;
+    }
+
+    // Gate: debug panel is hidden unless debug mode is on, or we explicitly force it on failure.
+    if(!DEBUG_MODE && !force){
+      el.hidden = true;
+      return;
+    }
+
+    const summaryEl = document.getElementById('csvDebugSummary');
+    const headersEl = document.getElementById('csvHeaders');
+    const mappingEl = document.getElementById('csvMapping');
+    const sampleEl = document.getElementById('csvSample');
+
+    const fileLabel = meta.fileName ? meta.fileName : 'CSV';
+    const rowsLabel = (typeof meta.rows === 'number') ? `${meta.rows} rows` : '';
+    const colsLabel = `${meta.headers.length} cols`;
+    const reasonLabel = reason ? ` • ${reason}` : '';
+    if(summaryEl) summaryEl.textContent = `(${[fileLabel, rowsLabel, colsLabel].filter(Boolean).join(' • ')}${reasonLabel})`;
+
+    // Headers chips (cap to keep UI sane)
+    if(headersEl){
+      headersEl.innerHTML = '';
+      const max = 28;
+      meta.headers.slice(0, max).forEach(h=>{
+        const d = document.createElement('div');
+        d.className = 'debug-chip';
+        d.title = String(h);
+        d.textContent = String(h);
+        headersEl.appendChild(d);
+      });
+      if(meta.headers.length > max){
+        const d = document.createElement('div');
+        d.className = 'debug-chip';
+        d.textContent = `+${meta.headers.length - max} more`;
+        headersEl.appendChild(d);
+      }
+    }
+
+    const mapping = detectCSVMapping(meta.headers);
+    if(mappingEl){
+      const lines = [];
+      const add = (label, key) => {
+        const v = mapping[key] ? `"${mapping[key]}"` : '(not found)';
+        lines.push(`${label}: ${v}`);
+      };
+      add('name', 'name');
+      add('cp', 'cp');
+      add('ivPercent', 'ivPercent');
+      add('ivString', 'ivString');
+      add('atkIV', 'atkIV');
+      add('defIV', 'defIV');
+      add('staIV', 'staIV');
+      add('type1', 'type1');
+      add('type2', 'type2');
+      add('types', 'types');
+      add('fastMove', 'fastMove');
+      add('chargedMove', 'chargedMove');
+      lines.push('');
+      lines.push('Note: If types are not present in the CSV, we fall back to a built-in species→type map.');
+      mappingEl.textContent = lines.join('\n');
+    }
+
+    if(sampleEl){
+      const r = firstRow || {};
+      const lines = [];
+      const addSample = (header) => {
+        if(!header) return;
+        const raw = r[header];
+        const value = (raw == null) ? '' : String(raw);
+        lines.push(`${header}: ${value}`);
+      };
+
+      Object.values(mapping).filter(Boolean).forEach(h=>addSample(h));
+      if(!lines.length){
+        const keys = Object.keys(r).slice(0, 10);
+        keys.forEach(k=>lines.push(`${k}: ${String(r[k] ?? '')}`));
+      }
+      sampleEl.textContent = lines.join('\n');
+    }
+
+    el.hidden = false;
+  }
+
+    const summaryEl = document.getElementById('csvDebugSummary');
+    const headersEl = document.getElementById('csvHeaders');
+    const mappingEl = document.getElementById('csvMapping');
+    const sampleEl = document.getElementById('csvSample');
+
+    const fileLabel = meta.fileName ? meta.fileName : 'CSV';
+    const rowsLabel = (typeof meta.rows === 'number') ? `${meta.rows} rows` : '';
+    const colsLabel = `${meta.headers.length} cols`;
+    if(summaryEl) summaryEl.textContent = `(${[fileLabel, rowsLabel, colsLabel].filter(Boolean).join(' • ')})`;
+
+    // Headers chips (cap to keep UI sane)
+    if(headersEl){
+      headersEl.innerHTML = '';
+      const max = 28;
+      meta.headers.slice(0, max).forEach(h=>{
+        const d = document.createElement('div');
+        d.className = 'debug-chip';
+        d.title = String(h);
+        d.textContent = String(h);
+        headersEl.appendChild(d);
+      });
+      if(meta.headers.length > max){
+        const d = document.createElement('div');
+        d.className = 'debug-chip';
+        d.textContent = `+${meta.headers.length - max} more`;
+        headersEl.appendChild(d);
+      }
+    }
+
+    const mapping = detectCSVMapping(meta.headers);
+    if(mappingEl){
+      const lines = [];
+      const add = (label, key) => {
+        const v = mapping[key] ? `"${mapping[key]}"` : '(not found)';
+        lines.push(`${label}: ${v}`);
+      };
+      add('name', 'name');
+      add('cp', 'cp');
+      add('ivPercent', 'ivPercent');
+      add('ivString', 'ivString');
+      add('atkIV', 'atkIV');
+      add('defIV', 'defIV');
+      add('staIV', 'staIV');
+      add('type1', 'type1');
+      add('type2', 'type2');
+      add('types', 'types');
+      lines.push('');
+      lines.push('Note: If types are not present in the CSV, we fall back to a built-in species→type map.');
+      mappingEl.textContent = lines.join('\n');
+    }
+
+    if(sampleEl){
+      const r = firstRow || {};
+      const lines = [];
+      const addSample = (label, header) => {
+        if(!header) return;
+        const raw = r[header];
+        const value = (raw == null) ? '' : String(raw);
+        lines.push(`${header}: ${value}`);
+      };
+
+      Object.values(mapping).filter(Boolean).forEach(h=>addSample('', h));
+      if(!lines.length){
+        // show first few keys
+        const keys = Object.keys(r).slice(0, 10);
+        keys.forEach(k=>lines.push(`${k}: ${String(r[k] ?? '')}`));
+      }
+      sampleEl.textContent = lines.join('\n');
+    }
+
+    el.hidden = false;
+  }
+
+function normalizeTypeLabel(raw){
+    const s = String(raw || '').trim();
+    if(!s) return null;
+    // Accept "WATER", "water", "Water"
+    const t = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    return TYPES.some(x => x.name === t) ? t : null;
+  }
+
+  function extractTypesFromRow(row, fallbackName, mapping){
+    // Try mapped columns first (if present)
+    const t1Key = mapping && mapping.type1 ? mapping.type1 : null;
+    const t2Key = mapping && mapping.type2 ? mapping.type2 : null;
+    const typesKey = mapping && mapping.types ? mapping.types : null;
+
+    const t1 = normalizeTypeLabel(t1Key ? row[t1Key] : (row['Type 1'] ?? row['Type1'] ?? row['type1'] ?? row['Primary Type'] ?? row['primary_type']));
+    const t2 = normalizeTypeLabel(t2Key ? row[t2Key] : (row['Type 2'] ?? row['Type2'] ?? row['type2'] ?? row['Secondary Type'] ?? row['secondary_type']));
+
+    if (t1 || t2) {
+      return [t1, t2].filter(Boolean);
+    }
+
+    // Or a combined field: "Water / Flying" or "Water,Flying" or "Water | Flying"
+    const combined =
+      (typesKey ? row[typesKey] : null) ??
+      row['Types'] ?? row['Type'] ?? row['Typing'] ?? row['types'] ?? row['type'] ?? '';
+
+    if (combined) {
+      const parts = String(combined)
+        .split(/[\/|,;·]/g)
+        .map(p => normalizeTypeLabel(p))
+        .filter(Boolean);
+      if (parts.length) return Array.from(new Set(parts)).slice(0, 2);
+    }
+
+    // Fallback to local species -> types map
+    return typesForName(fallbackName);
+  }
+
+    // Or a combined field: "Water / Flying" or "Water,Flying"
+    const combined = row['Types'] ?? row['Type'] ?? row['Typing'] ?? row['types'] ?? row['type'] ?? '';
+    if (combined) {
+      const parts = String(combined)
+        .split(/[\/|,]/g)
+        .map(p => normalizeTypeLabel(p))
+        .filter(Boolean);
+      if (parts.length) return Array.from(new Set(parts)).slice(0, 2);
+    }
+
+    // Fallback to local species -> types map
+    return typesForName(fallbackName);
+  }
+
+  function extractSpeciesName(row, mapping){
+    const mapped = (mapping && mapping.name) ? row[mapping.name] : null;
+    const mappedStr = String(mapped || '').trim();
+    if(mappedStr) return mappedStr;
+
+    // PokéGenie exports can vary; this tries the common names first.
+    const candidates = [
+      row['Name'], row['Pokemon'], row['Pokémon'], row['Species'], row['Species Name'], row['SpeciesName'],
+      row['Pokemon Name'], row['Pokémon Name'], row['PokemonName'], row['pokemon'], row['pokemon_name'], row['species']
+    ];
+
+    for (const c of candidates) {
+      const s = String(c || '').trim();
+      if (s) return s;
+    }
+    return '';
+  }
+    return '';
+  }
+
+  function buildFromCSV(csvText){
+    hideParseError();
+
+    const parsed = parseCSV(csvText);
+    rawPokemon = parsed;
+
+    const meta = Object.assign({}, window.__pogoCSVMeta || {}, {
+      rows: parsed.length,
+      headers: (window.__pogoCSVMeta && window.__pogoCSVMeta.headers && window.__pogoCSVMeta.headers.length)
+        ? window.__pogoCSVMeta.headers
+        : Object.keys(parsed[0] || {})
+    });
+    window.__pogoCSVMeta = meta;
+
+    const mapping = detectCSVMapping(meta.headers);
+
+    // Render debug (gated). On success, this only shows in debug mode.
+    try{
+      renderCSVMetaDebug(meta, parsed[0] || null, { force: false });
+    }catch(e){
+      console.warn('[PoGO] debug render failed', e);
+    }
+
+    if (!parsed.length) {
+      showParseError('No rows found in that CSV.', 'Make sure you exported from PokéGenie as CSV (not screenshots), then try again.');
+      try{ renderCSVMetaDebug(meta, null, { force: true, reason: 'no rows' }); }catch(e){}
+      return;
+    }
+
+    const out = [];
+    let missingName = 0;
+    let unknownTypes = 0;
+
+    for (const r of parsed) {
+      const rawName = extractSpeciesName(r, mapping);
+      if (!rawName) { missingName++; continue; }
+
+      const name = normalizeSpeciesName(rawName);
+
+      const cp = parseNumber(
+        (mapping && mapping.cp) ? r[mapping.cp] :
+        (r['CP'] ?? r['Cp'] ?? r['cp'] ?? r['Combat Power'] ?? r['combat_power'])
+      );
+
+      const iv = computeIVPct(r, mapping);
+
+      const t = extractTypesFromRow(r, name, mapping);
+      if (!t || !t.length) unknownTypes++;
+
+      const score = iv == null ? 0 : Math.round(iv);
+      const grade = gradeForScore(score);
+
+      // Keep a couple extras around for future chunks (no UI impact yet)
+      const fastMoveRaw = (mapping && mapping.fastMove) ? r[mapping.fastMove] : (r['Fast Move'] ?? r['Quick Move'] ?? r['Fast Attack']);
+      const chargedMoveRaw = (mapping && mapping.chargedMove) ? r[mapping.chargedMove] : (r['Charged Move'] ?? r['Charge Move'] ?? r['Charge']);
+
+      const isShadow = /shadow/i.test(String(r['Shadow'] ?? r['Is Shadow'] ?? r['shadow'] ?? rawName ?? ''));
+      const isPurified = /purif/i.test(String(r['Purified'] ?? r['Is Purified'] ?? r['purified'] ?? ''));
+
+      out.push({
+        name,
+        score,
+        grade,
+        cp: cp ?? 0,
+        iv: iv == null ? 0 : Math.round(iv),
+        types: (t && t.length) ? t.join(' / ') : '—',
+        _typesArr: (t && t.length) ? t : [],
+        _fastMove: fastMoveRaw ? String(fastMoveRaw).trim() : '',
+        _chargedMove: chargedMoveRaw ? String(chargedMoveRaw).trim() : '',
+        _isShadow: !!isShadow,
+        _isPurified: !!isPurified
+      });
+    }
+
+    if (!out.length) {
+      const headerSample = Object.keys(parsed[0] || {}).slice(0, 12).join(', ');
+      showParseError('Could not find Pokémon names in that CSV.', `I looked for columns like <code>Name</code>, <code>Pokemon</code>, <code>Species</code>. First headers: <code>${headerSample || '—'}</code>`);
+      try{ renderCSVMetaDebug(meta, parsed[0] || null, { force: true, reason: 'missing name column' }); }catch(e){}
+      return;
+    }
+
+    if (missingName > 0 && missingName >= Math.ceil(parsed.length * 0.6)) {
+      showParseError('This CSV has very few recognizable Pokémon names.', 'Try exporting again from PokéGenie as a full Pokémon list CSV (not a battle log or a summary export).');
+      try{ renderCSVMetaDebug(meta, parsed[0] || null, { force: true, reason: 'names not detected' }); }catch(e){}
+      // keep going anyway, we have some rows
+    }
+
+    if (unknownTypes > 0 && unknownTypes >= Math.ceil(out.length * 0.6)) {
+      // Non-fatal: keep going, but surface the issue clearly.
+      showParseError('Parsed rows, but many types could not be inferred.', 'We fall back to a built-in species→type map. If you see lots of “—”, your names may include forms we don’t recognize yet.');
+      try{ renderCSVMetaDebug(meta, parsed[0] || null, { force: true, reason: 'types missing' }); }catch(e){}
+    }
+
+    allResults = out;
+    updateView();
+  }
+
+  // SECTION: DERIVED DATA (filter/sort)
+
+  function getFilteredRows() {
+    if (selected.size === 0) return allResults;
+    return allResults.filter(r => rowTypeList(r).some(t => selected.has(t)));
+  }
+
+  function computeCoverage(rows) {
+    const covered = new Set();
+    rows.forEach(r => rowTypeList(r).forEach(t => covered.add(t)));
+    return covered;
+  }
+
+  function renderCollectionSummary() {
+    if (!collectionCountEl || !collectionCoverageEl) return;
+
+    if (!allResults || allResults.length === 0) {
+      collectionCountEl.textContent = '—';
+      collectionCoverageEl.textContent = `—/${TOTAL_TYPES}`;
+      return;
+    }
+
+    const covered = computeCoverage(allResults);
+    collectionCountEl.textContent = String(allResults.length);
+    collectionCoverageEl.textContent = `${covered.size}/${TOTAL_TYPES}`;
+  }
+
+  function renderSortedTable(rows) {
+    const { key, dir } = sortState;
+    const sorted = rows.slice().sort((a, b) => {
+      const delta = compare(a, b, key);
+      return dir === 'asc' ? delta : -delta;
+    });
+    renderTable(sorted);
+    renderSortIndicators();
+  }
+
+  function updateView() {
+    const filtered = getFilteredRows();
+    lastVisibleCount = filtered.length;
+    renderShowingLine();
+    renderCollectionSummary();
+    renderSortedTable(filtered);
+  }
+
+
+  const gradeRank = (g) => {
+    // Higher is better
+    const map = { 'S': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C+': 5, 'C': 4, 'D': 3, 'F': 2 };
+    return map[g] ?? 0;
+  };
+
+  const sortState = { key: 'score', dir: 'desc' };
+
+    function renderTable(rows) {
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.name}</td>
+        <td class="mono">${row.score}</td>
+        <td>${row.grade}</td>
+        <td class="mono">${row.cp}</td>
+        <td class="mono">${row.iv}</td>
+        <td>${row.types}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function compare(a, b, key) {
+    const av = a[key];
+    const bv = b[key];
+
+    if (key === 'grade') {
+      return gradeRank(av) - gradeRank(bv);
+    }
+
+    const numKeys = new Set(['score','cp','iv']);
+    if (numKeys.has(key)) return (Number(av) || 0) - (Number(bv) || 0);
+
+    return String(av).localeCompare(String(bv));
+  }
+
+    function applySort() {
+    updateView();
+  }
+
+  function renderSortIndicators() {
+    tableHeaders.forEach(th => {
+      const ind = th.querySelector('.sort-ind');
+      if (!ind) return;
+
+      if (th.dataset.key !== sortState.key) {
+        ind.textContent = '';
+        ind.style.opacity = '0.55';
+        return;
+      }
+
+      ind.style.opacity = '0.9';
+      ind.textContent = sortState.dir === 'asc' ? '▲' : '▼';
+    });
+  }
+
+  function onHeaderClick(e) {
+    const th = e.currentTarget;
+    const key = th.dataset.key;
+    if (!key) return;
+
+    if (sortState.key === key) {
+      sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortState.key = key;
+      // Default direction: numbers descending, strings ascending feels natural.
+      const numKeys = new Set(['score','cp','iv','grade']);
+      sortState.dir = numKeys.has(key) ? 'desc' : 'asc';
+    }
+
+    applySort();
+  }
+
+  tableHeaders.forEach(th => th.addEventListener('click', onHeaderClick));
+
+    function updateStickyMetrics() {
+  // Measure actual sticky tier heights so our offsets don't drift when padding/font sizes change.
+  const appbar = document.querySelector('.appbar');
+  const modebar = document.querySelector('.modebar');
+  const utilbar = document.querySelector('.utility-row');
+  const collectionbar = document.querySelector('.collectionbar');
+  const filterzone = document.querySelector('.filterzone');
+
+  const appH = Math.round(appbar ? appbar.getBoundingClientRect().height : 0);
+  const modeH = Math.round(modebar ? modebar.getBoundingClientRect().height : 0);
+  const utilH = Math.round(utilbar ? utilbar.getBoundingClientRect().height : 0);
+  const colH = Math.round(collectionbar ? collectionbar.getBoundingClientRect().height : 0);
+  const filH = Math.round(filterzone ? filterzone.getBoundingClientRect().height : 0);
+
+  // Expose real heights to CSS for correct stacking (prevents invisible overlap blocking taps).
+  document.documentElement.style.setProperty('--appbar-real-h', `${appH}px`);
+  document.documentElement.style.setProperty('--modebar-real-h', `${modeH}px`);
+  document.documentElement.style.setProperty('--utilbar-real-h', `${utilH}px`);
+  document.documentElement.style.setProperty('--collectionbar-real-h', `${colH}px`);
+  document.documentElement.style.setProperty('--filterzone-real-h', `${filH}px`);
+
+  const stackH = appH + modeH + utilH + colH + filH;
+  document.documentElement.style.setProperty('--sticky-stack-h', `${stackH}px`);
+  // Keep legacy var for anything else that might rely on it.
+  document.documentElement.style.setProperty('--sticky-offset', `${stackH}px`);
+
+  updateTableHeaderTop();
+}
+
+
+function updateTableHeaderTop() {
+  const thead = document.querySelector('thead');
+  if (!thead) return;
+
+  const stackH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sticky-stack-h')) || 0;
+  const rect = thead.getBoundingClientRect();
+
+  // Only offset the sticky header when it would collide with the app's sticky stack.
+  const shouldStick = rect.top <= stackH + 1;
+  document.documentElement.style.setProperty('--table-sticky-top', shouldStick ? `${stackH}px` : '0px');
+}
+
+// Throttle scroll work to animation frames.
+let _raf = 0;
+function onScrollOrResize() {
+  if (_raf) return;
+  _raf = requestAnimationFrame(() => {
+    _raf = 0;
+    updateStickyMetrics();
+  });
+}
+
+window.addEventListener('resize', onScrollOrResize);
+window.addEventListener('scroll', onScrollOrResize, { passive: true });
+
+
+// Initial render
+  renderGrid();
+  renderActiveStrip();
+
+  // Initialize Chunk 2 table behaviors
+  
+
+  // CSV upload wiring
+  const fileInputEl = document.getElementById('fileInput');
+  if(fileInputEl){
+    fileInputEl.addEventListener('change', (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      console.log('[PoGO] CSV selected:', file.name, file.size, 'bytes');
+      window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, { fileName: file.name, fileSize: file.size });
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          console.log('[PoGO] CSV loaded, parsing…');
+          buildFromCSV(String(reader.result || ''));
+          console.log('[PoGO] Parse complete. Rows:', allResults.length);
+        }catch(err){
+          console.error('[PoGO] Parse failed:', err);
+          {
+              const msg = String((err && err.message) ? err.message : err)
+                .replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;');
+              showParseError('Could not parse that CSV.', `Error: <code>${msg}</code><br/>If it came from PokéGenie, try exporting again as CSV and re-uploading.`);
+            }
+            try{
+              const meta = window.__pogoCSVMeta || null;
+              if(meta && meta.headers && meta.headers.length){
+                renderCSVMetaDebug(meta, null, { force: true, reason: 'parse failed' });
+              }
+            }catch(e){}
+        }
+      };
+      reader.onerror = () => {
+        console.error('[PoGO] FileReader error', reader.error);
+      };
+      reader.readAsText(file);
+      // reset so same file can be re-uploaded after tweaks
+      e.target.value = '';
+    });
+  } else {
+    console.warn('[PoGO] fileInput not found');
+  }
+
+
+  // ===== Glossary drawer wiring =====
+  const infoBtn = document.getElementById('infoBtn');
+  const infoDrawer = document.getElementById('infoDrawer');
+  const drawerBackdrop = document.getElementById('drawerBackdrop');
+  const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+
+  function openDrawer(){
+    if(!infoDrawer || !drawerBackdrop) return;
+    infoDrawer.classList.add('open');
+    infoDrawer.setAttribute('aria-hidden','false');
+    drawerBackdrop.hidden = false;
+    document.body.classList.add('no-scroll');
+  }
+  function closeDrawer(){
+    if(!infoDrawer || !drawerBackdrop) return;
+    infoDrawer.classList.remove('open');
+    infoDrawer.setAttribute('aria-hidden','true');
+    drawerBackdrop.hidden = true;
+    document.body.classList.remove('no-scroll');
+  }
+
+  if(infoBtn){
+    infoBtn.addEventListener('click', () => {
+      // toggle
+      const isOpen = infoDrawer && infoDrawer.classList.contains('open');
+      if(isOpen) closeDrawer(); else openDrawer();
+    });
+  }
+  if(drawerBackdrop){
+    drawerBackdrop.addEventListener('click', closeDrawer);
+  }
+  if(drawerCloseBtn){
+    drawerCloseBtn.addEventListener('click', closeDrawer);
+  }
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      if(infoDrawer && infoDrawer.classList.contains('open')) closeDrawer();
+    }
+  });
+
+
+updateStickyMetrics();
+  updateView();
+</script>
+</body>
+</html>
