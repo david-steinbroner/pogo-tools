@@ -130,7 +130,7 @@ The monolith has been refactored into a clean multi-file ES module architecture:
 
 1. **Ensure Cloudflare Pages is connected to GitHub**
    - Go to Cloudflare Dashboard -> Pages
-   - Your `pogo-tools` project should be listed
+   - Your `pogo-pal` project should be listed
 
 2. **Ensure preview deployments are enabled**
    - Click on your project -> Settings -> Builds & deployments
@@ -148,7 +148,7 @@ The monolith has been refactored into a clean multi-file ES module architecture:
 
 5. **Find your preview URL**
    - Go to Cloudflare Dashboard -> Pages -> Your project -> Deployments
-   - Preview deployments appear with a unique URL like: `refactor-v3.pogo-tools.pages.dev`
+   - Preview deployments appear with a unique URL like: `refactor-v3.pogo-pal.pages.dev`
 
 ---
 

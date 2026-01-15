@@ -1,4 +1,4 @@
-# PoGO Tools
+# PoGO Pal
 
 Open-source browser-based tools for Pokémon GO management.
 
@@ -25,8 +25,8 @@ Visit the hosted site (link TBD) and select a tool. All tools work entirely in y
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/pogo-tools.git
-   cd pogo-tools
+   git clone https://github.com/YOUR_USERNAME/pogo-pal.git
+   cd pogo-pal
    ```
 
 2. Open `index.html` in your browser, or use a local server:
@@ -62,13 +62,13 @@ No build step required - it's all static HTML and JavaScript.
 
 1. **Push to GitHub**: Create a new repository and push this code
    ```bash
-   gh repo create pogo-tools --public --source=. --push
+   gh repo create pogo-pal --public --source=. --push
    ```
 
 2. **Connect to Cloudflare Pages**:
    - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) → Pages → Create a project
    - Click "Connect to Git" and authorize GitHub access
-   - Select the `pogo-tools` repository
+   - Select the `pogo-pal` repository
 
 3. **Configure build settings**:
    - Framework preset: None
