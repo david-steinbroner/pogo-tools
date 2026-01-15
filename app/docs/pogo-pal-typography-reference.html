@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PoGo Pal — Typography & Sizing Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: #0a0a0f;
+      min-height: 100vh;
+      padding: 40px 20px;
+      font-family: system-ui, sans-serif;
+      color: white;
+    }
+
+    h1 {
+      font-family: "Press Start 2P", monospace;
+      font-size: 14px;
+      color: #9BBC0F;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-family: "VT323", monospace;
+      font-size: 24px;
+      color: #666;
+      margin-bottom: 60px;
+    }
+
+    /* Generation Sections */
+    .gen-section {
+      max-width: 1000px;
+      margin: 0 auto 80px;
+      padding: 40px;
+      border-radius: 12px;
+    }
+
+    .gen-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 4px solid currentColor;
+    }
+
+    .gen-code {
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+
+    .gen-name {
+      font-size: 20px;
+    }
+
+    .gen-year {
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    /* Spec Tables */
+    .spec-group {
+      margin-bottom: 40px;
+    }
+
+    .spec-title {
+      font-size: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px dashed currentColor;
+      opacity: 0.8;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 12px 16px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .spec-table th {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.6;
+    }
+
+    .spec-table td {
+      font-size: 14px;
+    }
+
+    .spec-table tr:nth-child(even) td {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .prop-name {
+      font-family: monospace;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .prop-value {
+      font-family: monospace;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* Font Samples */
+    .font-sample {
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .font-sample-label {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .font-sample-text {
+      line-height: 1.4;
+    }
+
+    /* Size demos */
+    .size-demo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .size-box {
+      border: 2px dashed currentColor;
+      opacity: 0.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .size-label {
+      font-family: monospace;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Animation timing visual */
+    .timing-demo {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .timing-bar {
+      height: 8px;
+      width: 120px;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .timing-bar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 30%;
+      border-radius: 4px;
+    }
+
+    .timing-label {
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GBP STYLES
+    ═══════════════════════════════════════════════════════════════ */
+    
+    .gen-gbp {
+      background: linear-gradient(180deg, #1a1f1a 0%, #0f140f 100%);
+      border: 4px solid #306230;
+      color: #9BBC0F;
+    }
+
+    .gen-gbp .gen-code { background: #9BBC0F; color: #0F380F; }
+    .gen-gbp .gen-name { font-family: "Press Start 2P", monospace; font-size: 14px; color: #9BBC0F; }
+    .gen-gbp .gen-year { font-family: "VT323", monospace; color: #306230; }
+    .gen-gbp .spec-title { font-family: "Press Start 2P", monospace; color: #8BAC0F; }
+    .gen-gbp .spec-table th { font-family: "Press Start 2P", monospace; color: #306230; }
+    .gen-gbp .spec-table td { font-family: "VT323", monospace; font-size: 20px; }
+    .gen-gbp .prop-value { background: #0F380F; color: #9BBC0F; }
+    .gen-gbp .font-sample { background: #0F380F; }
+    .gen-gbp .timing-bar { background: #306230; }
+    .gen-gbp .timing-bar::after { background: #9BBC0F; animation: gbp-timing 1s steps(1) infinite; }
+
+    @keyframes gbp-timing {
+      0% { left: 0; }
+      100% { left: 70%; }
+    }
+
+    /* GBP Font Samples */
+    .gbp-display {
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
+      color: #9BBC0F;
+      line-height: 1.8;
+    }
+
+    .gbp-body {
+      font-family: "VT323", monospace;
+      font-size: 22px;
+      color: #9BBC0F;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GBC STYLES
+    ═══════════════════════════════════════════════════════════════ */
+    
+    .gen-gbc {
+      background: linear-gradient(180deg, #1a0a2a 0%, #0f051a 100%);
+      border: 4px solid #4B2C6C;
+      color: #E8F5E9;
+    }
+
+    .gen-gbc .gen-code { background: #6B4C8C; color: #FFD700; }
+    .gen-gbc .gen-name { font-family: "Press Start 2P", monospace; font-size: 14px; color: #8B6CAC; }
+    .gen-gbc .gen-year { font-family: "VT323", monospace; color: #6B4C8C; }
+    .gen-gbc .spec-title { font-family: "Press Start 2P", monospace; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+    .gen-gbc .spec-table th { font-family: "Press Start 2P", monospace; color: #6B4C8C; }
+    .gen-gbc .spec-table td { font-family: "VT323", monospace; font-size: 20px; color: #C8E6C9; }
+    .gen-gbc .prop-value { background: #1B5E20; color: #E8F5E9; }
+    .gen-gbc .font-sample { background: #1B5E20; }
+    .gen-gbc .timing-bar { background: #4B2C6C; }
+    .gen-gbc .timing-bar::after { background: #FFD700; box-shadow: 0 0 10px #FFD700; animation: gbc-timing 1s steps(2) infinite; }
+
+    @keyframes gbc-timing {
+      0% { left: 0; }
+      100% { left: 70%; }
+    }
+
+    .gbc-display {
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
+      color: #E8F5E9;
+      line-height: 1.8;
+    }
+
+    .gbc-body {
+      font-family: "VT323", monospace;
+      font-size: 22px;
+      color: #C8E6C9;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GBA STYLES
+    ═══════════════════════════════════════════════════════════════ */
+    
+    .gen-gba {
+      background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1e 100%);
+      border: 4px solid #2A2A50;
+      color: #E8F8E8;
+    }
+
+    .gen-gba .gen-code { background: #3F3F74; color: white; }
+    .gen-gba .gen-name { font-family: "Press Start 2P", monospace; font-size: 14px; color: #5F5F94; }
+    .gen-gba .gen-year { font-family: "Outfit", sans-serif; font-weight: 500; color: #3F3F74; }
+    .gen-gba .spec-title { font-family: "Press Start 2P", monospace; font-size: 10px; color: #8080C0; }
+    .gen-gba .spec-table th { font-family: "Outfit", sans-serif; font-weight: 600; color: #5F5F94; }
+    .gen-gba .spec-table td { font-family: "Outfit", sans-serif; font-size: 16px; color: #D8E8D8; }
+    .gen-gba .prop-value { background: #182818; color: #E8F8E8; }
+    .gen-gba .font-sample { background: #182818; }
+    .gen-gba .timing-bar { background: #2A2A50; }
+    .gen-gba .timing-bar::after { background: #7B68EE; animation: gba-timing 1s steps(4) infinite; }
+
+    @keyframes gba-timing {
+      0% { left: 0; }
+      100% { left: 70%; }
+    }
+
+    .gba-display {
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+      color: #E8F8E8;
+      line-height: 1.8;
+    }
+
+    .gba-body {
+      font-family: "Outfit", sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      color: #D8E8D8;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SP STYLES
+    ═══════════════════════════════════════════════════════════════ */
+    
+    .gen-sp {
+      background: linear-gradient(180deg, #0a1525 0%, #050a12 100%);
+      border: 3px solid #0A2B5C;
+      color: #FAFAFA;
+    }
+
+    .gen-sp .gen-code { background: #1A4B8C; color: white; }
+    .gen-sp .gen-name { font-family: "Press Start 2P", monospace; font-size: 12px; color: #2A6BC0; }
+    .gen-sp .gen-year { font-family: "Outfit", sans-serif; font-weight: 500; color: #1A4B8C; }
+    .gen-sp .spec-title { font-family: "Press Start 2P", monospace; font-size: 9px; color: #C0C0C0; }
+    .gen-sp .spec-table th { font-family: "Outfit", sans-serif; font-weight: 600; color: #1A4B8C; }
+    .gen-sp .spec-table td { font-family: "Outfit", sans-serif; font-size: 16px; color: #E0E0E0; }
+    .gen-sp .prop-value { background: #111; color: #FAFAFA; }
+    .gen-sp .font-sample { background: #111; border: 1px solid #333; }
+    .gen-sp .timing-bar { background: #0A2B5C; }
+    .gen-sp .timing-bar::after { background: #2A6BC0; animation: sp-timing 1s steps(4) infinite; }
+
+    @keyframes sp-timing {
+      0% { left: 0; }
+      100% { left: 70%; }
+    }
+
+    .sp-display {
+      font-family: "Press Start 2P", monospace;
+      font-size: 9px;
+      color: #111;
+      line-height: 1.8;
+    }
+
+    .sp-body {
+      font-family: "Outfit", sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DS STYLES
+    ═══════════════════════════════════════════════════════════════ */
+    
+    .gen-ds {
+      background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #5A5A5A;
+      border-radius: 16px;
+      color: #FFFFFF;
+    }
+
+    .gen-ds .gen-code { background: #8A8A8A; color: white; border-radius: 8px; }
+    .gen-ds .gen-name { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 20px; color: white; }
+    .gen-ds .gen-year { font-family: "Inter", sans-serif; font-weight: 400; color: #8A8A8A; }
+    .gen-ds .spec-title { font-family: "Outfit", sans-serif; font-weight: 700; font-size: 14px; color: #AAA; border-bottom-style: solid; }
+    .gen-ds .spec-table th { font-family: "Outfit", sans-serif; font-weight: 600; color: #666; }
+    .gen-ds .spec-table td { font-family: "Inter", sans-serif; font-size: 15px; color: #DDD; }
+    .gen-ds .prop-value { background: #2A2A2A; color: #FFF; border-radius: 6px; }
+    .gen-ds .font-sample { background: #FFF; border-radius: 12px; }
+    .gen-ds .timing-bar { background: #333; border-radius: 4px; }
+    .gen-ds .timing-bar::after { background: linear-gradient(90deg, #2196F3, #E53935); border-radius: 4px; animation: ds-timing 1s ease-out infinite; }
+
+    @keyframes ds-timing {
+      0% { left: 0; }
+      100% { left: 70%; }
+    }
+
+    .ds-display {
+      font-family: "Outfit", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0A0A0A;
+      line-height: 1.4;
+    }
+
+    .ds-body {
+      font-family: "Inter", sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: #333;
+      line-height: 1.7;
+    }
+
+    /* Quick Reference Table */
+    .quick-ref {
+      max-width: 1000px;
+      margin: 0 auto 60px;
+      background: #111;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .quick-ref-title {
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
+      color: #9BBC0F;
+      padding: 20px;
+      background: #0a0a0a;
+      border-bottom: 2px solid #222;
+    }
+
+    .quick-ref table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .quick-ref th,
+    .quick-ref td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #222;
+    }
+
+    .quick-ref th {
+      font-family: "Press Start 2P", monospace;
+      font-size: 8px;
+      color: #666;
+      background: #0a0a0a;
+    }
+
+    .quick-ref td {
+      font-family: "VT323", monospace;
+      font-size: 18px;
+      color: #ccc;
+    }
+
+    .quick-ref td:first-child {
+      font-family: "Press Start 2P", monospace;
+      font-size: 10px;
+    }
+
+    .quick-ref tr:nth-child(1) td:first-child { color: #9BBC0F; }
+    .quick-ref tr:nth-child(2) td:first-child { color: #8B6CAC; }
+    .quick-ref tr:nth-child(3) td:first-child { color: #5F5F94; }
+    .quick-ref tr:nth-child(4) td:first-child { color: #2A6BC0; }
+    .quick-ref tr:nth-child(5) td:first-child { color: #8A8A8A; }
+
+    .code-snippet {
+      font-family: monospace;
+      font-size: 11px;
+      background: #1a1a1a;
+      padding: 3px 6px;
+      border-radius: 3px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📖 TYPOGRAPHY & SIZING<br>REFERENCE GUIDE</h1>
+  <p class="subtitle">Fonts, sizes, spacing, and timing for all 5 generations</p>
+
+  <!-- Quick Reference -->
+  <div class="quick-ref">
+    <div class="quick-ref-title">⚡ QUICK REFERENCE</div>
+    <table>
+      <tr>
+        <th>GEN</th>
+        <th>DISPLAY FONT</th>
+        <th>BODY FONT</th>
+        <th>ANIMATION</th>
+        <th>BORDER RADIUS</th>
+      </tr>
+      <tr>
+        <td>GBP</td>
+        <td>Press Start 2P</td>
+        <td>VT323</td>
+        <td><span class="code-snippet">steps(1)</span></td>
+        <td>4px</td>
+      </tr>
+      <tr>
+        <td>GBC</td>
+        <td>Press Start 2P</td>
+        <td>VT323</td>
+        <td><span class="code-snippet">steps(2)</span></td>
+        <td>6px</td>
+      </tr>
+      <tr>
+        <td>GBA</td>
+        <td>Press Start 2P</td>
+        <td>Outfit</td>
+        <td><span class="code-snippet">steps(4)</span></td>
+        <td>8px</td>
+      </tr>
+      <tr>
+        <td>SP</td>
+        <td>Press Start 2P</td>
+        <td>Outfit</td>
+        <td><span class="code-snippet">steps(4)</span></td>
+        <td>6px</td>
+      </tr>
+      <tr>
+        <td>DS</td>
+        <td>Outfit</td>
+        <td>Inter</td>
+        <td><span class="code-snippet">ease-out</span></td>
+        <td>12-16px</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ GBP ═══ -->
+  <section class="gen-section gen-gbp">
+    <div class="gen-header">
+      <span class="gen-code">GBP</span>
+      <span class="gen-name">GAME BOY POCKET</span>
+      <span class="gen-year">1996</span>
+    </div>
+
+    <!-- Typography -->
+    <div class="spec-group">
+      <h3 class="spec-title">TYPOGRAPHY</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Display Font</td>
+          <td><span class="prop-value">"Press Start 2P", monospace</span></td>
+          <td class="prop-name">--font-display</td>
+        </tr>
+        <tr>
+          <td>Body Font</td>
+          <td><span class="prop-value">"VT323", monospace</span></td>
+          <td class="prop-name">--font-body</td>
+        </tr>
+        <tr>
+          <td>Display Size</td>
+          <td><span class="prop-value">10-12px</span></td>
+          <td class="prop-name">--font-size-display</td>
+        </tr>
+        <tr>
+          <td>Body Size</td>
+          <td><span class="prop-value">20-22px</span></td>
+          <td class="prop-name">--font-size-body</td>
+        </tr>
+        <tr>
+          <td>Line Height</td>
+          <td><span class="prop-value">1.5</span></td>
+          <td class="prop-name">--line-height</td>
+        </tr>
+      </table>
+
+      <div class="font-sample">
+        <div class="font-sample-label">Display Font Sample</div>
+        <div class="font-sample-text gbp-display">WILD PIKACHU APPEARED!</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-sample-label">Body Font Sample</div>
+        <div class="font-sample-text gbp-body">What will TRAINER do? FIGHT, PKMN, ITEM, RUN</div>
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div class="spec-group">
+      <h3 class="spec-title">SIZING & SPACING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Border Radius</td>
+          <td><span class="prop-value">4px</span></td>
+          <td class="prop-name">--radius</td>
+        </tr>
+        <tr>
+          <td>Border Width</td>
+          <td><span class="prop-value">3-4px</span></td>
+          <td class="prop-name">--border-width</td>
+        </tr>
+        <tr>
+          <td>Button Size</td>
+          <td><span class="prop-value">40px</span></td>
+          <td class="prop-name">--btn-size</td>
+        </tr>
+        <tr>
+          <td>Icon Size</td>
+          <td><span class="prop-value">64px</span></td>
+          <td class="prop-name">--icon-size</td>
+        </tr>
+        <tr>
+          <td>Base Spacing</td>
+          <td><span class="prop-value">4px grid</span></td>
+          <td class="prop-name">--space-unit</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Animation -->
+    <div class="spec-group">
+      <h3 class="spec-title">ANIMATION & TIMING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Timing Function</td>
+          <td><span class="prop-value">steps(1)</span></td>
+          <td>Instant, no tweening</td>
+        </tr>
+        <tr>
+          <td>Blink Speed</td>
+          <td><span class="prop-value">0.5-0.8s</span></td>
+          <td>Cursor, selection</td>
+        </tr>
+        <tr>
+          <td>Transition</td>
+          <td><span class="prop-value">none</span></td>
+          <td>Hard state changes</td>
+        </tr>
+      </table>
+      <div class="timing-demo">
+        <div class="timing-bar"></div>
+        <span class="timing-label">steps(1) — instant jumps</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GBC ═══ -->
+  <section class="gen-section gen-gbc">
+    <div class="gen-header">
+      <span class="gen-code">GBC</span>
+      <span class="gen-name">GAME BOY COLOR</span>
+      <span class="gen-year">1998</span>
+    </div>
+
+    <!-- Typography -->
+    <div class="spec-group">
+      <h3 class="spec-title">TYPOGRAPHY</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Display Font</td>
+          <td><span class="prop-value">"Press Start 2P", monospace</span></td>
+          <td class="prop-name">--font-display</td>
+        </tr>
+        <tr>
+          <td>Body Font</td>
+          <td><span class="prop-value">"VT323", monospace</span></td>
+          <td class="prop-name">--font-body</td>
+        </tr>
+        <tr>
+          <td>Display Size</td>
+          <td><span class="prop-value">10-12px</span></td>
+          <td class="prop-name">--font-size-display</td>
+        </tr>
+        <tr>
+          <td>Body Size</td>
+          <td><span class="prop-value">20-22px</span></td>
+          <td class="prop-name">--font-size-body</td>
+        </tr>
+        <tr>
+          <td>Text Shadow</td>
+          <td><span class="prop-value">0 0 10px (glow)</span></td>
+          <td class="prop-name">--text-glow</td>
+        </tr>
+      </table>
+
+      <div class="font-sample">
+        <div class="font-sample-label">Display Font Sample</div>
+        <div class="font-sample-text gbc-display">WILD PIKACHU APPEARED!</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-sample-label">Body Font Sample</div>
+        <div class="font-sample-text gbc-body">What will TRAINER do? FIGHT, PKMN, ITEM, RUN</div>
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div class="spec-group">
+      <h3 class="spec-title">SIZING & SPACING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Border Radius</td>
+          <td><span class="prop-value">6px</span></td>
+          <td class="prop-name">--radius</td>
+        </tr>
+        <tr>
+          <td>Border Width</td>
+          <td><span class="prop-value">3-4px</span></td>
+          <td class="prop-name">--border-width</td>
+        </tr>
+        <tr>
+          <td>Button Size</td>
+          <td><span class="prop-value">40px</span></td>
+          <td class="prop-name">--btn-size</td>
+        </tr>
+        <tr>
+          <td>Icon Size</td>
+          <td><span class="prop-value">64px</span></td>
+          <td class="prop-name">--icon-size</td>
+        </tr>
+        <tr>
+          <td>Box Shadow</td>
+          <td><span class="prop-value">0 0 20px (glow)</span></td>
+          <td class="prop-name">--box-glow</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Animation -->
+    <div class="spec-group">
+      <h3 class="spec-title">ANIMATION & TIMING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Timing Function</td>
+          <td><span class="prop-value">steps(2)</span></td>
+          <td>Slightly smoother</td>
+        </tr>
+        <tr>
+          <td>Pulse Speed</td>
+          <td><span class="prop-value">0.8-2s</span></td>
+          <td>Glow effects</td>
+        </tr>
+        <tr>
+          <td>Screen Filter</td>
+          <td><span class="prop-value">saturate(1.15)</span></td>
+          <td>Color boost</td>
+        </tr>
+      </table>
+      <div class="timing-demo">
+        <div class="timing-bar"></div>
+        <span class="timing-label">steps(2) — 2 keyframes</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GBA ═══ -->
+  <section class="gen-section gen-gba">
+    <div class="gen-header">
+      <span class="gen-code">GBA</span>
+      <span class="gen-name">GAME BOY ADVANCE</span>
+      <span class="gen-year">2001</span>
+    </div>
+
+    <!-- Typography -->
+    <div class="spec-group">
+      <h3 class="spec-title">TYPOGRAPHY</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Display Font</td>
+          <td><span class="prop-value">"Press Start 2P", monospace</span></td>
+          <td class="prop-name">--font-display</td>
+        </tr>
+        <tr>
+          <td>Body Font</td>
+          <td><span class="prop-value">"Outfit", sans-serif</span></td>
+          <td class="prop-name">--font-body</td>
+        </tr>
+        <tr>
+          <td>Display Size</td>
+          <td><span class="prop-value">9-10px</span></td>
+          <td class="prop-name">--font-size-display</td>
+        </tr>
+        <tr>
+          <td>Body Size</td>
+          <td><span class="prop-value">16-17px</span></td>
+          <td class="prop-name">--font-size-body</td>
+        </tr>
+        <tr>
+          <td>Body Weight</td>
+          <td><span class="prop-value">400-500</span></td>
+          <td class="prop-name">--font-weight-body</td>
+        </tr>
+      </table>
+
+      <div class="font-sample">
+        <div class="font-sample-label">Display Font Sample</div>
+        <div class="font-sample-text gba-display">WILD PIKACHU APPEARED!</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-sample-label">Body Font Sample</div>
+        <div class="font-sample-text gba-body">What will TRAINER do? The transition to modern typography begins here with clean sans-serif body text.</div>
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div class="spec-group">
+      <h3 class="spec-title">SIZING & SPACING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Border Radius</td>
+          <td><span class="prop-value">8px</span></td>
+          <td class="prop-name">--radius</td>
+        </tr>
+        <tr>
+          <td>Border Width</td>
+          <td><span class="prop-value">3px</span></td>
+          <td class="prop-name">--border-width</td>
+        </tr>
+        <tr>
+          <td>Button Size</td>
+          <td><span class="prop-value">32px</span></td>
+          <td class="prop-name">--btn-size</td>
+        </tr>
+        <tr>
+          <td>Icon Size</td>
+          <td><span class="prop-value">80×56px (wide)</span></td>
+          <td class="prop-name">--icon-size</td>
+        </tr>
+        <tr>
+          <td>Aspect Ratio</td>
+          <td><span class="prop-value">3:2 landscape</span></td>
+          <td class="prop-name">--aspect-ratio</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Animation -->
+    <div class="spec-group">
+      <h3 class="spec-title">ANIMATION & TIMING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Timing Function</td>
+          <td><span class="prop-value">steps(4)</span></td>
+          <td>Smoother stepping</td>
+        </tr>
+        <tr>
+          <td>Animation Speed</td>
+          <td><span class="prop-value">0.4-0.6s</span></td>
+          <td>Quicker feel</td>
+        </tr>
+        <tr>
+          <td>Screen Filter</td>
+          <td><span class="prop-value">contrast(1.05)</span></td>
+          <td>Crisp reflective TFT</td>
+        </tr>
+      </table>
+      <div class="timing-demo">
+        <div class="timing-bar"></div>
+        <span class="timing-label">steps(4) — 4 keyframes</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SP ═══ -->
+  <section class="gen-section gen-sp">
+    <div class="gen-header">
+      <span class="gen-code">SP</span>
+      <span class="gen-name">GAME BOY ADVANCE SP</span>
+      <span class="gen-year">2003</span>
+    </div>
+
+    <!-- Typography -->
+    <div class="spec-group">
+      <h3 class="spec-title">TYPOGRAPHY</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Display Font</td>
+          <td><span class="prop-value">"Press Start 2P", monospace</span></td>
+          <td class="prop-name">--font-display</td>
+        </tr>
+        <tr>
+          <td>Body Font</td>
+          <td><span class="prop-value">"Outfit", sans-serif</span></td>
+          <td class="prop-name">--font-body</td>
+        </tr>
+        <tr>
+          <td>Display Size</td>
+          <td><span class="prop-value">9px</span></td>
+          <td class="prop-name">--font-size-display</td>
+        </tr>
+        <tr>
+          <td>Body Size</td>
+          <td><span class="prop-value">15-16px</span></td>
+          <td class="prop-name">--font-size-body</td>
+        </tr>
+        <tr>
+          <td>Body Weight</td>
+          <td><span class="prop-value">400-500</span></td>
+          <td class="prop-name">--font-weight-body</td>
+        </tr>
+      </table>
+
+      <div class="font-sample">
+        <div class="font-sample-label">Display Font Sample</div>
+        <div class="font-sample-text sp-display">WILD PIKACHU APPEARED!</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-sample-label">Body Font Sample</div>
+        <div class="font-sample-text sp-body">What will TRAINER do? The backlit screen makes everything crisp and readable. Premium portable gaming.</div>
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div class="spec-group">
+      <h3 class="spec-title">SIZING & SPACING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Border Radius</td>
+          <td><span class="prop-value">6px</span></td>
+          <td class="prop-name">--radius</td>
+        </tr>
+        <tr>
+          <td>Border Width</td>
+          <td><span class="prop-value">2px</span></td>
+          <td class="prop-name">--border-width</td>
+        </tr>
+        <tr>
+          <td>Button Size</td>
+          <td><span class="prop-value">28px</span></td>
+          <td class="prop-name">--btn-size</td>
+        </tr>
+        <tr>
+          <td>Icon Size</td>
+          <td><span class="prop-value">64px</span></td>
+          <td class="prop-name">--icon-size</td>
+        </tr>
+        <tr>
+          <td>Box Shadow</td>
+          <td><span class="prop-value">0 2px 8px</span></td>
+          <td class="prop-name">--shadow</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Animation -->
+    <div class="spec-group">
+      <h3 class="spec-title">ANIMATION & TIMING</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Timing Function</td>
+          <td><span class="prop-value">steps(4)</span></td>
+          <td>Same as GBA</td>
+        </tr>
+        <tr>
+          <td>Animation Speed</td>
+          <td><span class="prop-value">0.4s</span></td>
+          <td>Snappy</td>
+        </tr>
+        <tr>
+          <td>Screen Filter</td>
+          <td><span class="prop-value">brightness(1.05)</span></td>
+          <td>Backlit glow</td>
+        </tr>
+      </table>
+      <div class="timing-demo">
+        <div class="timing-bar"></div>
+        <span class="timing-label">steps(4) — crisp but smooth</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ DS ═══ -->
+  <section class="gen-section gen-ds">
+    <div class="gen-header">
+      <span class="gen-code">DS</span>
+      <span class="gen-name">Nintendo DS</span>
+      <span class="gen-year">2004</span>
+    </div>
+
+    <!-- Typography -->
+    <div class="spec-group">
+      <h3 class="spec-title">Typography</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Display Font</td>
+          <td><span class="prop-value">"Outfit", sans-serif</span></td>
+          <td class="prop-name">--font-display</td>
+        </tr>
+        <tr>
+          <td>Body Font</td>
+          <td><span class="prop-value">"Inter", sans-serif</span></td>
+          <td class="prop-name">--font-body</td>
+        </tr>
+        <tr>
+          <td>Display Size</td>
+          <td><span class="prop-value">18-20px</span></td>
+          <td class="prop-name">--font-size-display</td>
+        </tr>
+        <tr>
+          <td>Body Size</td>
+          <td><span class="prop-value">14-15px</span></td>
+          <td class="prop-name">--font-size-body</td>
+        </tr>
+        <tr>
+          <td>Display Weight</td>
+          <td><span class="prop-value">600-700</span></td>
+          <td class="prop-name">--font-weight-display</td>
+        </tr>
+      </table>
+
+      <div class="font-sample">
+        <div class="font-sample-label">Display Font Sample</div>
+        <div class="font-sample-text ds-display">Wild Pikachu appeared!</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-sample-label">Body Font Sample</div>
+        <div class="font-sample-text ds-body">What will Trainer do? Modern typography meets touch-friendly interfaces. The future of portable Pokémon gaming has arrived.</div>
+      </div>
+    </div>
+
+    <!-- Sizing -->
+    <div class="spec-group">
+      <h3 class="spec-title">Sizing & Spacing</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>CSS Variable</th>
+        </tr>
+        <tr>
+          <td>Border Radius</td>
+          <td><span class="prop-value">12-16px</span></td>
+          <td class="prop-name">--radius</td>
+        </tr>
+        <tr>
+          <td>Border Width</td>
+          <td><span class="prop-value">2px or none</span></td>
+          <td class="prop-name">--border-width</td>
+        </tr>
+        <tr>
+          <td>Button Size</td>
+          <td><span class="prop-value">24-36px</span></td>
+          <td class="prop-name">--btn-size</td>
+        </tr>
+        <tr>
+          <td>Icon Size</td>
+          <td><span class="prop-value">72px</span></td>
+          <td class="prop-name">--icon-size</td>
+        </tr>
+        <tr>
+          <td>Touch Target</td>
+          <td><span class="prop-value">44px minimum</span></td>
+          <td class="prop-name">--touch-target</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Animation -->
+    <div class="spec-group">
+      <h3 class="spec-title">Animation & Timing</h3>
+      <table class="spec-table">
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>Timing Function</td>
+          <td><span class="prop-value">ease-out</span></td>
+          <td>Smooth deceleration</td>
+        </tr>
+        <tr>
+          <td>Transition Duration</td>
+          <td><span class="prop-value">0.2s</span></td>
+          <td>Quick but visible</td>
+        </tr>
+        <tr>
+          <td>Hover Effects</td>
+          <td><span class="prop-value">translateY(-2px)</span></td>
+          <td>Lift on hover</td>
+        </tr>
+        <tr>
+          <td>Active Effects</td>
+          <td><span class="prop-value">scale(0.95)</span></td>
+          <td>Press feedback</td>
+        </tr>
+      </table>
+      <div class="timing-demo">
+        <div class="timing-bar"></div>
+        <span class="timing-label">ease-out — smooth deceleration</span>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PoGo Pal Design System — Nintendo Handheld Generations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: #0a0a0f; min-height: 100vh; }
+
+/* Nav */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10,10,15,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #222; padding: 12px 24px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.nav-btn { padding: 8px 16px; border: 2px solid transparent; border-radius: 4px; font-family: "Press Start 2P", monospace; font-size: 7px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.nav-btn-year { font-size: 5px; opacity: 0.7; }
+.nav-btn:hover { transform: translateY(-2px); border-color: white; }
+.nav-btn.gbp { background: #9BBC0F; color: #0F380F; }
+.nav-btn.gbc { background: #6B4C8C; color: white; }
+.nav-btn.gba { background: #3F3F74; color: white; }
+.nav-btn.sp { background: #1A4B8C; color: white; }
+.nav-btn.ds { background: #8A8A8A; color: white; }
+.nav-spacer { height: 80px; }
+
+/* Intro */
+.intro { background: linear-gradient(180deg, #1a1a2e 0%, #0a0a0f 100%); padding: 80px 24px; text-align: center; color: white; }
+.intro-title { font-family: "Press Start 2P", monospace; font-size: clamp(14px, 4vw, 28px); margin-bottom: 24px; background: linear-gradient(90deg, #9BBC0F, #6B4C8C, #3F3F74, #1A4B8C, #8A8A8A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.intro-subtitle { font-family: "VT323", monospace; font-size: 24px; color: #888; max-width: 600px; margin: 0 auto 40px; line-height: 1.4; }
+.intro-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.intro-badge { font-family: "Press Start 2P", monospace; font-size: 8px; padding: 8px 16px; border-radius: 4px; color: white; box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
+.intro-badge.red { background: #FF1111; }
+.intro-badge.blue { background: #1111FF; }
+.intro-badge.yellow { background: #FFD733; color: #333; }
+.intro-badge.green { background: #00AA00; }
+
+/* ═══ GBP SECTION ═══ */
+.section-gbp { --s1: #9BBC0F; --s2: #8BAC0F; --s3: #306230; --s4: #0F380F; --shell: #C0C0C0; --accent: #4A3B7C; --red: #CC0000; background: linear-gradient(180deg, #1a1f1a 0%, #0a0f0a 100%); padding: 80px 24px; position: relative; scroll-margin-top: 80px; }
+.section-gbp::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(155,188,15,0.02) 4px, rgba(155,188,15,0.02) 8px); pointer-events: none; }
+.gbp-container { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+.gbp-header { text-align: center; margin-bottom: 48px; }
+.gbp-label { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--s1); margin-bottom: 8px; letter-spacing: 2px; }
+.gbp-title { font-family: "Press Start 2P", monospace; font-size: clamp(12px, 3vw, 20px); color: var(--s1); text-shadow: 2px 2px 0 var(--s4); }
+.gbp-year { font-family: "VT323", monospace; font-size: 24px; color: var(--s3); margin-top: 8px; }
+
+.gbp-device { background: linear-gradient(180deg, #D8D8D8 0%, var(--shell) 30%, #A0A0A0 100%); border-radius: 12px 12px 48px 48px; padding: 20px; max-width: 340px; margin: 0 auto 48px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.5), inset -1px -1px 0 rgba(0,0,0,0.2), 6px 6px 0 rgba(0,0,0,0.4); }
+.gbp-device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 8px; }
+.gbp-brand { display: flex; align-items: center; gap: 6px; }
+.gbp-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+.gbp-brand-text { font-family: "Press Start 2P", monospace; font-size: 8px; color: var(--accent); }
+.gbp-power { display: flex; align-items: center; gap: 6px; }
+.gbp-power-label { font-family: "Press Start 2P", monospace; font-size: 5px; color: #666; }
+.gbp-led { width: 6px; height: 6px; background: var(--red); border-radius: 50%; box-shadow: 0 0 6px var(--red); animation: gbp-led 2s steps(1) infinite; }
+@keyframes gbp-led { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.gbp-bezel { background: #1a1a1a; border-radius: 6px; padding: 12px; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.6); }
+.gbp-bezel-label { font-family: "Press Start 2P", monospace; font-size: 4px; color: rgba(255,255,255,0.3); text-align: center; margin-bottom: 6px; }
+.gbp-screen { background: var(--s1); border: 3px solid var(--s4); border-radius: 4px; padding: 12px; min-height: 160px; position: relative; box-shadow: inset 6px 6px 0 var(--s2); }
+.gbp-screen::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
+.gbp-screen-title { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--s4); text-align: center; margin-bottom: 12px; animation: gbp-blink 3s steps(1) infinite; }
+@keyframes gbp-blink { 0%,92% { opacity: 1; } 96% { opacity: 0; } }
+.gbp-menu { list-style: none; font-family: "VT323", monospace; font-size: 20px; color: var(--s4); }
+.gbp-menu li { padding: 2px 20px; position: relative; }
+.gbp-menu li::before { content: "▶"; position: absolute; left: 4px; opacity: 0; font-size: 10px; }
+.gbp-menu li.active::before { opacity: 1; }
+.gbp-menu li.active { background: var(--s2); }
+.gbp-speaker { display: flex; justify-content: flex-end; padding: 16px 20px; gap: 4px; }
+.gbp-speaker-slot { width: 4px; height: 24px; background: #A0A0A0; border-radius: 2px; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4); }
+
+.gbp-docs { background: var(--s1); border: 4px solid var(--s4); border-radius: 4px; overflow: hidden; box-shadow: 8px 8px 0 rgba(0,0,0,0.4); position: relative; margin-bottom: 32px; }
+.gbp-docs::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px); pointer-events: none; z-index: 1; }
+.gbp-docs-header { background: var(--s3); color: var(--s1); padding: 16px; font-family: "Press Start 2P", monospace; font-size: 10px; display: flex; align-items: center; gap: 12px; }
+.gbp-docs-body { padding: 24px; color: var(--s4); position: relative; z-index: 2; }
+.gbp-docs-section { margin-bottom: 32px; }
+.gbp-docs-section:last-child { margin-bottom: 0; }
+.gbp-docs-title { font-family: "Press Start 2P", monospace; font-size: 9px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px dashed var(--s3); }
+.gbp-docs-text { font-family: "VT323", monospace; font-size: 22px; line-height: 1.5; margin-bottom: 16px; }
+.gbp-colors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.gbp-swatch { border: 3px solid var(--s4); border-radius: 4px; overflow: hidden; }
+.gbp-swatch-color { height: 48px; }
+.gbp-swatch-info { background: var(--s2); padding: 8px; }
+.gbp-swatch-name { font-family: "Press Start 2P", monospace; font-size: 5px; margin-bottom: 4px; }
+.gbp-swatch-hex { font-family: "VT323", monospace; font-size: 14px; }
+.gbp-code { background: var(--s4); color: var(--s1); padding: 16px; border-radius: 4px; font-family: "VT323", monospace; font-size: 18px; overflow-x: auto; margin: 16px 0; white-space: pre; }
+.gbp-battle { background: var(--s2); border: 4px solid var(--s4); border-radius: 4px; padding: 16px; font-family: "VT323", monospace; font-size: 22px; position: relative; }
+.gbp-battle::after { content: "▼"; position: absolute; bottom: 8px; right: 12px; font-size: 10px; animation: gbp-bounce 0.5s steps(2) infinite; }
+@keyframes gbp-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+.gbp-cursor { animation: gbp-cursor 0.8s steps(1) infinite; }
+@keyframes gbp-cursor { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+.gbp-components { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+.gbp-comp { background: var(--s2); border: 2px solid var(--s3); border-radius: 4px; padding: 16px; text-align: center; }
+.gbp-comp-label { font-family: "Press Start 2P", monospace; font-size: 6px; margin-bottom: 12px; color: var(--s3); }
+.gbp-btn { width: 40px; height: 40px; border-radius: 50%; border: none; font-family: "Press Start 2P", monospace; font-size: 10px; color: white; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+.gbp-btn-a { background: var(--red); }
+.gbp-btn-b { background: #1a1a1a; }
+.gbp-btn:active { transform: translateY(2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.4); }
+
+/* ═══ GBC SECTION ═══ */
+.section-gbc { --bg: #E8F5E9; --light: #C8E6C9; --dark: #2E7D32; --darkest: #1B5E20; --shell: #6B4C8C; --accent: #FFD700; --red: #E53935; background: linear-gradient(180deg, #1a0a2a 0%, #0f051a 100%); padding: 80px 24px; position: relative; scroll-margin-top: 80px; }
+.section-gbc::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 30%, rgba(107,76,140,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(107,76,140,0.1) 0%, transparent 50%); pointer-events: none; }
+.gbc-container { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+.gbc-header { text-align: center; margin-bottom: 48px; }
+.gbc-label { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--accent); margin-bottom: 8px; letter-spacing: 2px; text-shadow: 0 0 10px var(--accent); }
+.gbc-title { font-family: "Press Start 2P", monospace; font-size: clamp(12px, 3vw, 20px); color: #8B6CAC; text-shadow: 2px 2px 0 #4B2C6C, 0 0 20px rgba(107,76,140,0.5); }
+.gbc-year { font-family: "VT323", monospace; font-size: 24px; color: var(--shell); margin-top: 8px; }
+
+.gbc-device { background: linear-gradient(180deg, #8B6CAC 0%, var(--shell) 30%, #4B2C6C 100%); border-radius: 16px 16px 56px 56px; padding: 20px; max-width: 360px; margin: 0 auto 48px; box-shadow: inset 2px 2px 0 rgba(255,255,255,0.3), inset -2px -2px 0 rgba(0,0,0,0.2), 0 0 60px rgba(107,76,140,0.4), 8px 8px 0 rgba(0,0,0,0.4); position: relative; overflow: hidden; }
+.gbc-device::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 40%, rgba(0,0,0,0.1) 100%); pointer-events: none; }
+.gbc-device-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 8px; position: relative; z-index: 1; }
+.gbc-brand { display: flex; align-items: center; gap: 8px; }
+.gbc-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+.gbc-brand-text { font-family: "Press Start 2P", monospace; font-size: 9px; color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+.gbc-led { width: 8px; height: 8px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00; animation: gbc-led 2s steps(2) infinite; }
+@keyframes gbc-led { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.gbc-bezel { background: #2a2a4a; border-radius: 10px; padding: 14px; box-shadow: inset 4px 4px 8px rgba(0,0,0,0.5); position: relative; z-index: 1; }
+.gbc-bezel-label { font-family: "Press Start 2P", monospace; font-size: 5px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 6px; letter-spacing: 2px; }
+.gbc-screen { background: var(--bg); border: 4px solid var(--darkest); border-radius: 6px; padding: 14px; min-height: 180px; position: relative; filter: saturate(1.15); box-shadow: inset 4px 4px 0 var(--light); }
+.gbc-screen::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px); pointer-events: none; }
+.gbc-screen-title { font-family: "Press Start 2P", monospace; font-size: 10px; color: var(--darkest); text-align: center; margin-bottom: 12px; }
+.gbc-menu { list-style: none; font-family: "VT323", monospace; font-size: 22px; color: var(--darkest); }
+.gbc-menu li { padding: 3px 20px; position: relative; border-radius: 4px; }
+.gbc-menu li::before { content: "▶"; position: absolute; left: 4px; opacity: 0; font-size: 10px; color: var(--red); }
+.gbc-menu li.active::before { opacity: 1; }
+.gbc-menu li.active { background: var(--light); }
+
+.gbc-docs { background: var(--bg); border: 4px solid var(--darkest); border-radius: 8px; overflow: hidden; box-shadow: 8px 8px 0 rgba(0,0,0,0.4), 0 0 40px rgba(107,76,140,0.2); position: relative; margin-bottom: 32px; }
+.gbc-docs::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px); pointer-events: none; z-index: 1; }
+.gbc-docs-header { background: var(--dark); color: white; padding: 16px; font-family: "Press Start 2P", monospace; font-size: 10px; display: flex; align-items: center; gap: 12px; }
+.gbc-docs-body { padding: 24px; color: var(--darkest); position: relative; z-index: 2; filter: saturate(1.1); }
+.gbc-docs-section { margin-bottom: 32px; }
+.gbc-docs-section:last-child { margin-bottom: 0; }
+.gbc-docs-title { font-family: "Press Start 2P", monospace; font-size: 9px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px dashed var(--dark); }
+.gbc-docs-text { font-family: "VT323", monospace; font-size: 22px; line-height: 1.5; margin-bottom: 16px; }
+.gbc-shells { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.gbc-shell { width: 56px; height: 56px; border-radius: 10px; border: 3px solid rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+.gbc-shell::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 50%); }
+.gbc-shell:hover { transform: scale(1.15); box-shadow: 0 0 25px rgba(255,255,255,0.4); }
+.gbc-shell.atomic { background: #6B4C8C; }
+.gbc-shell.berry { background: #C41E3A; }
+.gbc-shell.teal { background: #008080; }
+.gbc-shell.dandelion { background: #F0C000; }
+.gbc-shell.grape { background: #5B3256; }
+.gbc-shell.kiwi { background: #7CB342; }
+.gbc-code { background: var(--darkest); color: var(--bg); padding: 16px; border-radius: 6px; font-family: "VT323", monospace; font-size: 18px; overflow-x: auto; margin: 16px 0; white-space: pre; }
+.gbc-battle { background: var(--light); border: 4px solid var(--darkest); border-radius: 6px; padding: 16px; font-family: "VT323", monospace; font-size: 22px; position: relative; }
+.gbc-battle::after { content: "▼"; position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: var(--red); animation: gbc-bounce 0.5s steps(2) infinite; }
+@keyframes gbc-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+.gbc-components { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+.gbc-comp { background: var(--light); border: 2px solid var(--dark); border-radius: 6px; padding: 16px; text-align: center; }
+.gbc-comp-label { font-family: "Press Start 2P", monospace; font-size: 6px; margin-bottom: 12px; color: var(--dark); }
+.gbc-btn { width: 40px; height: 40px; border-radius: 50%; border: none; font-family: "Press Start 2P", monospace; font-size: 10px; color: white; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+.gbc-btn-a { background: var(--red); }
+.gbc-btn-b { background: #5C5C8A; }
+.gbc-btn:active { transform: translateY(2px); }
+
+/* ═══ GBA SECTION ═══ */
+.section-gba { --bg: #D8E8D8; --light: #E8F8E8; --dark: #384838; --darkest: #182818; --shell: #3F3F74; --purple: #7B68EE; background: linear-gradient(180deg, #1a1a2e 0%, #0a0a1e 100%); padding: 80px 24px; scroll-margin-top: 80px; }
+.gba-container { max-width: 1000px; margin: 0 auto; }
+.gba-header { text-align: center; margin-bottom: 48px; }
+.gba-label { font-family: "Press Start 2P", monospace; font-size: 10px; color: #8080C0; margin-bottom: 8px; letter-spacing: 2px; }
+.gba-title { font-family: "Press Start 2P", monospace; font-size: clamp(12px, 3vw, 20px); color: #5F5F94; text-shadow: 2px 2px 0 #2A2A50; }
+.gba-year { font-family: "Outfit", sans-serif; font-size: 20px; color: var(--shell); margin-top: 8px; font-weight: 500; }
+
+.gba-device { background: linear-gradient(180deg, #5F5F94 0%, var(--shell) 30%, #2A2A50 100%); border-radius: 20px; padding: 16px 24px 24px; max-width: 520px; margin: 0 auto 48px; box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2), inset -2px -2px 0 rgba(0,0,0,0.2), 8px 8px 0 rgba(0,0,0,0.4); }
+.gba-shoulders { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.gba-shoulder { width: 80px; height: 14px; background: #2A2A50; border-radius: 4px 4px 8px 8px; font-family: "Press Start 2P", monospace; font-size: 6px; color: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; }
+.gba-main { display: flex; align-items: center; gap: 16px; }
+.gba-dpad { width: 80px; height: 80px; position: relative; }
+.gba-dpad-v, .gba-dpad-h { position: absolute; background: #1a1a1a; border-radius: 4px; }
+.gba-dpad-v { width: 24px; height: 72px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.gba-dpad-h { width: 72px; height: 24px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.gba-screen-area { flex: 1; }
+.gba-bezel { background: #1a1a2a; border-radius: 8px; padding: 10px; box-shadow: inset 3px 3px 6px rgba(0,0,0,0.5); }
+.gba-screen { background: var(--bg); border: 3px solid var(--darkest); border-radius: 4px; padding: 12px; min-height: 120px; filter: contrast(1.05); }
+.gba-screen-title { font-family: "Press Start 2P", monospace; font-size: 9px; color: var(--darkest); text-align: center; margin-bottom: 10px; }
+.gba-menu { list-style: none; font-family: "Outfit", sans-serif; font-size: 16px; font-weight: 500; color: var(--darkest); }
+.gba-menu li { padding: 3px 18px; position: relative; border-radius: 4px; }
+.gba-menu li::before { content: "▶"; position: absolute; left: 4px; opacity: 0; font-size: 8px; color: var(--purple); }
+.gba-menu li.active::before { opacity: 1; }
+.gba-menu li.active { background: var(--light); }
+.gba-buttons { width: 80px; display: flex; flex-direction: column; align-items: center; }
+.gba-ab { display: flex; gap: 8px; transform: rotate(-25deg); }
+.gba-btn { width: 32px; height: 32px; border-radius: 50%; border: none; font-family: "Press Start 2P", monospace; font-size: 8px; color: white; background: var(--purple); cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+.gba-btn:active { transform: translateY(1px); }
+
+.gba-docs { background: var(--bg); border: 4px solid var(--darkest); border-radius: 12px; overflow: hidden; box-shadow: 8px 8px 0 rgba(0,0,0,0.3); margin-bottom: 32px; }
+.gba-docs-header { background: var(--dark); color: white; padding: 16px; font-family: "Press Start 2P", monospace; font-size: 10px; display: flex; align-items: center; gap: 12px; }
+.gba-docs-body { padding: 24px; color: var(--darkest); }
+.gba-docs-section { margin-bottom: 32px; }
+.gba-docs-section:last-child { margin-bottom: 0; }
+.gba-docs-title { font-family: "Press Start 2P", monospace; font-size: 9px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px dashed var(--dark); }
+.gba-docs-text { font-family: "Outfit", sans-serif; font-size: 17px; line-height: 1.6; margin-bottom: 16px; }
+.gba-shells { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.gba-shell { width: 64px; height: 40px; border-radius: 8px; border: 3px solid rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; }
+.gba-shell:hover { transform: scale(1.1); }
+.gba-shell.indigo { background: #3F3F74; }
+.gba-shell.glacier { background: #A8C8E8; }
+.gba-shell.flame { background: #E84C3D; }
+.gba-shell.spice { background: #FF6600; }
+.gba-code { background: var(--darkest); color: var(--light); padding: 16px; border-radius: 8px; font-family: "VT323", monospace; font-size: 18px; overflow-x: auto; margin: 16px 0; white-space: pre; }
+.gba-battle { background: var(--light); border: 3px solid var(--darkest); border-radius: 8px; padding: 16px; font-family: "Outfit", sans-serif; font-size: 17px; position: relative; }
+.gba-battle::after { content: "▼"; position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: var(--purple); animation: gba-bounce 0.4s steps(4) infinite; }
+@keyframes gba-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+.gba-components { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.gba-comp { background: var(--light); border: 2px solid var(--dark); border-radius: 8px; padding: 16px; text-align: center; }
+.gba-comp-label { font-family: "Press Start 2P", monospace; font-size: 6px; margin-bottom: 12px; color: var(--dark); }
+
+/* ═══ SP SECTION ═══ */
+.section-sp { --bg: #FAFAFA; --dark: #333; --darkest: #111; --shell: #1A4B8C; background: linear-gradient(180deg, #0a1525 0%, #050a12 100%); padding: 80px 24px; scroll-margin-top: 80px; }
+.sp-container { max-width: 900px; margin: 0 auto; }
+.sp-header { text-align: center; margin-bottom: 48px; }
+.sp-label { font-family: "Press Start 2P", monospace; font-size: 10px; color: #C0C0C0; margin-bottom: 8px; letter-spacing: 2px; }
+.sp-title { font-family: "Press Start 2P", monospace; font-size: clamp(11px, 3vw, 18px); color: #2A6BC0; text-shadow: 2px 2px 0 #0A2B5C; }
+.sp-year { font-family: "Outfit", sans-serif; font-size: 20px; color: var(--shell); margin-top: 8px; font-weight: 500; }
+
+.sp-device { max-width: 320px; margin: 0 auto 48px; }
+.sp-top { background: linear-gradient(180deg, #2A6BC0 0%, var(--shell) 40%, #0A2B5C 100%); border-radius: 12px 12px 0 0; padding: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.2); }
+.sp-bezel { background: #0a0a0a; border-radius: 6px; padding: 10px; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.8); }
+.sp-screen { background: var(--bg); border: 2px solid var(--darkest); border-radius: 4px; padding: 12px; min-height: 140px; filter: brightness(1.05); }
+.sp-screen-title { font-family: "Press Start 2P", monospace; font-size: 9px; color: var(--darkest); text-align: center; margin-bottom: 10px; }
+.sp-menu { list-style: none; font-family: "Outfit", sans-serif; font-size: 15px; font-weight: 500; color: var(--darkest); }
+.sp-menu li { padding: 3px 16px; position: relative; border-radius: 3px; }
+.sp-menu li::before { content: "▶"; position: absolute; left: 4px; opacity: 0; font-size: 8px; color: var(--shell); }
+.sp-menu li.active::before { opacity: 1; }
+.sp-menu li.active { background: #E8E8E8; }
+.sp-hinge { height: 16px; background: linear-gradient(180deg, #0A2B5C 0%, #0a1a3c 50%, #0A2B5C 100%); display: flex; justify-content: center; align-items: center; }
+.sp-hinge-line { width: 60%; height: 4px; background: #050a15; border-radius: 2px; }
+.sp-bottom { background: linear-gradient(180deg, #0A2B5C 0%, var(--shell) 20%, #0A2B5C 100%); border-radius: 0 0 12px 12px; padding: 16px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.1), 6px 6px 0 rgba(0,0,0,0.4); }
+.sp-controls { display: flex; justify-content: space-between; align-items: center; }
+.sp-dpad { width: 60px; height: 60px; position: relative; }
+.sp-dpad-v, .sp-dpad-h { position: absolute; background: #0a0a0a; border-radius: 3px; }
+.sp-dpad-v { width: 18px; height: 54px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.sp-dpad-h { width: 54px; height: 18px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.sp-ab { display: flex; gap: 6px; transform: rotate(-25deg); }
+.sp-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-family: "Press Start 2P", monospace; font-size: 7px; color: white; background: #666; cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+.sp-btn:active { transform: translateY(1px); }
+.sp-sys { display: flex; justify-content: center; gap: 24px; margin-top: 12px; }
+.sp-sys-btn { width: 32px; height: 8px; background: #0a0a0a; border-radius: 4px; }
+
+.sp-docs { background: var(--bg); border: 3px solid var(--darkest); border-radius: 8px; overflow: hidden; box-shadow: 6px 6px 0 rgba(0,0,0,0.3); margin-bottom: 32px; }
+.sp-docs-header { background: var(--shell); color: white; padding: 16px; font-family: "Press Start 2P", monospace; font-size: 9px; display: flex; align-items: center; gap: 12px; }
+.sp-docs-body { padding: 24px; color: var(--darkest); }
+.sp-docs-section { margin-bottom: 32px; }
+.sp-docs-section:last-child { margin-bottom: 0; }
+.sp-docs-title { font-family: "Press Start 2P", monospace; font-size: 9px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--shell); }
+.sp-docs-text { font-family: "Outfit", sans-serif; font-size: 16px; line-height: 1.6; margin-bottom: 16px; }
+.sp-shells { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.sp-shell { width: 48px; height: 64px; border-radius: 6px 6px 8px 8px; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; position: relative; }
+.sp-shell::before { content: ""; position: absolute; top: 8px; left: 8px; right: 8px; height: 24px; background: rgba(0,0,0,0.15); border-radius: 2px; }
+.sp-shell:hover { transform: scale(1.1); }
+.sp-shell.cobalt { background: #1A4B8C; }
+.sp-shell.graphite { background: #3A3A3A; }
+.sp-shell.pink { background: #E8B8C8; }
+.sp-shell.onyx { background: #1a1a1a; }
+.sp-code { background: var(--darkest); color: var(--bg); padding: 16px; border-radius: 6px; font-family: "VT323", monospace; font-size: 18px; overflow-x: auto; margin: 16px 0; white-space: pre; }
+.sp-battle { background: #F0F0F0; border: 2px solid var(--darkest); border-radius: 6px; padding: 16px; font-family: "Outfit", sans-serif; font-size: 16px; position: relative; }
+.sp-battle::after { content: "▼"; position: absolute; bottom: 8px; right: 12px; font-size: 10px; color: var(--shell); animation: sp-bounce 0.4s steps(4) infinite; }
+@keyframes sp-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+.sp-components { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.sp-comp { background: #F0F0F0; border: 2px solid #ddd; border-radius: 6px; padding: 16px; text-align: center; }
+.sp-comp-label { font-family: "Press Start 2P", monospace; font-size: 6px; margin-bottom: 12px; color: #666; }
+
+/* ═══ DS SECTION ═══ */
+.section-ds { --bg: #FFF; --light: #F5F5F5; --dark: #2A2A2A; --darkest: #0A0A0A; --shell: #8A8A8A; --red: #E53935; --blue: #2196F3; background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%); padding: 80px 24px; scroll-margin-top: 80px; }
+.ds-container { max-width: 900px; margin: 0 auto; }
+.ds-header { text-align: center; margin-bottom: 48px; }
+.ds-label { font-family: "Outfit", sans-serif; font-size: 14px; font-weight: 600; color: #AAA; margin-bottom: 8px; letter-spacing: 4px; text-transform: uppercase; }
+.ds-title { font-family: "Outfit", sans-serif; font-size: clamp(20px, 4vw, 32px); font-weight: 700; color: white; }
+.ds-year { font-family: "Inter", sans-serif; font-size: 18px; color: var(--shell); margin-top: 8px; }
+
+.ds-device { max-width: 360px; margin: 0 auto 48px; }
+.ds-top { background: linear-gradient(180deg, #AAA 0%, var(--shell) 40%, #5A5A5A 100%); border-radius: 16px 16px 0 0; padding: 16px; }
+.ds-bezel { background: #1a1a1a; border-radius: 8px; padding: 12px; }
+.ds-screen { background: var(--bg); border-radius: 4px; padding: 12px; min-height: 120px; }
+.ds-screen-title { font-family: "Outfit", sans-serif; font-size: 14px; font-weight: 600; color: var(--darkest); text-align: center; margin-bottom: 12px; }
+.ds-menu { list-style: none; font-family: "Inter", sans-serif; font-size: 14px; color: var(--darkest); }
+.ds-menu li { padding: 6px 16px; position: relative; border-radius: 8px; transition: background 0.2s ease-out; }
+.ds-menu li::before { content: "▶"; position: absolute; left: 4px; opacity: 0; font-size: 8px; color: var(--blue); transition: opacity 0.2s ease-out; }
+.ds-menu li.active::before { opacity: 1; }
+.ds-menu li.active { background: var(--light); }
+.ds-hinge { height: 20px; background: linear-gradient(180deg, #5A5A5A 0%, #3a3a3a 50%, #5A5A5A 100%); display: flex; justify-content: center; align-items: center; gap: 8px; }
+.ds-hinge-dot { width: 6px; height: 6px; background: #2a2a2a; border-radius: 50%; }
+.ds-bottom { background: linear-gradient(180deg, #5A5A5A 0%, var(--shell) 30%, #5A5A5A 100%); border-radius: 0 0 16px 16px; padding: 16px; box-shadow: 8px 8px 0 rgba(0,0,0,0.3); }
+.ds-touch-bezel { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.ds-touch { background: var(--bg); border-radius: 4px; padding: 16px; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ds-touch-icon { font-size: 24px; margin-bottom: 8px; }
+.ds-touch-label { font-family: "Outfit", sans-serif; font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 2px; }
+.ds-controls { display: flex; justify-content: space-between; align-items: center; }
+.ds-dpad { width: 56px; height: 56px; position: relative; }
+.ds-dpad-v, .ds-dpad-h { position: absolute; background: #2a2a2a; border-radius: 4px; }
+.ds-dpad-v { width: 18px; height: 50px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.ds-dpad-h { width: 50px; height: 18px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.ds-buttons { display: flex; flex-wrap: wrap; width: 60px; gap: 4px; justify-content: center; }
+.ds-btn { width: 24px; height: 24px; border-radius: 50%; border: none; font-family: "Outfit", sans-serif; font-size: 10px; font-weight: 600; color: white; cursor: pointer; transition: transform 0.1s ease-out; background: #666; }
+.ds-btn-a { background: var(--red); }
+.ds-btn:active { transform: scale(0.95); }
+
+.ds-docs { background: var(--bg); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.3); margin-bottom: 32px; }
+.ds-docs-header { background: linear-gradient(90deg, #5A5A5A 0%, var(--shell) 50%, #5A5A5A 100%); color: white; padding: 20px; font-family: "Outfit", sans-serif; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+.ds-docs-body { padding: 32px; color: var(--darkest); }
+.ds-docs-section { margin-bottom: 40px; }
+.ds-docs-section:last-child { margin-bottom: 0; }
+.ds-docs-title { font-family: "Outfit", sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--blue); }
+.ds-docs-text { font-family: "Inter", sans-serif; font-size: 15px; line-height: 1.7; margin-bottom: 16px; color: #333; }
+.ds-shells { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; }
+.ds-shell { width: 48px; height: 72px; border-radius: 10px 10px 12px 12px; border: 2px solid rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; position: relative; overflow: hidden; }
+.ds-shell::before { content: ""; position: absolute; top: 10px; left: 6px; right: 6px; height: 28px; background: rgba(0,0,0,0.1); border-radius: 3px; }
+.ds-shell:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.ds-shell.titanium { background: #8A8A8A; }
+.ds-shell.blue { background: #0066CC; }
+.ds-shell.pink { background: #FF66B2; }
+.ds-shell.black { background: #2A2A2A; }
+.ds-code { background: #1a1a1a; color: #f0f0f0; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 14px; overflow-x: auto; margin: 16px 0; white-space: pre; }
+.ds-battle { background: var(--light); border-radius: 12px; padding: 20px; font-family: "Inter", sans-serif; font-size: 15px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.ds-battle::after { content: "▼"; position: absolute; bottom: 12px; right: 16px; font-size: 12px; color: var(--blue); animation: ds-bounce 0.6s ease-in-out infinite; }
+@keyframes ds-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+.ds-components { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+.ds-comp { background: var(--light); border-radius: 12px; padding: 20px; text-align: center; transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
+.ds-comp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.ds-comp-label { font-family: "Outfit", sans-serif; font-size: 12px; font-weight: 600; margin-bottom: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Shared type badges */
+.type-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 8px; font-weight: bold; color: white; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); margin: 2px; font-family: "Press Start 2P", monospace; }
+.type-fire { background: #F08030; }
+.type-water { background: #6890F0; }
+.type-grass { background: #78C850; }
+.type-psychic { background: #F85888; }
+
+/* Footer */
+.footer { background: #0a0a0a; padding: 48px 24px; text-align: center; color: #666; }
+.footer-title { font-family: "Press Start 2P", monospace; font-size: 10px; color: #444; margin-bottom: 16px; }
+.footer-dots { display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.footer-dot { width: 12px; height: 12px; border-radius: 50%; }
+.footer-dot.gbp { background: #9BBC0F; }
+.footer-dot.gbc { background: #6B4C8C; }
+.footer-dot.gba { background: #3F3F74; }
+.footer-dot.sp { background: #1A4B8C; }
+.footer-dot.ds { background: #8A8A8A; }
+.footer-arrow { color: #333; font-size: 12px; }
+.footer-text { font-family: "VT323", monospace; font-size: 18px; color: #555; }
+
+@media (max-width: 600px) {
+  .nav { padding: 8px 12px; gap: 4px; }
+  .nav-btn { padding: 6px 10px; font-size: 6px; }
+  .nav-btn-year { display: none; }
+  .gbp-colors, .gbc-shells, .gba-shells, .sp-shells, .ds-shells { justify-content: center; }
+  .gba-main { flex-direction: column; }
+  .gba-dpad, .gba-buttons { display: none; }
+  .gba-screen-area { width: 100%; }
+}
+</style>
+
+<!-- Navigation -->
+<nav class="nav">
+  <a href="#gbp" class="nav-btn gbp">GBP<span class="nav-btn-year">1996</span></a>
+  <a href="#gbc" class="nav-btn gbc">GBC<span class="nav-btn-year">1998</span></a>
+  <a href="#gba" class="nav-btn gba">GBA<span class="nav-btn-year">2001</span></a>
+  <a href="#sp" class="nav-btn sp">SP<span class="nav-btn-year">2003</span></a>
+  <a href="#ds" class="nav-btn ds">DS<span class="nav-btn-year">2004</span></a>
+</nav>
+<div class="nav-spacer"></div>
+
+<!-- Intro -->
+<section class="intro">
+  <h1 class="intro-title">PoGo Pal Design System</h1>
+  <p class="intro-subtitle">A nostalgic journey through Nintendo's handheld generations.<br>Each era, rendered in its own visual language.</p>
+  <div class="intro-badges">
+    <span class="intro-badge red">RED</span>
+    <span class="intro-badge blue">BLUE</span>
+    <span class="intro-badge yellow">YELLOW</span>
+    <span class="intro-badge green">GREEN</span>
+  </div>
+</section>
+
+<!-- ═══ GBP SECTION ═══ -->
+<section class="section-gbp" id="gbp">
+  <div class="gbp-container">
+    <div class="gbp-header">
+      <div class="gbp-label">GBP</div>
+      <h2 class="gbp-title">GAME BOY POCKET</h2>
+      <div class="gbp-year">1996</div>
+    </div>
+
+    <div class="gbp-device">
+      <div class="gbp-device-header">
+        <div class="gbp-brand"><div class="gbp-dot"></div><span class="gbp-brand-text">PoGo Pal</span></div>
+        <div class="gbp-power"><span class="gbp-power-label">POWER</span><div class="gbp-led"></div></div>
+      </div>
+      <div class="gbp-bezel">
+        <div class="gbp-bezel-label">DOT MATRIX WITH STEREO SOUND</div>
+        <div class="gbp-screen">
+          <div class="gbp-screen-title">★ GBP THEME ★</div>
+          <ul class="gbp-menu">
+            <li class="active">COLOR PALETTE</li>
+            <li>TYPOGRAPHY</li>
+            <li>COMPONENTS</li>
+            <li>ANIMATIONS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="gbp-speaker"><div class="gbp-speaker-slot"></div><div class="gbp-speaker-slot"></div><div class="gbp-speaker-slot"></div><div class="gbp-speaker-slot"></div></div>
+    </div>
+
+    <div class="gbp-docs">
+      <div class="gbp-docs-header"><span>◆</span> THE ORIGINAL ERA</div>
+      <div class="gbp-docs-body">
+        <div class="gbp-docs-section">
+          <h3 class="gbp-docs-title">ABOUT THIS THEME</h3>
+          <p class="gbp-docs-text">The Game Boy Pocket was the slimmer, refined successor to the original DMG. Released in 1996, it's what most of us played Red & Blue on. The crisper LCD and smaller form factor made it the definitive way to catch 'em all.</p>
+          <div class="gbp-battle">This theme channels pure 1996 energy.<br>4 shades of green. No compromises.<span class="gbp-cursor">_</span></div>
+        </div>
+        <div class="gbp-docs-section">
+          <h3 class="gbp-docs-title">4-SHADE LCD PALETTE</h3>
+          <p class="gbp-docs-text">The Game Boy's 4-shade limitation became its signature. These exact hex values recreate that iconic green-tinted experience.</p>
+          <div class="gbp-colors">
+            <div class="gbp-swatch"><div class="gbp-swatch-color" style="background:#9BBC0F"></div><div class="gbp-swatch-info"><div class="gbp-swatch-name">LIGHTEST</div><div class="gbp-swatch-hex">#9BBC0F</div></div></div>
+            <div class="gbp-swatch"><div class="gbp-swatch-color" style="background:#8BAC0F"></div><div class="gbp-swatch-info"><div class="gbp-swatch-name">LIGHT</div><div class="gbp-swatch-hex">#8BAC0F</div></div></div>
+            <div class="gbp-swatch"><div class="gbp-swatch-color" style="background:#306230"></div><div class="gbp-swatch-info"><div class="gbp-swatch-name">DARK</div><div class="gbp-swatch-hex">#306230</div></div></div>
+            <div class="gbp-swatch"><div class="gbp-swatch-color" style="background:#0F380F"></div><div class="gbp-swatch-info"><div class="gbp-swatch-name">DARKEST</div><div class="gbp-swatch-hex">#0F380F</div></div></div>
+          </div>
+        </div>
+        <div class="gbp-docs-section">
+          <h3 class="gbp-docs-title">TYPOGRAPHY & ANIMATION</h3>
+          <div class="gbp-code">--font-display: "Press Start 2P", monospace;
+--font-body: "VT323", monospace;
+
+/* Instant animations - no tweening */
+animation-timing-function: steps(1);</div>
+        </div>
+        <div class="gbp-docs-section">
+          <h3 class="gbp-docs-title">COMPONENTS</h3>
+          <div class="gbp-components">
+            <div class="gbp-comp"><div class="gbp-comp-label">A BUTTON</div><button class="gbp-btn gbp-btn-a">A</button></div>
+            <div class="gbp-comp"><div class="gbp-comp-label">B BUTTON</div><button class="gbp-btn gbp-btn-b">B</button></div>
+            <div class="gbp-comp"><div class="gbp-comp-label">TYPE BADGES</div><span class="type-badge type-fire">FIRE</span><span class="type-badge type-water">WATER</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GBC SECTION ═══ -->
+<section class="section-gbc" id="gbc">
+  <div class="gbc-container">
+    <div class="gbc-header">
+      <div class="gbc-label">GBC</div>
+      <h2 class="gbc-title">GAME BOY COLOR</h2>
+      <div class="gbc-year">1998</div>
+    </div>
+
+    <div class="gbc-device">
+      <div class="gbc-device-header">
+        <div class="gbc-brand"><div class="gbc-dot"></div><span class="gbc-brand-text">PoGo Pal</span></div>
+        <div class="gbc-led"></div>
+      </div>
+      <div class="gbc-bezel">
+        <div class="gbc-bezel-label">COLOR</div>
+        <div class="gbc-screen">
+          <div class="gbc-screen-title">★ GBC THEME ★</div>
+          <ul class="gbc-menu">
+            <li class="active">SHELL COLORS</li>
+            <li>FULL PALETTE</li>
+            <li>COMPONENTS</li>
+            <li>POKÉMANIA</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="gbc-docs">
+      <div class="gbc-docs-header"><span>◆</span> THE COLOR REVOLUTION</div>
+      <div class="gbc-docs-body">
+        <div class="gbc-docs-section">
+          <h3 class="gbc-docs-title">ABOUT THIS THEME</h3>
+          <p class="gbc-docs-text">1998 changed everything. Full color displays, translucent shells, and Pokémon Gold & Silver on the horizon. The Game Boy Color represented peak Pokémania—everyone had one, and everyone had an opinion about which shell color was best.</p>
+          <div class="gbc-battle">Full color. Translucent shells.<br>The world went Pokémon crazy.<span class="gbp-cursor">_</span></div>
+        </div>
+        <div class="gbc-docs-section">
+          <h3 class="gbc-docs-title">TRANSLUCENT SHELL VARIANTS</h3>
+          <p class="gbc-docs-text">The GBC's translucent shells were iconic. Each color had its own personality. Atomic Purple was the default, but everyone had their favorite.</p>
+          <div class="gbc-shells">
+            <div class="gbc-shell atomic"></div>
+            <div class="gbc-shell berry"></div>
+            <div class="gbc-shell teal"></div>
+            <div class="gbc-shell dandelion"></div>
+            <div class="gbc-shell grape"></div>
+            <div class="gbc-shell kiwi"></div>
+          </div>
+        </div>
+        <div class="gbc-docs-section">
+          <h3 class="gbc-docs-title">VISUAL LANGUAGE</h3>
+          <div class="gbc-code">/* Saturated screen filter */
+filter: saturate(1.15);
+
+/* Glowing accent effect */
+text-shadow: 0 0 10px var(--accent);
+box-shadow: 0 0 20px rgba(107, 76, 140, 0.4);
+
+/* Slightly smoother animation */
+animation-timing-function: steps(2);</div>
+        </div>
+        <div class="gbc-docs-section">
+          <h3 class="gbc-docs-title">COMPONENTS</h3>
+          <div class="gbc-components">
+            <div class="gbc-comp"><div class="gbc-comp-label">A BUTTON</div><button class="gbc-btn gbc-btn-a">A</button></div>
+            <div class="gbc-comp"><div class="gbc-comp-label">B BUTTON</div><button class="gbc-btn gbc-btn-b">B</button></div>
+            <div class="gbc-comp"><div class="gbc-comp-label">TYPE BADGES</div><span class="type-badge type-grass">GRASS</span><span class="type-badge type-psychic">PSYCHIC</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GBA SECTION ═══ -->
+<section class="section-gba" id="gba">
+  <div class="gba-container">
+    <div class="gba-header">
+      <div class="gba-label">GBA</div>
+      <h2 class="gba-title">GAME BOY ADVANCE</h2>
+      <div class="gba-year">2001</div>
+    </div>
+
+    <div class="gba-device">
+      <div class="gba-shoulders"><div class="gba-shoulder">L</div><div class="gba-shoulder">R</div></div>
+      <div class="gba-main">
+        <div class="gba-dpad"><div class="gba-dpad-h"></div><div class="gba-dpad-v"></div></div>
+        <div class="gba-screen-area">
+          <div class="gba-bezel">
+            <div class="gba-screen">
+              <div class="gba-screen-title">★ GBA THEME ★</div>
+              <ul class="gba-menu">
+                <li class="active">WIDER SCREEN</li>
+                <li>SHOULDER BTNS</li>
+                <li>RUBY/SAPPHIRE</li>
+                <li>TRANSITION ERA</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="gba-buttons"><div class="gba-ab"><button class="gba-btn">B</button><button class="gba-btn">A</button></div></div>
+      </div>
+    </div>
+
+    <div class="gba-docs">
+      <div class="gba-docs-header"><span>◆</span> THE TRANSITION ERA</div>
+      <div class="gba-docs-body">
+        <div class="gba-docs-section">
+          <h3 class="gba-docs-title">ABOUT THIS THEME</h3>
+          <p class="gba-docs-text">The GBA brought wider screens, shoulder buttons, and a massive leap in graphical power. Ruby & Sapphire introduced abilities, natures, and double battles. The landscape orientation changed how we held our handhelds forever.</p>
+          <div class="gba-battle">Wider screen. More power. Shoulder buttons.<br>Ruby & Sapphire changed everything.</div>
+        </div>
+        <div class="gba-docs-section">
+          <h3 class="gba-docs-title">SHELL VARIANTS</h3>
+          <p class="gba-docs-text">The GBA came in a variety of colors, from the iconic Indigo to the eye-catching Spice Orange.</p>
+          <div class="gba-shells">
+            <div class="gba-shell indigo"></div>
+            <div class="gba-shell glacier"></div>
+            <div class="gba-shell flame"></div>
+            <div class="gba-shell spice"></div>
+          </div>
+        </div>
+        <div class="gba-docs-section">
+          <h3 class="gba-docs-title">VISUAL LANGUAGE</h3>
+          <div class="gba-code">/* Typography transition */
+--font-display: "Press Start 2P", monospace;
+--font-body: "Outfit", sans-serif;
+
+/* Smoother animation steps */
+animation-timing-function: steps(4);</div>
+        </div>
+        <div class="gba-docs-section">
+          <h3 class="gba-docs-title">COMPONENTS</h3>
+          <div class="gba-components">
+            <div class="gba-comp"><div class="gba-comp-label">A/B BUTTONS</div><button class="gba-btn" style="margin-right:8px">A</button><button class="gba-btn">B</button></div>
+            <div class="gba-comp"><div class="gba-comp-label">TYPE BADGES</div><span class="type-badge" style="background:#7038F8">DRAGON</span><span class="type-badge" style="background:#B8B8D0;color:#333">STEEL</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SP SECTION ═══ -->
+<section class="section-sp" id="sp">
+  <div class="sp-container">
+    <div class="sp-header">
+      <div class="sp-label">SP</div>
+      <h2 class="sp-title">GAME BOY ADVANCE SP</h2>
+      <div class="sp-year">2003</div>
+    </div>
+
+    <div class="sp-device">
+      <div class="sp-top">
+        <div class="sp-bezel">
+          <div class="sp-screen">
+            <div class="sp-screen-title">★ SP THEME ★</div>
+            <ul class="sp-menu">
+              <li class="active">BACKLIT SCREEN</li>
+              <li>CLAMSHELL</li>
+              <li>FIRERED/LEAFGREEN</li>
+              <li>PREMIUM FEEL</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sp-hinge"><div class="sp-hinge-line"></div></div>
+      <div class="sp-bottom">
+        <div class="sp-controls">
+          <div class="sp-dpad"><div class="sp-dpad-h"></div><div class="sp-dpad-v"></div></div>
+          <div class="sp-ab"><button class="sp-btn">B</button><button class="sp-btn">A</button></div>
+        </div>
+        <div class="sp-sys"><div class="sp-sys-btn"></div><div class="sp-sys-btn"></div></div>
+      </div>
+    </div>
+
+    <div class="sp-docs">
+      <div class="sp-docs-header"><span>◆</span> THE PREMIUM ERA</div>
+      <div class="sp-docs-body">
+        <div class="sp-docs-section">
+          <h3 class="sp-docs-title">ABOUT THIS THEME</h3>
+          <p class="sp-docs-text">Finally—a backlit screen! The SP's clamshell design felt premium and pocketable. FireRed & LeafGreen brought Kanto back to life with modern visuals. The AGS-101 model's backlight made this the definitive way to play GBA games.</p>
+          <div class="sp-battle">Backlit screen. Clamshell design.<br>Return to Kanto in style.</div>
+        </div>
+        <div class="sp-docs-section">
+          <h3 class="sp-docs-title">SHELL VARIANTS</h3>
+          <p class="sp-docs-text">The SP came in sleek, modern colors. Cobalt Blue was the flagship, but the NES Classic Edition remains a collector's grail.</p>
+          <div class="sp-shells">
+            <div class="sp-shell cobalt"></div>
+            <div class="sp-shell graphite"></div>
+            <div class="sp-shell pink"></div>
+            <div class="sp-shell onyx"></div>
+          </div>
+        </div>
+        <div class="sp-docs-section">
+          <h3 class="sp-docs-title">VISUAL LANGUAGE</h3>
+          <div class="sp-code">/* Bright, backlit screen feel */
+filter: brightness(1.05);
+background: #FAFAFA;
+color: #111111;
+
+/* Same animation timing as GBA */
+animation-timing-function: steps(4);</div>
+        </div>
+        <div class="sp-docs-section">
+          <h3 class="sp-docs-title">COMPONENTS</h3>
+          <div class="sp-components">
+            <div class="sp-comp"><div class="sp-comp-label">BUTTONS</div><button class="sp-btn" style="margin-right:8px">A</button><button class="sp-btn">B</button></div>
+            <div class="sp-comp"><div class="sp-comp-label">TYPE BADGES</div><span class="type-badge type-fire">FIRE</span><span class="type-badge type-grass">GRASS</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DS SECTION ═══ -->
+<section class="section-ds" id="ds">
+  <div class="ds-container">
+    <div class="ds-header">
+      <div class="ds-label">DS</div>
+      <h2 class="ds-title">Nintendo DS</h2>
+      <div class="ds-year">2004</div>
+    </div>
+
+    <div class="ds-device">
+      <div class="ds-top">
+        <div class="ds-bezel">
+          <div class="ds-screen">
+            <div class="ds-screen-title">DS THEME</div>
+            <ul class="ds-menu">
+              <li class="active">DUAL SCREENS</li>
+              <li>TOUCH CONTROLS</li>
+              <li>WI-FI BATTLES</li>
+              <li>MODERN ERA</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="ds-hinge"><div class="ds-hinge-dot"></div><div class="ds-hinge-dot"></div><div class="ds-hinge-dot"></div></div>
+      <div class="ds-bottom">
+        <div class="ds-touch-bezel">
+          <div class="ds-touch">
+            <div class="ds-touch-icon">👆</div>
+            <div class="ds-touch-label">Touch Screen</div>
+          </div>
+        </div>
+        <div class="ds-controls">
+          <div class="ds-dpad"><div class="ds-dpad-h"></div><div class="ds-dpad-v"></div></div>
+          <div class="ds-buttons">
+            <button class="ds-btn">X</button>
+            <button class="ds-btn">Y</button>
+            <button class="ds-btn ds-btn-a">A</button>
+            <button class="ds-btn">B</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-docs">
+      <div class="ds-docs-header"><span>◆</span> THE MODERN ERA</div>
+      <div class="ds-docs-body">
+        <div class="ds-docs-section">
+          <h3 class="ds-docs-title">About This Theme</h3>
+          <p class="ds-docs-text">The Nintendo DS brought dual screens, touch controls, and Wi-Fi to handheld gaming. Diamond & Pearl launched Generation IV with online battles and global trading. This was the future—and it felt like it.</p>
+          <div class="ds-battle">Dual screens. Touch controls. Wi-Fi battles.<br>The future of Pokémon arrived.</div>
+        </div>
+        <div class="ds-docs-section">
+          <h3 class="ds-docs-title">Shell Variants</h3>
+          <p class="ds-docs-text">The DS came in a rainbow of colors, from the classic Titanium to vibrant special editions.</p>
+          <div class="ds-shells">
+            <div class="ds-shell titanium"></div>
+            <div class="ds-shell blue"></div>
+            <div class="ds-shell pink"></div>
+            <div class="ds-shell black"></div>
+          </div>
+        </div>
+        <div class="ds-docs-section">
+          <h3 class="ds-docs-title">Visual Language</h3>
+          <div class="ds-code">/* Modern typography */
+--font-display: "Outfit", sans-serif;
+--font-body: "Inter", sans-serif;
+
+/* Smooth animations */
+animation-timing-function: ease-out;
+transition: all 0.2s ease-out;</div>
+        </div>
+        <div class="ds-docs-section">
+          <h3 class="ds-docs-title">Components</h3>
+          <div class="ds-components">
+            <div class="ds-comp"><div class="ds-comp-label">Buttons</div><button class="ds-btn ds-btn-a" style="width:36px;height:36px;margin-right:8px">A</button><button class="ds-btn" style="width:36px;height:36px">B</button></div>
+            <div class="ds-comp"><div class="ds-comp-label">Type Badges</div><span class="type-badge" style="background:#705848">DARK</span><span class="type-badge" style="background:#EE99AC">FAIRY</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-title">PoGo Pal Design System</div>
+  <div class="footer-dots">
+    <div class="footer-dot gbp"></div><span class="footer-arrow">→</span>
+    <div class="footer-dot gbc"></div><span class="footer-arrow">→</span>
+    <div class="footer-dot gba"></div><span class="footer-arrow">→</span>
+    <div class="footer-dot sp"></div><span class="footer-arrow">→</span>
+    <div class="footer-dot ds"></div>
+  </div>
+  <div class="footer-text">1996 → 1998 → 2001 → 2003 → 2004</div>
+  <div class="footer-text" style="margin-top:16px;opacity:0.6">Gotta catch 'em all. Every generation.</div>
+</footer>
+
+<script>
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(btn.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+document.querySelectorAll('.gbp-menu li, .gbc-menu li, .gba-menu li, .sp-menu li, .ds-menu li').forEach(item => {
+  item.addEventListener('click', function() {
+    this.parentElement.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
