@@ -163,11 +163,12 @@ button { font-family: inherit; }
   position: sticky;
   top: 0;
   z-index: 100;
-  height: var(--appbar-h);
+  min-height: var(--appbar-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-lg);
+  padding-top: env(safe-area-inset-top, 0);
   background-color: #EDE8DC;
   border-bottom: 3px solid var(--border-strong);
   isolation: isolate;
