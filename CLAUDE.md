@@ -5,12 +5,12 @@ Trade tab implementation
 
 ## Next Up
 - [ ] Trade tab: placeholder or basic implementation
-- [ ] Consider additional VS mode enhancements based on user feedback
 
 ## Blocked / Questions
 (none)
 
 ## Recent Progress
+- 2026-01-15: VS tab UX - unified upload buttons with icons, reordered layout (Bring/Avoid first when no CSV)
 - 2026-01-15: VS tab polish - removed VS icon, added upload buttons to empty states
 - 2026-01-15: Design System Migration complete - migrated to light "Pokédex Companion" theme (10 chunks)
 - 2026-01-15: VS type selector Done/Edit toggle - explicit collapse control, validation feedback
