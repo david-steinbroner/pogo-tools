@@ -860,23 +860,34 @@ table {
   width: 100%;
   border-collapse: collapse;
   min-width: 680px;
+  font-family: var(--font-body);
+  font-size: 20px;
 }
 
 th, td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(42, 42, 74, 0.6);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
   text-align: left;
-  font-size: 0.92rem;
 }
 
 th {
   position: sticky;
   top: var(--table-sticky-top);
   z-index: 20;
-  background: rgba(22, 33, 62, 0.92);
+  background: var(--bg-surface-alt);
   color: var(--text-secondary);
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  font-family: var(--font-display);
+  font-size: 8px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-strong);
+}
+
+td {
+  color: var(--text-primary);
+}
+
+tr:hover td {
+  background: var(--bg-surface-alt);
 }
 
 th.sortable {
@@ -884,18 +895,21 @@ th.sortable {
   user-select: none;
 }
 
+th.sortable:hover {
+  background: var(--bg-inset);
+}
+
 th.sortable:active { transform: translateY(1px); }
 
 .th-inner {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .sort-ind {
-  font-size: 0.8em;
-  opacity: 0.75;
-  letter-spacing: 0;
+  font-size: 10px;
+  color: var(--color-primary);
 }
 
 .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
@@ -904,30 +918,35 @@ th.sortable:active { transform: translateY(1px); }
    ERROR PANEL
    ============================================ */
 .error-panel {
-  margin: 10px 12px 0 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(233,69,96,0.55);
-  background: rgba(233,69,96,0.12);
-  color: rgba(255,255,255,0.92);
-  font-size: 13.5px;
+  margin: var(--space-sm) var(--space-md) 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-error);
+  background: #fff5f5;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 18px;
   line-height: 1.3;
 }
 
 .error-panel .error-title {
-  font-weight: 750;
-  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-error);
+  margin-bottom: var(--space-xs);
 }
 
 .error-panel .error-meta {
-  color: rgba(255,255,255,0.75);
-  font-size: 12.5px;
+  color: var(--text-secondary);
+  font-size: 16px;
 }
 
 .error-panel code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-  color: rgba(255,255,255,0.85);
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-error);
+  background: transparent;
 }
 
 /* ============================================
