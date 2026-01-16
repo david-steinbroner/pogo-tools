@@ -144,8 +144,7 @@
 
       <!-- VIEW: COLLECTION -->
       <div id="viewCollection" hidden>
-        <!-- Coming Soon placeholder -->
-        <section class="collection-coming-soon">
+        <section class="coming-soon-placeholder">
           <div class="vs-panel">
             <div class="vs-panel-header">
               <div class="panel-subtitle mono">Coming soon. This tab will help you organize your POKéMON collection.</div>
@@ -155,79 +154,11 @@
             </div>
           </div>
         </section>
-
-        <!-- Hidden elements for future Collection functionality -->
-        <div aria-label="Filters" class="filterzone" id="filterZone" hidden
-          <div aria-label="Active filters" class="active-strip">
-            <div class="active-left">
-              <button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
-                <span aria-hidden="true" class="types-open-icon">+</span>
-                <span>Types</span>
-              </button>
-              <div aria-label="Selected types" class="active-icons" id="activeIcons">
-                <span class="active-all" id="activeAll">All types</span>
-              </div>
-            </div>
-            <button class="clear-btn" hidden="" id="clearBtn" type="button">Clear</button>
-          </div>
-        </div>
-
-        <section class="collection-view" hidden>
-          <div class="showing-row">
-            <div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(-)</span></div>
-          </div>
-          <div id="parseError" class="error-panel" hidden></div>
-          <details id="csvDebug" class="debug-details" hidden>
-            <summary>
-              <span>CSV detected</span>
-              <span id="csvDebugSummary" class="mono"></span>
-            </summary>
-            <div class="debug-body">
-              <div class="debug-block">
-                <div class="debug-label">Headers</div>
-                <div id="csvHeaders" class="debug-chipwrap"></div>
-              </div>
-              <div class="debug-block">
-                <div class="debug-label">Mapping (what we used)</div>
-                <div id="csvMapping" class="debug-mapping"></div>
-              </div>
-              <div class="debug-block">
-                <div class="debug-label">Sample row (first row)</div>
-                <div id="csvSample" class="debug-sample"></div>
-              </div>
-            </div>
-          </details>
-          <p class="hint">Option C layout: type filters stay pinned, results live directly beneath.</p>
-          <section aria-label="Results" class="panel">
-            <div class="panel-header">
-              <h2>Results</h2>
-              <div class="sub">Tap a type pill to filter</div>
-            </div>
-            <div id="resultsScroll" class="table-wrap">
-              <table id="resultsTable">
-                <thead>
-                  <tr>
-                    <th class="sortable" data-key="name"><span class="th-inner">Pokemon <span class="sort-ind" aria-hidden="true"></span></span></th>
-                    <th class="mono sortable" data-key="score"><span class="th-inner">Score <span class="sort-ind" aria-hidden="true"></span></span></th>
-                    <th class="sortable" data-key="grade"><span class="th-inner">Grade <span class="sort-ind" aria-hidden="true"></span></span></th>
-                    <th class="mono sortable" data-key="cp"><span class="th-inner">CP <span class="sort-ind" aria-hidden="true"></span></span></th>
-                    <th class="mono sortable" data-key="iv"><span class="th-inner">IV% <span class="sort-ind" aria-hidden="true"></span></span></th>
-                    <th class="sortable" data-key="types"><span class="th-inner">Types <span class="sort-ind" aria-hidden="true"></span></span></th>
-                  </tr>
-                </thead>
-                <tbody id="resultsBody">
-                  <!-- rows rendered by JS -->
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </section>
       </div>
 
       <!-- VIEW: TRADE -->
       <div id="viewTrade" hidden>
-        <!-- Coming Soon placeholder -->
-        <section class="trade-coming-soon">
+        <section class="coming-soon-placeholder">
           <div class="vs-panel">
             <div class="vs-panel-header">
               <div class="panel-subtitle mono">Coming soon. This tab will help you know what POKéMON to trade and transfer.</div>

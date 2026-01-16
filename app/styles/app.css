@@ -1245,8 +1245,7 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* Show placeholder in coming soon sections */
-.collection-coming-soon .collapsible-placeholder,
-.trade-coming-soon .collapsible-placeholder {
+.coming-soon-placeholder .collapsible-placeholder {
   display: block;
 }
 
