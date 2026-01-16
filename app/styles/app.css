@@ -1424,6 +1424,10 @@ body.no-scroll { overflow: hidden; }
   color: var(--text-secondary);
 }
 
+.vs-empty[hidden] {
+  display: none;
+}
+
 .vs-empty-upload {
   width: 24px;
   height: 24px;
