@@ -52,10 +52,8 @@ export const vsAvoidMovesEl = document.getElementById('vsAvoidMoves');
 export const vsAvoidBodiesEl = document.getElementById('vsAvoidBodies');
 export const vsWatchOutEl = document.getElementById('vsWatchOut');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
-export const vsTipBtn = document.getElementById('vsTipBtn');
+export const vsInfoBtn = document.getElementById('vsInfoBtn');
 export const vsTooltipEl = document.getElementById('vsTooltip');
-export const vsTopUploadBtn = document.getElementById('vsTopUploadBtn');
-export const vsRiskyUploadBtn = document.getElementById('vsRiskyUploadBtn');
 
 // Trade view elements
 export const tradeView = document.getElementById('tradeView');

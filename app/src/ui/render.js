@@ -374,7 +374,7 @@ export function syncVsGridSelectionUI() {
   dom.vsGridEl.querySelectorAll('button.type-grid-btn').forEach(btn => {
     const t = btn.dataset.type;
     const on = state.vsSelectedTypes.has(t);
-    btn.classList.toggle('selected', on);
+    btn.classList.toggle('is-selected', on);
     btn.setAttribute('aria-pressed', String(on));
   });
 }

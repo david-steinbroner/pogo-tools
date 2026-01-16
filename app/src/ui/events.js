@@ -273,18 +273,10 @@ export function wireEvents() {
     });
   }
 
-  if (dom.vsTipBtn && dom.vsTooltipEl) {
-    dom.vsTipBtn.addEventListener('click', () => {
+  if (dom.vsInfoBtn && dom.vsTooltipEl) {
+    dom.vsInfoBtn.addEventListener('click', () => {
       dom.vsTooltipEl.hidden = !dom.vsTooltipEl.hidden;
     });
-  }
-
-  // VS upload buttons (trigger same file input as main Upload button)
-  if (dom.vsTopUploadBtn && dom.fileInput) {
-    dom.vsTopUploadBtn.addEventListener('click', () => dom.fileInput.click());
-  }
-  if (dom.vsRiskyUploadBtn && dom.fileInput) {
-    dom.vsRiskyUploadBtn.addEventListener('click', () => dom.fileInput.click());
   }
 
   // Table header sorting

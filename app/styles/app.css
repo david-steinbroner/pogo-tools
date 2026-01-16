@@ -1100,6 +1100,7 @@ body.no-scroll { overflow: hidden; }
 }
 
 .vs-panel-header {
+  position: relative;
   background: var(--bg-surface-alt);
   margin: calc(-1 * var(--space-md));
   margin-bottom: var(--space-md);
@@ -1119,6 +1120,31 @@ body.no-scroll { overflow: hidden; }
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
   color: var(--text-secondary);
+}
+
+.info-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: var(--space-xs);
+  border-radius: 50%;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-family: serif;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.info-icon-btn:hover {
+  background: var(--color-secondary);
+  color: var(--text-inverse);
+  border-color: var(--color-secondary);
 }
 
 .vs-block {
@@ -1177,7 +1203,6 @@ body.no-scroll { overflow: hidden; }
 .vs-hero .vs-hero-grid { order: 1; }
 .vs-hero .vs-note { order: 2; }
 .vs-hero .vs-brief { order: 3; }
-.vs-hero .battle-tiprow { order: 4; }
 
 /* No roster: brief first, picks last */
 .vs-hero.no-roster .vs-brief { order: 1; }
@@ -1258,7 +1283,7 @@ body.no-scroll { overflow: hidden; }
   font-size: var(--text-display-xs);
   color: var(--text-secondary);
   text-transform: uppercase;
-  width: 90px;
+  width: 110px;
   flex-shrink: 0;
   padding-top: var(--space-xs);
 }
@@ -1378,13 +1403,13 @@ body.no-scroll { overflow: hidden; }
 .battle-tooltip {
   position: absolute;
   right: 0;
-  bottom: 100%;
-  margin-bottom: var(--space-xs);
+  top: 100%;
+  margin-top: var(--space-xs);
   width: min(320px, calc(100vw - 56px));
   border-radius: var(--radius-md);
   border: 2px solid var(--border-strong);
   background: var(--bg-surface);
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
   padding: var(--space-md);
   color: var(--text-primary);
   z-index: 10;

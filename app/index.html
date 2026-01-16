@@ -21,6 +21,12 @@
     <div class="title">PoGO Pal</div>
   </div>
   <div class="appbar-right">
+    <input accept=".csv" class="hidden-file" id="fileInput" type="file"/>
+    <button id="uploadBtn" class="icon-btn" type="button" aria-label="Upload CSV" title="Upload CSV">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
+      </svg>
+    </button>
     <button id="infoBtn" class="icon-btn gbp-q" type="button" aria-label="Info" title="Glossary">?</button>
   </div>
 </header>
@@ -32,22 +38,6 @@
     <button id="modeCollectionBtn" class="mode-tab is-active" role="tab" aria-selected="true" type="button">Collection</button>
     <button id="modeTradeBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Trade</button>
   </div>
-</div>
-
-<!-- UTILITY ROW -->
-<div id="utilityRow" class="utility-row" aria-label="Utility">
-  <div class="utility-left">
-    <input accept=".csv" class="hidden-file" id="fileInput" type="file"/>
-    <button id="uploadBtn" class="util-btn" type="button" aria-label="Upload CSV" title="Upload CSV">
-      <span class="util-icon" aria-hidden="true">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
-        </svg>
-      </span>
-      <span class="util-label">Upload</span>
-    </button>
-  </div>
-  <div class="utility-right"></div>
 </div>
 
 <div id="collectionSticky">
@@ -100,7 +90,15 @@
       <div class="vs-panel">
         <div class="vs-panel-header">
           <div class="vs-panel-title">VS Assistant</div>
-          <div class="vs-panel-sub mono" id="vsSub">Pick opponent type(s). We'll show you how to increase your chances at winning.</div>
+          <div class="vs-panel-sub mono" id="vsSub">
+            Pick opponent type(s). We'll show you how to increase your chances at winning.
+            <button class="info-icon-btn" id="vsInfoBtn" type="button" aria-label="More info">i</button>
+          </div>
+          <div class="battle-tooltip" id="vsTooltip" hidden>
+            <div class="t"><strong>When battling, moves matter most.</strong> Damage comes from a Pokémon's <em>move</em> type, not the <em>Pokémon's</em> type.</div>
+            <div class="t">Pokémon usually learn moves matching their own type, so bringing a Fire-type against Grass usually means you'll have the right moves to do the most damage.</div>
+            <div class="t">That said, CP matters too: a high-CP Pokémon with the "wrong" type will often beat a low-CP Pokémon with the "right" type.</div>
+          </div>
         </div>
 
         <div class="vs-block">
@@ -132,14 +130,6 @@
               <div class="vs-picks" id="vsTopPicks"></div>
               <div class="vs-empty" id="vsTopEmpty">
                 <span class="mono">Upload a CSV to see roster picks.</span>
-                <button class="util-btn vs-upload-btn" id="vsTopUploadBtn" type="button">
-                  <span class="util-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
-                    </svg>
-                  </span>
-                  <span class="util-label">Upload</span>
-                </button>
               </div>
             </div>
 
@@ -148,14 +138,6 @@
               <div class="vs-picks" id="vsRiskyPicks"></div>
               <div class="vs-empty" id="vsRiskyEmpty">
                 <span class="mono">Upload a CSV to see roster picks.</span>
-                <button class="util-btn vs-upload-btn" id="vsRiskyUploadBtn" type="button">
-                  <span class="util-icon" aria-hidden="true">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
-                    </svg>
-                  </span>
-                  <span class="util-label">Upload</span>
-                </button>
               </div>
             </div>
           </div>
@@ -181,15 +163,6 @@
             </div>
           </div>
 
-          <div class="battle-tiprow">
-            <div class="tip-label mono">Rule of thumb</div>
-            <button class="tip-btn" id="vsTipBtn" type="button" aria-label="Show rule of thumb">?</button>
-            <div class="battle-tooltip" id="vsTooltip" hidden>
-              <div class="t"><strong>When battling, moves matter most.</strong> Damage comes from a Pokémon's <em>move</em> type, not the <em>Pokémon's</em> type.</div>
-              <div class="t">Pokémon usually learn moves matching their own type, so bringing a Fire-type against Grass usually means you'll have the right moves to do the most damage.</div>
-              <div class="t">That said, CP matters too: a high-CP Pokémon with the "wrong" type will often beat a low-CP Pokémon with the "right" type.</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
