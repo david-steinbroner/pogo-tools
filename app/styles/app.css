@@ -1161,7 +1161,7 @@ body.no-scroll { overflow: hidden; }
   margin-bottom: var(--space-xs);
 }
 
-.vs-panel-sub {
+.panel-subtitle {
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
   color: var(--text-secondary);
@@ -1318,21 +1318,6 @@ body.no-scroll { overflow: hidden; }
   gap: var(--space-sm);
 }
 
-/* Recommendations header */
-.vs-reco-header {
-  font-family: var(--font-body);
-  font-size: var(--text-body-md);
-  color: var(--text-secondary);
-  text-align: center;
-  margin-top: var(--space-lg);
-  margin-bottom: var(--space-sm);
-}
-
-.vs-reco-header .tm {
-  font-size: 10px;
-  vertical-align: super;
-  line-height: 1;
-}
 
 .vs-hero {
   margin-top: var(--space-md);
