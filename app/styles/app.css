@@ -1434,9 +1434,14 @@ body.no-scroll { overflow: hidden; }
   margin-bottom: var(--space-sm);
 }
 
+/* Hide selected pills row when picker is expanded */
+.vs-block:has(.vs-details[open]) .battle-selected-wrap {
+  display: none;
+}
+
 .battle-selected {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-sm);
 }
 
