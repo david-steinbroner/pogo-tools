@@ -613,13 +613,19 @@ export function renderRosterPicks(oppTypes) {
   }
 
   if (!hasRoster) {
+    // No CSV - show upload empty state, hide pick types CTA
     if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = false;
     if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = false;
+    if (dom.vsTopPickTypesCtaEl) dom.vsTopPickTypesCtaEl.hidden = true;
+    if (dom.vsRiskyPickTypesCtaEl) dom.vsRiskyPickTypesCtaEl.hidden = true;
     return;
   }
 
+  // Has CSV and types - hide all empty states
   if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = true;
   if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = true;
+  if (dom.vsTopPickTypesCtaEl) dom.vsTopPickTypesCtaEl.hidden = true;
+  if (dom.vsRiskyPickTypesCtaEl) dom.vsRiskyPickTypesCtaEl.hidden = true;
 
   const scored = scoreRosterAgainst(oppTypes);
   const offenseOk = scored.filter(s => s.offenseBest >= 1.0);
