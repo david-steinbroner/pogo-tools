@@ -1700,6 +1700,7 @@ body.no-scroll { overflow: hidden; }
   th, td { padding: 9px 10px; font-size: 0.9rem; }
   .main {
     padding: 10px;
-    padding-top: calc(var(--appbar-h) + env(safe-area-inset-top, 0) + 10px);
+    /* Extra padding to ensure content clears the fixed appbar + safe area */
+    padding-top: calc(var(--appbar-h) + env(safe-area-inset-top, 0) + var(--appbar-h) + 10px);
   }
 }
