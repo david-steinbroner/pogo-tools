@@ -125,6 +125,8 @@
 
 html {
   scroll-padding-top: calc(var(--appbar-h) + env(safe-area-inset-top, 0));
+  /* Snap scroll to top when released near top */
+  scroll-snap-type: y proximity;
 }
 
 body {
@@ -295,6 +297,9 @@ html[data-skin="gba-ds"] .skin-mark {
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   overflow: hidden;
+  /* Snap point for scroll - content rests at top */
+  scroll-snap-align: start;
+  scroll-margin-top: calc(var(--appbar-h) + env(safe-area-inset-top, 0) + var(--space-md));
 }
 
 .window-tabs {
