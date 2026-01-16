@@ -27,8 +27,7 @@
         <path d="M19 15v4H5v-4H3v6h18v-6h-2zM11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"></path>
       </svg>
     </button>
-    <!-- Info button hidden for now -->
-    <button id="infoBtn" class="icon-btn gbp-q" type="button" aria-label="Info" title="Glossary" hidden>?</button>
+    <button id="infoBtn" class="icon-btn gbp-q" type="button" aria-label="About" title="About Pogo Pal">?</button>
   </div>
 </header>
 
@@ -192,42 +191,62 @@
 
 <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
 
-<aside id="infoDrawer" class="drawer" aria-hidden="true" aria-label="Glossary drawer">
+<aside id="infoDrawer" class="drawer" aria-hidden="true" aria-label="About drawer">
   <div class="drawer-header">
-    <div class="drawer-title">Glossary</div>
-    <button id="drawerCloseBtn" class="icon-btn" aria-label="Close glossary" title="Close">
+    <div class="drawer-title">ABOUT POGO PAL</div>
+    <button id="drawerCloseBtn" class="icon-btn" aria-label="Close" title="Close">
       <span aria-hidden="true" class="close-x">X</span>
     </button>
   </div>
 
   <div class="drawer-content">
     <div class="gloss">
-      This panel is intentionally practical: it describes what this prototype is calculating <em>right now</em>, plus the assumptions behind it.
+      Your battle buddy for POKéMON GO. Upload your collection and get smart recommendations for battles, trades, and more.
     </div>
 
     <details open>
-      <summary>Score</summary>
+      <summary>VERSUS MODE</summary>
       <div class="gloss">
-        <strong>Current definition (prototype):</strong> <code>Score = IV%</code>.
-        This is a "good enough" stand-in so sorting and filtering are meaningful while we build.
+        Select your opponent's POKéMON TYPE(S) and your POGO PAL tells you:
+        <br/><br/>
+        • MOVE TYPES to use (super effective against opponent)<br/>
+        • MOVE TYPES to avoid (not very effective)<br/>
+        • POKéMON TYPES to bring (resist opponent's attacks)<br/>
+        • POKéMON TYPES to avoid (weak to opponent's attacks)
+        <br/><br/>
+        Upload a CSV from PokeGenie to also get specific POKéMON picks from your collection.
       </div>
     </details>
 
     <details open>
-      <summary>IV%</summary>
+      <summary>COMING SOON</summary>
       <div class="gloss">
-        <strong>IV%</strong> is the Pokemon's individual values (IVs) normalized to a percentage:
+        <strong>COLLECTION</strong> - Organize and filter your POKéMON by type, IV%, and more.
         <br/><br/>
-        <code>IV% = ((AtkIV + DefIV + StaIV) / 45) x 100</code>
-        <br/><br/>
-        Each IV ranges 0-15, so the max total is 45.
+        <strong>TRADE</strong> - Know which POKéMON are safe to trade or transfer.
       </div>
     </details>
 
     <details open>
-      <summary>Grade</summary>
+      <summary>HOW IT WORKS</summary>
       <div class="gloss">
-        A quick letter grade derived from Score/IV%. Thresholds are adjustable; these are the current defaults:
+        Recommendations are based on the POKéMON type chart. Each type has strengths (super effective) and weaknesses (not very effective).
+        <br/><br/>
+        When you select opponent types, POGO PAL calculates:
+        <br/><br/>
+        • <strong>Offensive advantage:</strong> Which move types deal 1.6x or 2.56x damage<br/>
+        • <strong>Defensive advantage:</strong> Which POKéMON types take reduced damage
+        <br/><br/>
+        With a CSV uploaded, your actual POKéMON are scored and ranked based on their types matching these criteria.
+      </div>
+    </details>
+
+    <details>
+      <summary>TERMS</summary>
+      <div class="gloss">
+        <strong>IV%</strong> - Individual Values as percentage. (Atk + Def + Sta) / 45 × 100
+        <br/><br/>
+        <strong>GRADE</strong> - Letter grade from IV%:
         <div class="grade-grid" aria-label="Grade thresholds">
           <div><span class="grade-pill">S</span> Excellent</div><div>>= 98%</div>
           <div><span class="grade-pill">A</span> Great</div><div>>= 90%</div>
@@ -236,15 +255,6 @@
           <div><span class="grade-pill">D</span> Meh</div><div>>= 50%</div>
           <div><span class="grade-pill">F</span> Low</div><div>< 50%</div>
         </div>
-      </div>
-    </details>
-
-    <details>
-      <summary>Type coverage</summary>
-      <div class="gloss">
-        <strong>Collection type coverage</strong> counts how many of the 18 Pokemon types appear anywhere in your uploaded collection.
-        <br/><br/>
-        <code>(unique types found in collection) / 18</code>
       </div>
     </details>
   </div>
