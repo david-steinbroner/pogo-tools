@@ -1152,19 +1152,19 @@ body.no-scroll { overflow: hidden; }
 
 .info-trigger .battle-tooltip {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   top: calc(100% + 8px);
   right: auto;
   margin-top: 0;
+  transform: none;
+  max-width: calc(100vw - 32px);
 }
 
 .info-trigger .battle-tooltip::before {
   content: '';
   position: absolute;
   top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 8px;
   border: 6px solid transparent;
   border-bottom-color: var(--border-strong);
 }
@@ -1173,8 +1173,7 @@ body.no-scroll { overflow: hidden; }
   content: '';
   position: absolute;
   top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 9px;
   border: 5px solid transparent;
   border-bottom-color: var(--bg-surface);
 }
@@ -1275,14 +1274,16 @@ body.no-scroll { overflow: hidden; }
 
 .vs-empty {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-sm);
   color: var(--text-secondary);
 }
 
-.vs-upload-btn {
-  margin-top: var(--space-xs);
+.vs-empty-upload {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .vs-note {

@@ -279,6 +279,14 @@ export function wireEvents() {
     });
   }
 
+  // VS empty state upload buttons
+  if (dom.vsTopUploadBtn && dom.fileInput) {
+    dom.vsTopUploadBtn.addEventListener('click', () => dom.fileInput.click());
+  }
+  if (dom.vsRiskyUploadBtn && dom.fileInput) {
+    dom.vsRiskyUploadBtn.addEventListener('click', () => dom.fileInput.click());
+  }
+
   // Table header sorting
   dom.tableHeaders.forEach(th => th.addEventListener('click', handleHeaderClick));
 
