@@ -794,6 +794,12 @@ button.type-pill:hover {
   box-shadow: inset 2px 2px 0 rgba(0,0,0,0.1);
 }
 
+/* Smaller font for longer type names in grid to prevent truncation */
+.type-grid .type-pill[data-type="electric"] .type-name,
+.type-grid .type-pill[data-type="fighting"] .type-name {
+  font-size: 12px;
+}
+
 .sheet-hint {
   margin-top: var(--space-sm);
   color: var(--text-muted);
