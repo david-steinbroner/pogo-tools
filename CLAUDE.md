@@ -62,10 +62,11 @@ python -m http.server 8000
 ```
 
 ## Links
-- Preview: https://refactor-v3.pogo-pal.pages.dev
+- Preview (design-system): https://design-system-migration.pogo-pal.pages.dev
+- Preview (refactor-v3): https://refactor-v3.pogo-pal.pages.dev
 - Production: https://pogo-pal.pages.dev
 - Repo: https://github.com/david-steinbroner/pogo-pal
-- Branch: refactor-v3
+- Branch: design-system-migration (active), refactor-v3 (base)
 
 ## Constraints
 - Safari-safe JS (no bleeding-edge features)
