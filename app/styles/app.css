@@ -1349,6 +1349,7 @@ body.no-scroll { overflow: hidden; }
   border-radius: var(--radius-sm);
   border: 2px solid var(--border-default);
   background: var(--bg-surface);
+  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
   box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
