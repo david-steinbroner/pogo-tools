@@ -467,9 +467,10 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 .icon-btn.gbp-q.is-active {
-  background: var(--color-secondary);
-  color: var(--text-inverse);
-  border-color: var(--color-secondary);
+  /* Pressed/inset effect - like selected type pills */
+  background: var(--bg-inset);
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15), inset 1px 1px 2px rgba(0,0,0,0.1);
+  transform: translateY(1px);
 }
 
 /* ============================================
@@ -991,7 +992,7 @@ body.no-scroll { overflow: hidden; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.55);
-  z-index: 2100;
+  z-index: 10000;
 }
 
 .drawer {
@@ -1006,7 +1007,7 @@ body.no-scroll { overflow: hidden; }
   transform: translateX(104%);
   transition: transform 180ms ease;
   padding-top: env(safe-area-inset-top, 0);
-  z-index: 2200;
+  z-index: 10001;
   display: flex;
   flex-direction: column;
 }
