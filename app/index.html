@@ -136,8 +136,21 @@
 
       <!-- VIEW: COLLECTION -->
       <div id="viewCollection" hidden>
-        <!-- Collection summary bar -->
-        <div aria-label="Collection summary" class="collectionbar" id="collectionBar">
+        <!-- Coming Soon placeholder -->
+        <section class="collection-coming-soon">
+          <div class="vs-panel">
+            <div class="vs-panel-header">
+              <div class="vs-panel-title">Collection</div>
+              <div class="panel-subtitle mono">Coming soon. This tab will help you organize your POKéMON collection.</div>
+            </div>
+            <div class="vs-block">
+              <div class="hint">Placeholder screen. No behavior yet.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Collection summary bar (hidden for now) -->
+        <div aria-label="Collection summary" class="collectionbar" id="collectionBar" hidden>
           <div class="collection-left">
             <div class="collection-stat">Pokemon: <strong id="collectionCount">-</strong></div>
             <div class="collection-stat">Type coverage: <strong id="collectionCoverage">-/18</strong></div>
@@ -145,8 +158,8 @@
           <div class="collection-note" title="Updates after CSV upload">Collection</div>
         </div>
 
-        <!-- Filters -->
-        <div aria-label="Filters" class="filterzone" id="filterZone">
+        <!-- Filters (hidden for now) -->
+        <div aria-label="Filters" class="filterzone" id="filterZone" hidden
           <div aria-label="Active filters" class="active-strip">
             <div class="active-left">
               <button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
@@ -161,7 +174,7 @@
           </div>
         </div>
 
-        <section class="collection-view">
+        <section class="collection-view" hidden>
           <div class="showing-row">
             <div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(-)</span></div>
           </div>
@@ -219,7 +232,7 @@
           <div class="vs-panel">
             <div class="vs-panel-header">
               <div class="vs-panel-title">Trade</div>
-              <div class="panel-subtitle mono">Coming soon. This tab will help you pick safe trades, prioritize distance/lucky odds, and export lists.</div>
+              <div class="panel-subtitle mono">Coming soon. This tab will help you know what POKéMON to trade and transfer.</div>
             </div>
             <div class="vs-block">
               <div class="hint">Placeholder screen. No behavior yet.</div>
