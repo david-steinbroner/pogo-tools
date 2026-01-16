@@ -677,14 +677,35 @@ export function syncVsUI() {
     renderTypePills(dom.vsAvoidBodiesEl, []);
     if (dom.vsTopPicksEl) dom.vsTopPicksEl.innerHTML = '';
     if (dom.vsRiskyPicksEl) dom.vsRiskyPicksEl.innerHTML = '';
-    if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = false;
-    if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = false;
+
+    // Conditional empty states: CSV uploaded vs not
+    const hasRoster = Array.isArray(state.allResults) && state.allResults.length > 0;
+    if (hasRoster) {
+      // Has CSV but no types - show "pick types" CTA
+      if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = true;
+      if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = true;
+      if (dom.vsTopPickTypesCtaEl) dom.vsTopPickTypesCtaEl.hidden = false;
+      if (dom.vsRiskyPickTypesCtaEl) dom.vsRiskyPickTypesCtaEl.hidden = false;
+    } else {
+      // No CSV - show "upload CSV" empty state
+      if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = false;
+      if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = false;
+      if (dom.vsTopPickTypesCtaEl) dom.vsTopPickTypesCtaEl.hidden = true;
+      if (dom.vsRiskyPickTypesCtaEl) dom.vsRiskyPickTypesCtaEl.hidden = true;
+    }
+
     if (dom.vsRosterNoteEl) {
       dom.vsRosterNoteEl.hidden = true;
       dom.vsRosterNoteEl.textContent = '';
     }
     return;
   }
+
+  // Types selected - hide all empty states
+  if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = true;
+  if (dom.vsRiskyEmptyEl) dom.vsRiskyEmptyEl.hidden = true;
+  if (dom.vsTopPickTypesCtaEl) dom.vsTopPickTypesCtaEl.hidden = true;
+  if (dom.vsRiskyPickTypesCtaEl) dom.vsRiskyPickTypesCtaEl.hidden = true;
 
   renderVsBrief(oppTypes);
   renderRosterPicks(oppTypes);

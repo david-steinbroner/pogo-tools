@@ -62,6 +62,9 @@ export const vsModalBackdrop = document.getElementById('vsModalBackdrop');
 export const vsModalClose = document.getElementById('vsModalClose');
 export const vsTopUploadBtn = document.getElementById('vsTopUploadBtn');
 export const vsRiskyUploadBtn = document.getElementById('vsRiskyUploadBtn');
+export const vsTopPickTypesCtaEl = document.getElementById('vsTopPickTypesCta');
+export const vsRiskyPickTypesCtaEl = document.getElementById('vsRiskyPickTypesCta');
+export const vsSubEl = document.getElementById('vsSub');
 
 // Trade view elements
 export const tradeView = document.getElementById('tradeView');

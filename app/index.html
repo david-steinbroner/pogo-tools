@@ -108,7 +108,7 @@
             <div class="brief-row">
               <div class="brief-k"><strong>Top picks</strong></div>
               <div class="picks-list" id="vsTopPicks"></div>
-              <div class="vs-empty" id="vsTopEmpty">
+              <div class="vs-empty" id="vsTopEmpty" hidden>
                 <span class="mono">Upload a CSV</span>
                 <button class="icon-btn vs-empty-upload" id="vsTopUploadBtn" type="button" aria-label="Upload CSV" title="Upload CSV">
                   <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -116,11 +116,12 @@
                   </svg>
                 </button>
               </div>
+              <button class="vs-pick-types-cta mono" id="vsTopPickTypesCta" type="button" hidden>Pick opponent POKéMON TYPE(S) <span class="cta-arrow">↑</span></button>
             </div>
             <div class="brief-row">
               <div class="brief-k"><strong>Risky picks</strong></div>
               <div class="picks-list" id="vsRiskyPicks"></div>
-              <div class="vs-empty" id="vsRiskyEmpty">
+              <div class="vs-empty" id="vsRiskyEmpty" hidden>
                 <span class="mono">Upload a CSV</span>
                 <button class="icon-btn vs-empty-upload" id="vsRiskyUploadBtn" type="button" aria-label="Upload CSV" title="Upload CSV">
                   <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -128,6 +129,7 @@
                   </svg>
                 </button>
               </div>
+              <button class="vs-pick-types-cta mono" id="vsRiskyPickTypesCta" type="button" hidden>Pick opponent POKéMON TYPE(S) <span class="cta-arrow">↑</span></button>
             </div>
           </div>
 

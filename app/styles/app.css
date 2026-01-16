@@ -1430,6 +1430,32 @@ body.no-scroll { overflow: hidden; }
   flex-shrink: 0;
 }
 
+/* CTA to pick opponent types (when CSV uploaded but no types selected) */
+.vs-pick-types-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-accent);
+  background: transparent;
+  border: 1px dashed var(--color-accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.vs-pick-types-cta:hover,
+.vs-pick-types-cta:focus {
+  background: rgba(74, 144, 140, 0.1);
+  border-style: solid;
+}
+
+.vs-pick-types-cta .cta-arrow {
+  font-size: 1.1em;
+}
+
 .vs-note {
   font-family: var(--font-body);
   font-size: var(--text-body-sm);

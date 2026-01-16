@@ -300,6 +300,19 @@ export function wireEvents() {
     dom.vsRiskyUploadBtn.addEventListener('click', () => dom.fileInput.click());
   }
 
+  // VS "pick types" CTA buttons - scroll to type picker
+  const scrollToTypePicker = () => {
+    if (dom.vsSubEl) {
+      dom.vsSubEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  if (dom.vsTopPickTypesCtaEl) {
+    dom.vsTopPickTypesCtaEl.addEventListener('click', scrollToTypePicker);
+  }
+  if (dom.vsRiskyPickTypesCtaEl) {
+    dom.vsRiskyPickTypesCtaEl.addEventListener('click', scrollToTypePicker);
+  }
+
   // Collapsible sections - reusable toggle handler
   document.querySelectorAll('.collapsible-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
