@@ -1153,6 +1153,10 @@ body.no-scroll { overflow: hidden; }
   z-index: 100;
 }
 
+.modal-backdrop[hidden] {
+  display: none;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -1161,6 +1165,10 @@ body.no-scroll { overflow: hidden; }
   justify-content: center;
   padding: var(--space-md);
   z-index: 101;
+}
+
+.modal[hidden] {
+  display: none;
 }
 
 .modal-card {
