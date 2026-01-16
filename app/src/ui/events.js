@@ -253,10 +253,13 @@ export function wireEvents() {
       if (vsTypePicker.open) {
         // Trying to close - validate at least 1 type selected
         if (state.vsSelectedTypes.size === 0) {
-          const note = document.getElementById('vsSelectedNote');
-          if (note) {
-            note.classList.add('flash');
-            setTimeout(() => note.classList.remove('flash'), 400);
+          const vsSub = document.getElementById('vsSub');
+          if (vsSub) {
+            // Scroll to the section header
+            vsSub.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Flash red twice
+            vsSub.classList.add('flash-error');
+            setTimeout(() => vsSub.classList.remove('flash-error'), 800);
           }
           return;
         }

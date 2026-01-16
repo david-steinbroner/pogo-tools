@@ -168,9 +168,9 @@ button { font-family: inherit; }
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-lg);
-  background: #EDE8DC;
-  background: var(--bg-surface);
+  background-color: #EDE8DC;
   border-bottom: 3px solid var(--border-strong);
+  isolation: isolate;
 }
 
 .appbar-left {
@@ -1492,6 +1492,19 @@ body.no-scroll { overflow: hidden; }
 @keyframes flash-note {
   0%, 100% { color: var(--text-muted); }
   50% { color: var(--color-error); }
+}
+
+/* Double flash error animation for validation */
+.flash-error {
+  animation: flash-error-2x 0.8s ease;
+}
+
+@keyframes flash-error-2x {
+  0%, 100% { color: inherit; }
+  12.5%, 37.5% { color: var(--color-error); }
+  25%, 50% { color: inherit; }
+  62.5%, 87.5% { color: var(--color-error); }
+  75% { color: inherit; }
 }
 
 .battle-tiprow {
