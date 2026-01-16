@@ -1314,7 +1314,24 @@ body.no-scroll { overflow: hidden; }
 .vs-actions {
   margin-top: var(--space-sm);
   display: flex;
+  justify-content: center;
   gap: var(--space-sm);
+}
+
+/* Recommendations header */
+.vs-reco-header {
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.vs-reco-header .tm {
+  font-size: 10px;
+  vertical-align: super;
+  line-height: 1;
 }
 
 .vs-hero {
@@ -1404,6 +1421,10 @@ body.no-scroll { overflow: hidden; }
   font-size: var(--text-display-xs);
   color: var(--text-secondary);
   text-transform: uppercase;
+}
+
+.brief-k strong {
+  color: var(--text-primary);
 }
 
 .brief-v {
@@ -1537,6 +1558,10 @@ body.no-scroll { overflow: hidden; }
 #viewVersus,
 #viewCollection,
 #viewTrade { display: contents; }
+
+#viewVersus[hidden],
+#viewCollection[hidden],
+#viewTrade[hidden] { display: none !important; }
 
 .icon {
   width: 18px;

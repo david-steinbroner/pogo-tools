@@ -387,15 +387,11 @@ export function syncVsTypePickerLabel() {
 }
 
 export function renderVsSelectedChips() {
-  if (!dom.vsSelectedEl || !dom.vsSelectedNoteEl) return;
+  if (!dom.vsSelectedEl) return;
   dom.vsSelectedEl.innerHTML = '';
 
   const list = Array.from(state.vsSelectedTypes);
-  if (!list.length) {
-    dom.vsSelectedNoteEl.hidden = false;
-    return;
-  }
-  dom.vsSelectedNoteEl.hidden = true;
+  if (!list.length) return;
 
   list.forEach(t => {
     const chip = document.createElement('button');
@@ -494,6 +490,22 @@ export function computeAvoidBodies(oppTypes) {
 
   const bad = scored.filter(s => s.worst >= 1.6).slice(0, 6).map(s => s.type);
   return bad;
+}
+
+/**
+ * Compute Pokemon types that RESIST opponent attacks (good to bring).
+ * Returns types with lowest incoming damage multipliers from opponent moves.
+ */
+export function computeBringBodies(oppTypes) {
+  const scored = TYPES.map(t => {
+    let best = 1.0;
+    for (const opp of oppTypes) {
+      best = Math.min(best, eff(opp, t.name));
+    }
+    return { type: t.name, best };
+  }).sort((a, b) => a.best - b.best);
+
+  return scored.filter(s => s.best < 1.0).slice(0, 6).map(s => s.type);
 }
 
 export function scoreRosterAgainst(oppTypes) {
@@ -630,17 +642,16 @@ export function renderRosterPicks(oppTypes) {
 export function renderVsBrief(oppTypes) {
   const guidance = computeMoveGuidance(oppTypes);
   const avoidBodies = computeAvoidBodies(oppTypes);
+  const bringBodies = computeBringBodies(oppTypes);
 
   renderTypePills(dom.vsBringMovesEl, guidance.bring);
   renderTypePills(dom.vsAvoidMovesEl, guidance.avoid);
+  renderTypePills(dom.vsBringBodiesEl, bringBodies);
   renderTypePills(dom.vsAvoidBodiesEl, avoidBodies);
-  renderTypePills(dom.vsWatchOutEl, oppTypes);
 }
 
 export function syncVsUI() {
   const oppTypes = Array.from(state.vsSelectedTypes);
-
-  if (dom.vsCountNoteEl) dom.vsCountNoteEl.textContent = `${oppTypes.length}/3`;
 
   renderVsSelectedChips();
   syncVsGridSelectionUI();
@@ -648,13 +659,16 @@ export function syncVsUI() {
   // Sync the Done/Edit label based on details open state
   syncVsTypePickerLabel();
 
-  if (dom.vsHeroEl) dom.vsHeroEl.hidden = oppTypes.length === 0;
+  // Show/hide recommendations header and hero section
+  const hasTypes = oppTypes.length > 0;
+  if (dom.vsRecoHeaderEl) dom.vsRecoHeaderEl.hidden = !hasTypes;
+  if (dom.vsHeroEl) dom.vsHeroEl.hidden = !hasTypes;
 
   if (oppTypes.length === 0) {
     renderTypePills(dom.vsBringMovesEl, []);
     renderTypePills(dom.vsAvoidMovesEl, []);
+    renderTypePills(dom.vsBringBodiesEl, []);
     renderTypePills(dom.vsAvoidBodiesEl, []);
-    renderTypePills(dom.vsWatchOutEl, []);
     if (dom.vsTopPicksEl) dom.vsTopPicksEl.innerHTML = '';
     if (dom.vsRiskyPicksEl) dom.vsRiskyPicksEl.innerHTML = '';
     if (dom.vsTopEmptyEl) dom.vsTopEmptyEl.hidden = false;
