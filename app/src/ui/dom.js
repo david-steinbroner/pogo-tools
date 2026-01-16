@@ -53,7 +53,9 @@ export const vsAvoidBodiesEl = document.getElementById('vsAvoidBodies');
 export const vsWatchOutEl = document.getElementById('vsWatchOut');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
 export const vsInfoBtn = document.getElementById('vsInfoBtn');
-export const vsTooltipEl = document.getElementById('vsTooltip');
+export const vsModal = document.getElementById('vsModal');
+export const vsModalBackdrop = document.getElementById('vsModalBackdrop');
+export const vsModalClose = document.getElementById('vsModalClose');
 export const vsTopUploadBtn = document.getElementById('vsTopUploadBtn');
 export const vsRiskyUploadBtn = document.getElementById('vsRiskyUploadBtn');
 

@@ -273,10 +273,23 @@ export function wireEvents() {
     });
   }
 
-  if (dom.vsInfoBtn && dom.vsTooltipEl) {
-    dom.vsInfoBtn.addEventListener('click', () => {
-      dom.vsTooltipEl.hidden = !dom.vsTooltipEl.hidden;
-    });
+  // VS info modal
+  if (dom.vsInfoBtn && dom.vsModal && dom.vsModalBackdrop) {
+    const openModal = () => {
+      dom.vsModal.hidden = false;
+      dom.vsModalBackdrop.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    const closeModal = () => {
+      dom.vsModal.hidden = true;
+      dom.vsModalBackdrop.hidden = true;
+      document.body.style.overflow = '';
+    };
+    dom.vsInfoBtn.addEventListener('click', openModal);
+    dom.vsModalBackdrop.addEventListener('click', closeModal);
+    if (dom.vsModalClose) {
+      dom.vsModalClose.addEventListener('click', closeModal);
+    }
   }
 
   // VS empty state upload buttons
@@ -309,6 +322,11 @@ export function wireEvents() {
     if (e.key === 'Escape') {
       if (activeSheet && !activeSheet.hidden) closeSheet();
       if (dom.infoDrawer && dom.infoDrawer.classList.contains('open')) closeDrawer();
+      if (dom.vsModal && !dom.vsModal.hidden) {
+        dom.vsModal.hidden = true;
+        dom.vsModalBackdrop.hidden = true;
+        document.body.style.overflow = '';
+      }
     }
   });
 

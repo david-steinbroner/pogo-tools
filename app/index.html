@@ -92,14 +92,7 @@
           <div class="vs-panel-title">VS Assistant</div>
           <div class="vs-panel-sub mono" id="vsSub">
             Pick opponent type(s). We'll show you how to increase your chances at winning.
-            <span class="info-trigger">
-              <button class="info-icon-btn" id="vsInfoBtn" type="button" aria-label="More info">i</button>
-              <div class="battle-tooltip" id="vsTooltip" hidden>
-                <div class="t"><strong>When battling, moves matter most.</strong> Damage comes from a Pokémon's <em>move</em> type, not the <em>Pokémon's</em> type.</div>
-                <div class="t">Pokémon usually learn moves matching their own type, so bringing a Fire-type against Grass usually means you'll have the right moves to do the most damage.</div>
-                <div class="t">That said, CP matters too: a high-CP Pokémon with the "wrong" type will often beat a low-CP Pokémon with the "right" type.</div>
-              </div>
-            </span>
+            <button class="info-icon-btn" id="vsInfoBtn" type="button" aria-label="More info">i</button>
           </div>
         </div>
 
@@ -309,6 +302,22 @@
     </details>
   </div>
 </aside>
+
+<!-- VS Info Modal -->
+<div id="vsModalBackdrop" class="modal-backdrop" hidden></div>
+<div id="vsModal" class="modal" hidden aria-modal="true" role="dialog" aria-label="Battle tips">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Battle Tips</div>
+      <button id="vsModalClose" class="modal-close-btn" type="button" aria-label="Close">X</button>
+    </div>
+    <div class="modal-body">
+      <div class="t"><strong>When battling, moves matter most.</strong> Damage comes from a Pokémon's <em>move</em> type, not the <em>Pokémon's</em> type.</div>
+      <div class="t">Pokémon usually learn moves matching their own type, so bringing a Fire-type against Grass usually means you'll have the right moves to do the most damage.</div>
+      <div class="t">That said, CP matters too: a high-CP Pokémon with the "wrong" type will often beat a low-CP Pokémon with the "right" type.</div>
+    </div>
+  </div>
+</div>
 
 </div>
 
