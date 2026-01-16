@@ -168,6 +168,7 @@ button { font-family: inherit; }
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--space-lg);
+  background: #EDE8DC;
   background: var(--bg-surface);
   border-bottom: 3px solid var(--border-strong);
 }
