@@ -1321,8 +1321,8 @@ body.no-scroll { overflow: hidden; }
 
 /* Reusable action row for button groups - asymmetric spacing keeps buttons connected to content above */
 .action-row {
-  margin-top: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xl);
   display: flex;
   justify-content: center;
   gap: var(--space-sm);
@@ -1346,6 +1346,8 @@ body.no-scroll { overflow: hidden; }
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
   color: var(--text-secondary);
 }
 

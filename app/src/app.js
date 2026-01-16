@@ -115,6 +115,7 @@ function buildFromCSV(csvText) {
 
   setResults(out);
   render.updateView();
+  render.syncVsUI();
 }
 
 /**
