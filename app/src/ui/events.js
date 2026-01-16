@@ -286,6 +286,10 @@ export function wireEvents() {
     };
     dom.vsInfoBtn.addEventListener('click', openModal);
     dom.vsModalBackdrop.addEventListener('click', closeModal);
+    // Close when clicking outside the modal card
+    dom.vsModal.addEventListener('click', (e) => {
+      if (e.target === dom.vsModal) closeModal();
+    });
     if (dom.vsModalClose) {
       dom.vsModalClose.addEventListener('click', closeModal);
     }
