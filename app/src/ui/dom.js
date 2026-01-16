@@ -54,6 +54,8 @@ export const vsWatchOutEl = document.getElementById('vsWatchOut');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
 export const vsTipBtn = document.getElementById('vsTipBtn');
 export const vsTooltipEl = document.getElementById('vsTooltip');
+export const vsTopUploadBtn = document.getElementById('vsTopUploadBtn');
+export const vsRiskyUploadBtn = document.getElementById('vsRiskyUploadBtn');
 
 // Trade view elements
 export const tradeView = document.getElementById('tradeView');

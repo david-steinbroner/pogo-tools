@@ -28,7 +28,7 @@
 <!-- MODE TABS -->
 <div id="modeTabs" class="modebar" role="tablist" aria-label="Mode">
   <div class="modebar-inner">
-    <button id="modeVsBtn" class="mode-tab" role="tab" aria-selected="false" type="button"><span class="vs-mark" aria-hidden="true">VS</span> Versus</button>
+    <button id="modeVsBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Versus</button>
     <button id="modeCollectionBtn" class="mode-tab is-active" role="tab" aria-selected="true" type="button">Collection</button>
     <button id="modeTradeBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Trade</button>
   </div>
@@ -130,13 +130,19 @@
             <div class="vs-hero-card">
               <div class="vs-h">Top picks</div>
               <div class="vs-picks" id="vsTopPicks"></div>
-              <div class="vs-empty mono" id="vsTopEmpty">Upload a CSV in Collection mode to see roster picks.</div>
+              <div class="vs-empty" id="vsTopEmpty">
+                <span class="mono">Upload a CSV to see roster picks.</span>
+                <button class="sheet-btn vs-upload-btn" id="vsTopUploadBtn" type="button">Upload</button>
+              </div>
             </div>
 
             <div class="vs-hero-card">
               <div class="vs-h">Risky picks</div>
               <div class="vs-picks" id="vsRiskyPicks"></div>
-              <div class="vs-empty mono" id="vsRiskyEmpty">These are strong CP options that take big damage here.</div>
+              <div class="vs-empty" id="vsRiskyEmpty">
+                <span class="mono">Upload a CSV to see roster picks.</span>
+                <button class="sheet-btn vs-upload-btn" id="vsRiskyUploadBtn" type="button">Upload</button>
+              </div>
             </div>
           </div>
 

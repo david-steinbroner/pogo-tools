@@ -228,21 +228,6 @@ button { font-family: inherit; }
   line-height: 1;
 }
 
-/* VS mark icon */
-.vs-mark {
-  width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-default);
-  background: var(--bg-inset);
-  color: var(--text-secondary);
-  user-select: none;
-}
 
 .skin-mark {
   font-weight: 900;
@@ -290,17 +275,9 @@ html[data-skin="gba-ds"] .panel-header h2 {
   text-transform: uppercase;
 }
 
-/* VS mark styling */
-html[data-skin="gba-ds"] .vs-mark,
+/* Skin mark styling */
 html[data-skin="gba-ds"] .skin-mark {
   font-family: var(--font-display);
-}
-
-html[data-skin="gba-ds"] .icon-btn .vs-mark {
-  background: var(--color-primary);
-  color: var(--text-inverse);
-  border: none;
-  border-radius: var(--radius-sm);
 }
 
 /* ============================================
@@ -354,22 +331,10 @@ html[data-skin="gba-ds"] .icon-btn .vs-mark {
   color: var(--text-primary);
 }
 
-.mode-tab .vs-mark {
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radius-sm);
-  font-size: 8px;
-}
-
 .mode-tab.is-active {
   background: var(--color-primary);
   color: var(--text-inverse);
   box-shadow: inset 1px 1px 0 rgba(255,255,255,0.2), 1px 1px 0 rgba(0,0,0,0.2);
-}
-
-.mode-tab.is-active .vs-mark {
-  background: rgba(255,255,255,0.2);
-  color: var(--text-inverse);
 }
 
 /* ============================================
@@ -1240,9 +1205,15 @@ body.no-scroll { overflow: hidden; }
 }
 
 .vs-empty {
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
   color: var(--text-secondary);
+}
+
+.vs-upload-btn {
+  margin-top: var(--space-xs);
 }
 
 .vs-note {
