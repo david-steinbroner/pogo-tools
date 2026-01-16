@@ -1319,8 +1319,10 @@ body.no-scroll { overflow: hidden; }
 
 .vs-summary::-webkit-details-marker { display: none; }
 
-.vs-actions {
+/* Reusable action row for button groups - asymmetric spacing keeps buttons connected to content above */
+.action-row {
   margin-top: var(--space-sm);
+  margin-bottom: var(--space-lg);
   display: flex;
   justify-content: center;
   gap: var(--space-sm);
