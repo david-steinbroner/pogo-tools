@@ -45,24 +45,30 @@ export const vsSelectedEl = document.getElementById('vsSelected');
 export const vsSelectedNoteEl = document.getElementById('vsSelectedNote');
 export const vsCountNoteEl = document.getElementById('vsCountNote');
 export const vsClearBtn = document.getElementById('vsClearBtn');
-export const vsHeroEl = document.getElementById('vsHero');
-export const vsTopPicksEl = document.getElementById('vsTopPicks');
-export const vsRiskyPicksEl = document.getElementById('vsRiskyPicks');
-export const vsPokeRecoSectionEl = document.getElementById('vsPokeRecoSection');
-export const vsUploadPromptEl = document.getElementById('vsUploadPrompt');
-export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
+
+// Section 1: Type Effectiveness
+export const vsTypeEffectivenessResultsEl = document.getElementById('vsTypeEffectivenessResults');
+export const vsSection1PickPromptEl = document.getElementById('vsSection1PickPrompt');
 export const vsBringMovesEl = document.getElementById('vsBringMoves');
 export const vsAvoidMovesEl = document.getElementById('vsAvoidMoves');
 export const vsBringBodiesEl = document.getElementById('vsBringBodies');
 export const vsAvoidBodiesEl = document.getElementById('vsAvoidBodies');
+
+// Section 2: Pokemon Recommendations
+export const vsPokeRecoResultsEl = document.getElementById('vsPokeRecoResults');
+export const vsSection2UploadPromptEl = document.getElementById('vsSection2UploadPrompt');
+export const vsSection2PickPromptEl = document.getElementById('vsSection2PickPrompt');
+export const vsTopPicksEl = document.getElementById('vsTopPicks');
+export const vsRiskyPicksEl = document.getElementById('vsRiskyPicks');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
+export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
+
 export const vsRecoHeaderEl = document.getElementById('vsRecoHeader');
 export const vsInfoBtn = document.getElementById('vsInfoBtn');
 export const vsModal = document.getElementById('vsModal');
 export const vsModalBackdrop = document.getElementById('vsModalBackdrop');
 export const vsModalClose = document.getElementById('vsModalClose');
 export const vsSubEl = document.getElementById('vsSub');
-export const vsPickPromptEl = document.getElementById('vsPickPrompt');
 
 // Trade view elements
 export const tradeView = document.getElementById('tradeView');

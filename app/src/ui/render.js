@@ -597,22 +597,12 @@ export function makePokePickCard(row, typesArr, cp) {
 export function renderRosterPicks(oppTypes) {
   if (!dom.vsTopPicksEl || !dom.vsRiskyPicksEl) return;
 
-  const hasRoster = Array.isArray(state.allResults) && state.allResults.length > 0;
-
-  // Toggle section visibility based on CSV
-  if (dom.vsPokeRecoSectionEl) dom.vsPokeRecoSectionEl.hidden = !hasRoster;
-  if (dom.vsUploadPromptEl) dom.vsUploadPromptEl.hidden = hasRoster;
-
   dom.vsTopPicksEl.innerHTML = '';
   dom.vsRiskyPicksEl.innerHTML = '';
 
   if (dom.vsRosterNoteEl) {
     dom.vsRosterNoteEl.hidden = true;
     dom.vsRosterNoteEl.textContent = '';
-  }
-
-  if (!hasRoster) {
-    return;
   }
 
   const scored = scoreRosterAgainst(oppTypes);
@@ -660,20 +650,31 @@ export function syncVsUI() {
   // Sync the Done/Edit label based on details open state
   syncVsTypePickerLabel();
 
-  // Show/hide recommendations section based on whether types are selected
   const hasTypes = oppTypes.length > 0;
-  if (dom.vsHeroEl) dom.vsHeroEl.hidden = !hasTypes;
-  if (dom.vsPickPromptEl) dom.vsPickPromptEl.hidden = hasTypes;
+  const hasRoster = Array.isArray(state.allResults) && state.allResults.length > 0;
 
-  if (oppTypes.length === 0) {
-    // No types selected - vsHero is hidden, vsPickPrompt is shown
-    // Nothing else to render
-    return;
+  // SECTION 1: Type Effectiveness
+  // Show results when types selected, show pick prompt when not
+  if (dom.vsTypeEffectivenessResultsEl) dom.vsTypeEffectivenessResultsEl.hidden = !hasTypes;
+  if (dom.vsSection1PickPromptEl) dom.vsSection1PickPromptEl.hidden = hasTypes;
+
+  if (hasTypes) {
+    renderVsBrief(oppTypes);
   }
 
-  // Types selected - render recommendations
-  renderVsBrief(oppTypes);
-  renderRosterPicks(oppTypes);
+  // SECTION 2: Pokemon Recommendations
+  // Three states: (1) CSV + types = results, (2) CSV no types = pick prompt, (3) no CSV = upload prompt
+  const showSection2Results = hasRoster && hasTypes;
+  const showSection2PickPrompt = hasRoster && !hasTypes;
+  const showSection2UploadPrompt = !hasRoster;
+
+  if (dom.vsPokeRecoResultsEl) dom.vsPokeRecoResultsEl.hidden = !showSection2Results;
+  if (dom.vsSection2PickPromptEl) dom.vsSection2PickPromptEl.hidden = !showSection2PickPrompt;
+  if (dom.vsSection2UploadPromptEl) dom.vsSection2UploadPromptEl.hidden = !showSection2UploadPrompt;
+
+  if (showSection2Results) {
+    renderRosterPicks(oppTypes);
+  }
 }
 
 // Sticky metrics

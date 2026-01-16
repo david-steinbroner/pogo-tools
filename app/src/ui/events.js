@@ -292,19 +292,22 @@ export function wireEvents() {
     }
   }
 
-  // VS empty state upload button
+  // VS empty state upload button (Section 2)
   if (dom.vsUploadPromptBtn && dom.fileInput) {
     dom.vsUploadPromptBtn.addEventListener('click', () => dom.fileInput.click());
   }
 
-  // VS "pick types" CTA - scroll to type picker
+  // VS "pick types" CTAs - scroll to type picker
   const scrollToTypePicker = () => {
     if (dom.vsSubEl) {
       dom.vsSubEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  if (dom.vsPickPromptEl) {
-    dom.vsPickPromptEl.addEventListener('click', scrollToTypePicker);
+  if (dom.vsSection1PickPromptEl) {
+    dom.vsSection1PickPromptEl.addEventListener('click', scrollToTypePicker);
+  }
+  if (dom.vsSection2PickPromptEl) {
+    dom.vsSection2PickPromptEl.addEventListener('click', scrollToTypePicker);
   }
 
   // Collapsible sections - reusable toggle handler
