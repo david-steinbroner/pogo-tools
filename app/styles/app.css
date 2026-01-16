@@ -1241,6 +1241,12 @@ body.no-scroll { overflow: hidden; }
   display: block;
 }
 
+/* Show placeholder in coming soon sections */
+.collection-coming-soon .collapsible-placeholder,
+.trade-view .collapsible-placeholder {
+  display: block;
+}
+
 .vs-panel-title {
   font-family: var(--font-display);
   font-size: var(--text-display-sm);
