@@ -108,6 +108,7 @@ export function openDrawer() {
   dom.infoDrawer.setAttribute('aria-hidden', 'false');
   dom.drawerBackdrop.hidden = false;
   document.body.classList.add('no-scroll');
+  if (dom.infoBtn) dom.infoBtn.classList.add('is-active');
 }
 
 export function closeDrawer() {
@@ -116,6 +117,7 @@ export function closeDrawer() {
   dom.infoDrawer.setAttribute('aria-hidden', 'true');
   dom.drawerBackdrop.hidden = true;
   document.body.classList.remove('no-scroll');
+  if (dom.infoBtn) dom.infoBtn.classList.remove('is-active');
 }
 
 // Scroll throttle
