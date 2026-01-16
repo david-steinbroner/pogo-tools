@@ -31,61 +31,19 @@
   </div>
 </header>
 
-<!-- MODE TABS -->
-<div id="modeTabs" class="modebar" role="tablist" aria-label="Mode">
-  <div class="modebar-inner">
-    <button id="modeVsBtn" class="mode-tab is-active" role="tab" aria-selected="true" type="button">Versus</button>
-    <button id="modeCollectionBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Collection</button>
-    <button id="modeTradeBtn" class="mode-tab" role="tab" aria-selected="false" type="button">Trade</button>
-  </div>
-</div>
-
-<div id="collectionSticky" hidden>
-  <div aria-label="Collection summary" class="collectionbar" id="collectionBar">
-    <div class="collection-left">
-      <div class="collection-stat">Pokemon: <strong id="collectionCount">-</strong></div>
-      <div class="collection-stat">Type coverage: <strong id="collectionCoverage">-/18</strong></div>
-    </div>
-    <div class="collection-note" title="Updates after CSV upload">Collection</div>
-  </div>
-
-  <!-- Filters -->
-  <div aria-label="Filters" class="filterzone" id="filterZone">
-    <div aria-label="Active filters" class="active-strip">
-      <div class="active-left">
-        <button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
-          <span aria-hidden="true" class="types-open-icon">+</span>
-          <span>Types</span>
-        </button>
-        <div aria-label="Selected types" class="active-icons" id="activeIcons">
-          <span class="active-all" id="activeAll">All types</span>
-        </div>
-      </div>
-      <button class="clear-btn" hidden="" id="clearBtn" type="button">Clear</button>
-    </div>
-  </div>
-
-  <!-- Bottom sheet: Type picker -->
-  <div class="sheet-backdrop" hidden="" id="sheetBackdrop"></div>
-  <section aria-label="Choose types" aria-modal="true" class="sheet" hidden="" id="typesSheet" role="dialog">
-    <div class="sheet-header">
-      <div class="sheet-title">Choose types</div>
-      <div class="sheet-actions">
-        <button class="sheet-btn ghost" id="selectAllBtn" type="button">All</button>
-        <button class="sheet-btn ghost" id="sheetClearBtn" type="button">Clear</button>
-        <button class="sheet-btn" id="sheetDoneBtn" type="button">Done</button>
-      </div>
-    </div>
-    <div class="sheet-body">
-      <div aria-label="Type grid" class="type-grid" id="typeGrid"></div>
-      <div class="sheet-hint mono">Tap types to toggle. Selected types show as icons above.</div>
-    </div>
-  </section>
-</div>
-
 <main class="main">
-  <!-- VIEW: VERSUS -->
-  <div id="viewVersus">
+  <div class="app-window">
+    <!-- Window Tabs -->
+    <div class="window-tabs" role="tablist" aria-label="Mode">
+      <button id="modeVsBtn" class="window-tab is-active" role="tab" aria-selected="true" type="button">Versus</button>
+      <button id="modeCollectionBtn" class="window-tab" role="tab" aria-selected="false" type="button">Collection</button>
+      <button id="modeTradeBtn" class="window-tab" role="tab" aria-selected="false" type="button">Trade</button>
+    </div>
+
+    <!-- Window Content -->
+    <div class="window-content">
+      <!-- VIEW: VERSUS -->
+      <div id="viewVersus">
     <section id="vsView" class="vs-view">
       <div class="vs-panel">
         <div class="vs-panel-header">
@@ -173,75 +131,119 @@
     </section>
   </div>
 
-  <!-- VIEW: COLLECTION -->
-  <div id="viewCollection">
-    <section id="collectionView" class="collection-view" hidden>
-      <div class="showing-row">
-        <div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(-)</span></div>
-      </div>
-      <div id="parseError" class="error-panel" hidden></div>
-      <details id="csvDebug" class="debug-details" hidden>
-        <summary>
-          <span>CSV detected</span>
-          <span id="csvDebugSummary" class="mono"></span>
-        </summary>
-        <div class="debug-body">
-          <div class="debug-block">
-            <div class="debug-label">Headers</div>
-            <div id="csvHeaders" class="debug-chipwrap"></div>
+      <!-- VIEW: COLLECTION -->
+      <div id="viewCollection" hidden>
+        <!-- Collection summary bar -->
+        <div aria-label="Collection summary" class="collectionbar" id="collectionBar">
+          <div class="collection-left">
+            <div class="collection-stat">Pokemon: <strong id="collectionCount">-</strong></div>
+            <div class="collection-stat">Type coverage: <strong id="collectionCoverage">-/18</strong></div>
           </div>
-          <div class="debug-block">
-            <div class="debug-label">Mapping (what we used)</div>
-            <div id="csvMapping" class="debug-mapping"></div>
-          </div>
-          <div class="debug-block">
-            <div class="debug-label">Sample row (first row)</div>
-            <div id="csvSample" class="debug-sample"></div>
-          </div>
+          <div class="collection-note" title="Updates after CSV upload">Collection</div>
         </div>
-      </details>
-      <p class="hint">Option C layout: type filters stay pinned, results live directly beneath.</p>
-      <section aria-label="Results" class="panel">
-        <div class="panel-header">
-          <h2>Results</h2>
-          <div class="sub">Tap a type pill to filter</div>
-        </div>
-        <div id="resultsScroll" class="table-wrap">
-          <table id="resultsTable">
-            <thead>
-              <tr>
-                <th class="sortable" data-key="name"><span class="th-inner">Pokemon <span class="sort-ind" aria-hidden="true"></span></span></th>
-                <th class="mono sortable" data-key="score"><span class="th-inner">Score <span class="sort-ind" aria-hidden="true"></span></span></th>
-                <th class="sortable" data-key="grade"><span class="th-inner">Grade <span class="sort-ind" aria-hidden="true"></span></span></th>
-                <th class="mono sortable" data-key="cp"><span class="th-inner">CP <span class="sort-ind" aria-hidden="true"></span></span></th>
-                <th class="mono sortable" data-key="iv"><span class="th-inner">IV% <span class="sort-ind" aria-hidden="true"></span></span></th>
-                <th class="sortable" data-key="types"><span class="th-inner">Types <span class="sort-ind" aria-hidden="true"></span></span></th>
-              </tr>
-            </thead>
-            <tbody id="resultsBody">
-              <!-- rows rendered by JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </section>
-  </div>
 
-  <!-- VIEW: TRADE -->
-  <div id="viewTrade">
-    <section id="tradeView" class="trade-view" hidden>
-      <div class="vs-panel">
-        <div class="vs-panel-header">
-          <div class="vs-panel-title">Trade</div>
-          <div class="vs-panel-sub mono">Coming soon. This tab will help you pick safe trades, prioritize distance/lucky odds, and export lists.</div>
+        <!-- Filters -->
+        <div aria-label="Filters" class="filterzone" id="filterZone">
+          <div aria-label="Active filters" class="active-strip">
+            <div class="active-left">
+              <button aria-controls="typesSheet" aria-haspopup="dialog" class="types-open-btn" id="typesOpenBtn" type="button">
+                <span aria-hidden="true" class="types-open-icon">+</span>
+                <span>Types</span>
+              </button>
+              <div aria-label="Selected types" class="active-icons" id="activeIcons">
+                <span class="active-all" id="activeAll">All types</span>
+              </div>
+            </div>
+            <button class="clear-btn" hidden="" id="clearBtn" type="button">Clear</button>
+          </div>
         </div>
-        <div class="vs-block">
-          <div class="hint">Placeholder screen. No behavior yet.</div>
-        </div>
+
+        <section class="collection-view">
+          <div class="showing-row">
+            <div>Showing: <strong id="showingTypes">Water</strong> <span class="mono" id="showingCount">(-)</span></div>
+          </div>
+          <div id="parseError" class="error-panel" hidden></div>
+          <details id="csvDebug" class="debug-details" hidden>
+            <summary>
+              <span>CSV detected</span>
+              <span id="csvDebugSummary" class="mono"></span>
+            </summary>
+            <div class="debug-body">
+              <div class="debug-block">
+                <div class="debug-label">Headers</div>
+                <div id="csvHeaders" class="debug-chipwrap"></div>
+              </div>
+              <div class="debug-block">
+                <div class="debug-label">Mapping (what we used)</div>
+                <div id="csvMapping" class="debug-mapping"></div>
+              </div>
+              <div class="debug-block">
+                <div class="debug-label">Sample row (first row)</div>
+                <div id="csvSample" class="debug-sample"></div>
+              </div>
+            </div>
+          </details>
+          <p class="hint">Option C layout: type filters stay pinned, results live directly beneath.</p>
+          <section aria-label="Results" class="panel">
+            <div class="panel-header">
+              <h2>Results</h2>
+              <div class="sub">Tap a type pill to filter</div>
+            </div>
+            <div id="resultsScroll" class="table-wrap">
+              <table id="resultsTable">
+                <thead>
+                  <tr>
+                    <th class="sortable" data-key="name"><span class="th-inner">Pokemon <span class="sort-ind" aria-hidden="true"></span></span></th>
+                    <th class="mono sortable" data-key="score"><span class="th-inner">Score <span class="sort-ind" aria-hidden="true"></span></span></th>
+                    <th class="sortable" data-key="grade"><span class="th-inner">Grade <span class="sort-ind" aria-hidden="true"></span></span></th>
+                    <th class="mono sortable" data-key="cp"><span class="th-inner">CP <span class="sort-ind" aria-hidden="true"></span></span></th>
+                    <th class="mono sortable" data-key="iv"><span class="th-inner">IV% <span class="sort-ind" aria-hidden="true"></span></span></th>
+                    <th class="sortable" data-key="types"><span class="th-inner">Types <span class="sort-ind" aria-hidden="true"></span></span></th>
+                  </tr>
+                </thead>
+                <tbody id="resultsBody">
+                  <!-- rows rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </section>
       </div>
-    </section>
-  </div>
+
+      <!-- VIEW: TRADE -->
+      <div id="viewTrade" hidden>
+        <section id="tradeView" class="trade-view">
+          <div class="vs-panel">
+            <div class="vs-panel-header">
+              <div class="vs-panel-title">Trade</div>
+              <div class="vs-panel-sub mono">Coming soon. This tab will help you pick safe trades, prioritize distance/lucky odds, and export lists.</div>
+            </div>
+            <div class="vs-block">
+              <div class="hint">Placeholder screen. No behavior yet.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div><!-- /.window-content -->
+  </div><!-- /.app-window -->
 </main>
+
+<!-- Type Picker Sheet (Collection mode) -->
+<div class="sheet-backdrop" hidden="" id="sheetBackdrop"></div>
+<section aria-label="Choose types" aria-modal="true" class="sheet" hidden="" id="typesSheet" role="dialog">
+  <div class="sheet-header">
+    <div class="sheet-title">Choose types</div>
+    <div class="sheet-actions">
+      <button class="sheet-btn ghost" id="selectAllBtn" type="button">All</button>
+      <button class="sheet-btn ghost" id="sheetClearBtn" type="button">Clear</button>
+      <button class="sheet-btn" id="sheetDoneBtn" type="button">Done</button>
+    </div>
+  </div>
+  <div class="sheet-body">
+    <div aria-label="Type grid" class="type-grid" id="typeGrid"></div>
+    <div class="sheet-hint mono">Tap types to toggle. Selected types show as icons above.</div>
+  </div>
+</section>
 
 <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
 

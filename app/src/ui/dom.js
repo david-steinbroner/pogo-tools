@@ -26,14 +26,17 @@ export const fileInput = document.getElementById('fileInput');
 
 // Collection view elements
 export const collectionBar = document.getElementById('collectionBar');
-export const collectionSticky = document.getElementById('collectionSticky');
 export const filterZone = document.getElementById('filterZone');
-export const collectionView = document.getElementById('collectionView');
+export const collectionView = document.getElementById('viewCollection');
 export const collectionCountEl = document.getElementById('collectionCount');
 export const collectionCoverageEl = document.getElementById('collectionCoverage');
 export const showingTypesEl = document.getElementById('showingTypes');
 export const showingCountEl = document.getElementById('showingCount');
 export const parseErrorEl = document.getElementById('parseError');
+
+// View wrapper elements (for mode switching)
+export const viewVersus = document.getElementById('viewVersus');
+export const viewTrade = document.getElementById('viewTrade');
 
 // VS view elements
 export const vsView = document.getElementById('vsView');

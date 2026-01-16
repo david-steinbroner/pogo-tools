@@ -281,7 +281,52 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 /* ============================================
-   MODE BAR (Segmented Control)
+   APP WINDOW (Browser-style container)
+   ============================================ */
+.app-window {
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.window-tabs {
+  display: flex;
+  background: var(--bg-inset);
+  border-bottom: 2px solid var(--border-default);
+  padding: 0;
+}
+
+.window-tab {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-display);
+  font-size: var(--text-display-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.window-tab:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.window-tab.is-active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-weight: normal;
+}
+
+.window-content {
+  padding: var(--space-md);
+}
+
+/* ============================================
+   MODE BAR (Legacy - kept for reference)
    ============================================ */
 .modebar {
   position: sticky;
@@ -292,7 +337,6 @@ html[data-skin="gba-ds"] .skin-mark {
   align-items: center;
   padding: var(--space-sm) var(--space-lg);
   gap: var(--space-md);
-  border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-page);
 }
 
@@ -419,17 +463,14 @@ html[data-skin="gba-ds"] .skin-mark {
    COLLECTION BAR & FILTER ZONE
    ============================================ */
 .collectionbar {
-  position: sticky;
-  top: calc(var(--appbar-real-h) + var(--modebar-real-h) + var(--utilbar-real-h));
-  z-index: 200;
   min-height: var(--collectionbar-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-md) var(--space-md);
-  border-bottom: 2px solid var(--border-strong);
-  background: var(--bg-surface);
+  border-bottom: 2px solid var(--border-default);
+  background: var(--bg-surface-alt);
 }
 
 .collection-left {
@@ -461,10 +502,7 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 .filterzone {
-  position: sticky;
-  top: calc(var(--appbar-real-h) + var(--modebar-real-h) + var(--utilbar-real-h) + var(--collectionbar-real-h));
-  z-index: 80;
-  border-bottom: 2px solid var(--border-strong);
+  border-bottom: 2px solid var(--border-default);
   background: var(--bg-surface-alt);
 }
 
@@ -1281,8 +1319,6 @@ body.no-scroll { overflow: hidden; }
 
 .vs-hero {
   margin-top: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 3px solid var(--border-strong);
   display: flex;
   flex-direction: column;
 }
@@ -1361,11 +1397,6 @@ body.no-scroll { overflow: hidden; }
   flex-direction: column;
   gap: var(--space-sm);
   padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.brief-row:last-child {
-  border-bottom: none;
 }
 
 .brief-k {

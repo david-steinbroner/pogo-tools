@@ -58,13 +58,10 @@ export function setModeUI(mode) {
   setTab(dom.modeCollectionBtn, isCollection);
   setTab(dom.modeTradeBtn, isTrade);
 
-  if (dom.collectionBar) dom.collectionBar.hidden = !isCollection;
-  if (dom.collectionSticky) dom.collectionSticky.hidden = !isCollection;
-  if (dom.filterZone) dom.filterZone.hidden = !isCollection;
+  // Show/hide view wrappers
+  if (dom.viewVersus) dom.viewVersus.hidden = !isVS;
   if (dom.collectionView) dom.collectionView.hidden = !isCollection;
-
-  if (dom.vsView) dom.vsView.hidden = !isVS;
-  if (dom.tradeView) dom.tradeView.hidden = !isTrade;
+  if (dom.viewTrade) dom.viewTrade.hidden = !isTrade;
 
   if (!isCollection && activeSheet && !activeSheet.hidden) closeSheet();
 
