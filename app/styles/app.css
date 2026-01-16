@@ -1152,9 +1152,9 @@ body.no-scroll { overflow: hidden; }
 
 .info-trigger .battle-tooltip {
   position: absolute;
-  left: 0;
+  right: 0;
+  left: auto;
   top: calc(100% + 8px);
-  right: auto;
   margin-top: 0;
   transform: none;
   max-width: calc(100vw - 32px);
@@ -1164,7 +1164,8 @@ body.no-scroll { overflow: hidden; }
   content: '';
   position: absolute;
   top: -8px;
-  left: 8px;
+  right: 8px;
+  left: auto;
   border: 6px solid transparent;
   border-bottom-color: var(--border-strong);
 }
@@ -1173,7 +1174,8 @@ body.no-scroll { overflow: hidden; }
   content: '';
   position: absolute;
   top: -5px;
-  left: 9px;
+  right: 9px;
+  left: auto;
   border: 5px solid transparent;
   border-bottom-color: var(--bg-surface);
 }
