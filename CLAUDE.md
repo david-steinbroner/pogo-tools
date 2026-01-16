@@ -1,18 +1,17 @@
 # PoGO Pal - Project Manifest
 
 ## Current Focus
-Versus hierarchy tightening (scan-first, Top Picks hero, compact opponent input)
+Trade tab implementation
 
 ## Next Up
-- [ ] Versus: scan-first flow (prompt user to upload before showing type selector)
-- [ ] Versus: Top Picks hero section (highlight best counters prominently)
-- [ ] Versus: compact opponent type input (streamline the UI)
 - [ ] Trade tab: placeholder or basic implementation
+- [ ] Consider additional VS mode enhancements based on user feedback
 
 ## Blocked / Questions
 (none)
 
 ## Recent Progress
+- 2026-01-15: VS tab polish - removed VS icon, added upload buttons to empty states
 - 2026-01-15: Design System Migration complete - migrated to light "Pokédex Companion" theme (10 chunks)
 - 2026-01-15: VS type selector Done/Edit toggle - explicit collapse control, validation feedback
 - 2025-01-15: Fixed CSV name detection - skip numeric values (Pokedex #), find actual Pokemon names
@@ -62,11 +61,9 @@ python -m http.server 8000
 ```
 
 ## Links
-- Preview (design-system): https://design-system-migration.pogo-pal.pages.dev
-- Preview (refactor-v3): https://refactor-v3.pogo-pal.pages.dev
 - Production: https://pogo-pal.pages.dev
 - Repo: https://github.com/david-steinbroner/pogo-pal
-- Branch: design-system-migration (active), refactor-v3 (base)
+- Branch: main
 
 ## Constraints
 - Safari-safe JS (no bleeding-edge features)
