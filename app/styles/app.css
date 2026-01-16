@@ -789,9 +789,10 @@ button.type-pill:hover {
 }
 
 .type-pill.is-selected {
-  border-color: var(--text-primary);
+  /* Pressed/inset effect - like a Game Boy button being pressed */
   background: var(--bg-inset);
-  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.1);
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.15), inset 1px 1px 2px rgba(0,0,0,0.1);
+  transform: translateY(1px);
 }
 
 /* Smaller font for longer type names in grid to prevent truncation */
@@ -1277,6 +1278,7 @@ body.no-scroll { overflow: hidden; }
   font-size: 8px;
   cursor: pointer;
   vertical-align: middle;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
 }
 
 .info-icon-btn:hover {
