@@ -68,7 +68,7 @@ export function renderGrid() {
   TYPES.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'type-grid-btn';
+    btn.className = 'type-pill';
     btn.dataset.type = t.name;
 
     const icon = document.createElement('span');
@@ -89,7 +89,7 @@ export function renderGrid() {
 // Sync grid selection UI
 export function syncGridSelectionUI() {
   if (!dom.gridEl) return;
-  dom.gridEl.querySelectorAll('button.type-grid-btn').forEach(btn => {
+  dom.gridEl.querySelectorAll('button.type-pill').forEach(btn => {
     const t = btn.dataset.type;
     const on = state.selectedTypes.has(t);
     btn.classList.toggle('is-selected', on);
@@ -351,7 +351,7 @@ export function renderVsGrid() {
   TYPES.forEach(t => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'type-grid-btn';
+    btn.className = 'type-pill';
     btn.dataset.type = t.name;
 
     const icon = document.createElement('span');
@@ -371,7 +371,7 @@ export function renderVsGrid() {
 
 export function syncVsGridSelectionUI() {
   if (!dom.vsGridEl) return;
-  dom.vsGridEl.querySelectorAll('button.type-grid-btn').forEach(btn => {
+  dom.vsGridEl.querySelectorAll('button.type-pill').forEach(btn => {
     const t = btn.dataset.type;
     const on = state.vsSelectedTypes.has(t);
     btn.classList.toggle('is-selected', on);
@@ -400,7 +400,7 @@ export function renderVsSelectedChips() {
   list.forEach(t => {
     const chip = document.createElement('button');
     chip.type = 'button';
-    chip.className = 'battle-chip';
+    chip.className = 'type-pill';
     chip.title = 'Remove';
     chip.dataset.type = t;
 
@@ -429,7 +429,7 @@ export function renderTypePills(container, types) {
 
   types.forEach(t => {
     const pill = document.createElement('span');
-    pill.className = 'battle-pill';
+    pill.className = 'type-pill';
     const meta = typeMeta(t);
 
     const icon = document.createElement('span');
@@ -551,7 +551,7 @@ export function makePokePickCard(row, typesArr, cp) {
 
   (typesArr || []).forEach(t => {
     const chip = document.createElement('span');
-    chip.className = 'poke-type';
+    chip.className = 'type-pill';
 
     const icon = document.createElement('span');
     icon.className = 'icon-chip';
@@ -560,7 +560,7 @@ export function makePokePickCard(row, typesArr, cp) {
     icon.innerHTML = svgForType(t);
 
     const label = document.createElement('span');
-    label.className = 'poke-type-name';
+    label.className = 'type-name';
     label.textContent = t;
 
     chip.appendChild(icon);

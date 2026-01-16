@@ -204,7 +204,7 @@ export function wireEvents() {
   // Type grid clicks (delegated)
   if (dom.gridEl) {
     dom.gridEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('button.type-grid-btn');
+      const btn = e.target.closest('button.type-pill');
       if (btn && btn.dataset.type) {
         handleTypeToggle(btn.dataset.type);
       }
@@ -224,7 +224,7 @@ export function wireEvents() {
   // VS mode events
   if (dom.vsGridEl) {
     dom.vsGridEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('button.type-grid-btn');
+      const btn = e.target.closest('button.type-pill');
       if (btn && btn.dataset.type) {
         handleVsTypeToggle(btn.dataset.type);
       }
@@ -232,7 +232,7 @@ export function wireEvents() {
   }
   if (dom.vsSelectedEl) {
     dom.vsSelectedEl.addEventListener('click', (e) => {
-      const chip = e.target.closest('.battle-chip');
+      const chip = e.target.closest('.type-pill');
       if (chip && chip.dataset.type) {
         handleVsTypeToggle(chip.dataset.type);
       }
