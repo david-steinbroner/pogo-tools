@@ -13,6 +13,7 @@ Versus hierarchy tightening (scan-first, Top Picks hero, compact opponent input)
 (none)
 
 ## Recent Progress
+- 2026-01-15: Design System Migration complete - migrated to light "Pokédex Companion" theme (10 chunks)
 - 2026-01-15: VS type selector Done/Edit toggle - explicit collapse control, validation feedback
 - 2025-01-15: Fixed CSV name detection - skip numeric values (Pokedex #), find actual Pokemon names
 - 2025-01-15: Filtering + sorting verified working: type filters, "X of Y" counts, sorting on filtered subset
@@ -43,15 +44,15 @@ Single-page app using ES modules (no build step):
     app.css               # All CSS (~1300 lines, GBA/DS theming)
   /docs/
     HANDOFF.md            # Legacy continuity doc
-    pogo-pal-design-system-v3.html
-    pogo-pal-typography-reference.html
+    design-system.md      # Design System v4 spec (single source of truth)
+    design-migration-plan.md  # Migration plan (complete)
 
 /legacy/
   pogo-v3-prototype-v3_35-legacy.html   # Original monolith for reference
 ```
 
 ## Design Direction
-Pokemon handheld UI vibes (Game Boy → GBA → Nintendo DS). Current baseline: GBP-inspired (pixelated uppercase headers, tactile borders, "?" info icon style).
+Pokemon handheld UI vibes (Game Boy → GBA → Nintendo DS). Current theme: **Design System v4 "Pokédex Companion"** - warm cream light theme with visible 2px borders, Press Start 2P headers, VT323 body text, 4px border-radius for GBA-era feel.
 
 ## Dev Setup
 ```bash
