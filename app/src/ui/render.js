@@ -551,8 +551,15 @@ export function makePokePickCard(row, typesArr, cp) {
   card.className = 'poke-card';
 
   const name = document.createElement('div');
+  const nameText = row.name || '-';
   name.className = 'poke-name';
-  name.textContent = row.name || '-';
+  // Dynamic font scaling for long names
+  if (nameText.length > 14) {
+    name.classList.add('very-long-name');
+  } else if (nameText.length > 10) {
+    name.classList.add('long-name');
+  }
+  name.textContent = nameText;
 
   const meta = document.createElement('div');
   meta.className = 'poke-meta mono';
