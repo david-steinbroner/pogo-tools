@@ -48,9 +48,13 @@ export function detectCSVMapping(headers) {
   const h = Array.isArray(headers) ? headers : [];
   const m = {};
 
+  // For name column, be more specific to avoid matching "#", "Index", etc.
   m.name = _firstHeaderMatch(h, [
     'Pokemon', 'Pokémon', 'Name', 'Species', 'Pokemon Name', 'Pokémon Name',
-    /pokemon/i, /species/i, /name/i
+    'Species Name', 'SpeciesName', 'Pokemon Species', 'Pokémon Species',
+    'Monster', 'Monster Name',
+    /^pokemon$/i, /^pokémon$/i, /^name$/i, /^species$/i,
+    /pokemon\s*name/i, /species\s*name/i
   ]);
   m.cp = _firstHeaderMatch(h, ['CP', 'Combat Power', 'CombatPower', /\bcp\b/i]);
   m.ivPercent = _firstHeaderMatch(h, [
@@ -150,18 +154,42 @@ export function extractTypesFromRow(row, fallbackName, mapping) {
 }
 
 /**
+ * Check if a value looks like a Pokemon name (not just a number)
+ */
+function _looksLikeName(val) {
+  const s = String(val || '').trim();
+  if (!s) return false;
+  // If it's purely numeric, it's probably a Pokedex number, not a name
+  if (/^\d+$/.test(s)) return false;
+  // If it's very short and numeric-ish, skip
+  if (s.length <= 3 && /^\d/.test(s)) return false;
+  return true;
+}
+
+/**
  * Extract species name from a CSV row
  */
 export function extractSpeciesName(row, mapping) {
+  // Try mapped column first, but only if the value looks like a name
   const mapped = (mapping && mapping.name) ? row[mapping.name] : null;
   const mappedStr = String(mapped || '').trim();
-  if (mappedStr) return mappedStr;
+  if (mappedStr && _looksLikeName(mappedStr)) return mappedStr;
 
+  // Extended list of candidates for PokeGenie and other exports
   const candidates = [
     row['Name'], row['Pokemon'], row['Pokémon'], row['Species'], row['Species Name'], row['SpeciesName'],
-    row['Pokemon Name'], row['Pokémon Name'], row['PokemonName'], row['pokemon'], row['pokemon_name'], row['species']
+    row['Pokemon Name'], row['Pokémon Name'], row['PokemonName'], row['pokemon'], row['pokemon_name'], row['species'],
+    row['Monster'], row['Monster Name'], row['Creature'], row['Poke'], row['Mon'],
+    row['Pokemon Species'], row['Pokémon Species'], row['PokemonSpecies']
   ];
 
+  for (const c of candidates) {
+    const s = String(c || '').trim();
+    if (_looksLikeName(s)) return s;
+  }
+
+  // Last resort: return whatever we have, even if numeric (for debugging)
+  if (mappedStr) return mappedStr;
   for (const c of candidates) {
     const s = String(c || '').trim();
     if (s) return s;

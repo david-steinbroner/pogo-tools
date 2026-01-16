@@ -30,6 +30,14 @@ function buildFromCSV(csvText) {
 
   const mapping = detectCSVMapping(meta.headers);
 
+  // Debug: log headers and mapping for troubleshooting
+  console.log('[PoGO] CSV Headers:', meta.headers);
+  console.log('[PoGO] Detected mapping:', mapping);
+  if (parsed[0]) {
+    console.log('[PoGO] First row sample:', parsed[0]);
+    console.log('[PoGO] Name column value:', mapping.name ? parsed[0][mapping.name] : 'NO MAPPING');
+  }
+
   // Render debug (gated)
   try {
     render.renderCSVMetaDebug(meta, parsed[0] || null, { force: false });
