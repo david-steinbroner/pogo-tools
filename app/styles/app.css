@@ -1454,6 +1454,10 @@ body.no-scroll { overflow: hidden; }
   gap: var(--space-sm);
 }
 
+.vs-brief[hidden] {
+  display: none;
+}
+
 .brief-row {
   display: flex;
   flex-direction: column;
