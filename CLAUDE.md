@@ -17,6 +17,8 @@ Combat Intelligence Suite
 (none)
 
 ## Recent Progress
+- 2026-01-17: Dynamic VS tab ordering - sections reorder based on CSV upload state, all sections now collapsible
+- 2026-01-17: App footer - copyright, MIT license link, GitHub link, Niantic disclaimer
 - 2026-01-17: VS tab restructure by actionability - General Pokémon first, then Types sections (collapsed), Your Pokémon bumps to top when CSV uploaded
 - 2026-01-16: Reusable error modal - showError/hideError functions, styled modal with backdrop, CSV validation messages
 - 2026-01-16: Unified Pokemon cards - consistent height, CP placeholder for general counters, simplified layout
