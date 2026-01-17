@@ -1948,10 +1948,11 @@ body.no-scroll { overflow: hidden; }
    ============================================ */
 
 .type-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: var(--space-sm);
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-md);
   width: 100%;
+  justify-content: center;
 }
 
 .type-column {
@@ -1959,6 +1960,9 @@ body.no-scroll { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
+  max-width: 150px;
 }
 
 .type-column-header {
