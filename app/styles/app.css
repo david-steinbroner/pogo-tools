@@ -1754,3 +1754,28 @@ body.no-scroll { overflow: hidden; }
     padding-top: calc(var(--appbar-h) + env(safe-area-inset-top, 0) + var(--appbar-h) + 10px);
   }
 }
+
+/* ========================================
+   FOOTER
+   ======================================== */
+.app-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.app-footer a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+.app-footer a:hover {
+  color: var(--text-primary);
+}
