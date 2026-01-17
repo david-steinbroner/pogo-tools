@@ -1672,11 +1672,12 @@ body.no-scroll { overflow: hidden; }
   height: 100%;
 }
 
-/* Front face - shown by default, content vertically centered */
+/* Front face - shown by default, content vertically centered (bumped up slightly) */
 .flip-card-front {
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding-bottom: 20px; /* bump content up */
 }
 
 /* Back face - hidden by default, content centered */
@@ -1855,6 +1856,7 @@ body.no-scroll { overflow: hidden; }
   top: var(--space-xs);
   left: var(--space-xs);
   right: var(--space-xs);
+  height: 45%;
 }
 
 .matchup-detail.weak-section {
@@ -1862,6 +1864,7 @@ body.no-scroll { overflow: hidden; }
   bottom: var(--space-xs);
   left: var(--space-xs);
   right: var(--space-xs);
+  height: 45%;
 }
 
 .matchup-label {
@@ -1881,11 +1884,11 @@ body.no-scroll { overflow: hidden; }
   color: var(--danger, #c55);
 }
 
-/* Mini type pills container */
+/* Mini type pills container - no wrap, fit on one line */
 .matchup-pills {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
+  flex-wrap: nowrap;
+  gap: 3px;
   justify-content: center;
 }
 
