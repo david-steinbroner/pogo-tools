@@ -750,11 +750,11 @@ export function syncVsUI() {
     setCollapsed(dom.vsPokeTypesSectionEl, false);
     setCollapsed(dom.vsGeneralPokeSectionEl, true);
   } else {
-    // Non-uploaders: GENERAL, YOUR expanded; POKEMON, MOVE collapsed
+    // Non-uploaders: GENERAL expanded; POKEMON, MOVE, YOUR collapsed (YOUR at bottom, de-emphasized)
     setCollapsed(dom.vsGeneralPokeSectionEl, false);
-    setCollapsed(dom.vsYourPokeSectionEl, false);
     setCollapsed(dom.vsPokeTypesSectionEl, true);
     setCollapsed(dom.vsMoveTypesSectionEl, true);
+    setCollapsed(dom.vsYourPokeSectionEl, true);
   }
 
   updateScrollState();

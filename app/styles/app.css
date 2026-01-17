@@ -1792,11 +1792,11 @@ body.no-scroll { overflow: hidden; }
   display: none;
 }
 
-/* Default order (non-uploaders): General → Your → Pokemon Types → Move Types */
+/* Default order (non-uploaders): General → Pokemon Types → Move Types → Your */
 #vsGeneralPokeSection { order: 1; }
-#vsYourPokeSection { order: 2; }
-#vsPokeTypesSection { order: 3; }
-#vsMoveTypesSection { order: 4; }
+#vsPokeTypesSection { order: 2; }
+#vsMoveTypesSection { order: 3; }
+#vsYourPokeSection { order: 4; }
 
 /* Uploader order: Your → Move Types → Pokemon Types → General */
 #vsRecommendations.has-roster #vsYourPokeSection { order: 1; }
