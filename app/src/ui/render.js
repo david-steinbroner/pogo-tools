@@ -662,14 +662,7 @@ export function renderBudgetCounters(oppTypes) {
     const card = makePokePickCard(
       { name: c.name },
       c.types,
-      null,  // Don't show note in meta slot - card has limited space
-      {
-        moveset: `${c.fast} / ${c.charged}`,
-        badges: [
-          { type: c.tier, label: c.tier.charAt(0).toUpperCase() + c.tier.slice(1) },
-          { type: c.cost, label: c.cost.charAt(0).toUpperCase() + c.cost.slice(1) }
-        ]
-      }
+      null
     );
     card.classList.add('budget-card');
     dom.vsBudgetPicksEl.appendChild(card);
