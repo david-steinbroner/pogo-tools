@@ -1776,14 +1776,15 @@ body.no-scroll { overflow: hidden; }
   font-size: 11px;
 }
 
-/* Line 3: Matchup icons row */
+/* Matchup icons row - positioned at bottom */
 .poke-matchup-icons {
+  position: absolute;
+  bottom: var(--space-xs);
+  left: var(--space-xs);
+  right: var(--space-xs);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  margin-top: auto;
-  padding-top: 4px;
 }
 
 .matchup-icons-strong,
