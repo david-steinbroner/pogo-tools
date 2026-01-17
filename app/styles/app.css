@@ -802,6 +802,12 @@ button.type-pill:hover {
   transform: translateY(1px);
 }
 
+/* Block-level pill variant - stretches to fill container */
+.type-pill--block {
+  width: 100%;
+  justify-content: center;
+}
+
 /* Smaller font for longer type names in grid to prevent truncation */
 .type-grid .type-pill[data-type="Electric"] .type-name,
 .type-grid .type-pill[data-type="Fighting"] .type-name {
@@ -1484,20 +1490,20 @@ body.no-scroll { overflow: hidden; }
   line-height: 1;
 }
 
-.vs-note {
+.helper-text {
   font-family: var(--font-body);
   font-size: var(--text-body-sm);
   color: var(--text-secondary);
   margin-bottom: var(--space-md);
 }
 
-.vs-brief {
+.brief-container {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.vs-brief[hidden] {
+.brief-container[hidden] {
   display: none;
 }
 
@@ -1508,14 +1514,14 @@ body.no-scroll { overflow: hidden; }
   padding: var(--space-sm) 0;
 }
 
-.brief-k {
+.brief-label {
   font-family: var(--font-display);
   font-size: var(--text-display-xs);
   color: var(--text-secondary);
   text-transform: uppercase;
 }
 
-.brief-k strong {
+.brief-label strong {
   color: var(--text-primary);
 }
 
@@ -1969,11 +1975,6 @@ body.no-scroll { overflow: hidden; }
 .type-column-header {
   margin-bottom: var(--space-xs);
   width: 100%;
-}
-
-.type-column-header .type-pill {
-  width: 100%;
-  justify-content: center;
 }
 
 .type-column-cards {

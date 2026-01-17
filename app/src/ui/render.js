@@ -859,7 +859,9 @@ export function renderColumnLayout(container, oppTypes, countersByType) {
     // Column header - opponent type pill (using shared helper)
     const header = document.createElement('div');
     header.className = 'type-column-header';
-    header.appendChild(createTypePill(oppType));
+    const headerPill = createTypePill(oppType);
+    headerPill.classList.add('type-pill--block');
+    header.appendChild(headerPill);
     column.appendChild(header);
 
     // Cards for this column
