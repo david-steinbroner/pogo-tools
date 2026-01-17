@@ -1968,6 +1968,12 @@ body.no-scroll { overflow: hidden; }
 
 .type-column-header {
   margin-bottom: var(--space-xs);
+  width: 100%;
+}
+
+.type-column-header .type-pill {
+  width: 100%;
+  justify-content: center;
 }
 
 .type-column-cards {
