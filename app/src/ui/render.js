@@ -704,29 +704,32 @@ export function syncVsUI() {
   const hasTypes = oppTypes.length > 0;
   const hasRoster = Array.isArray(state.allResults) && state.allResults.length > 0;
 
-  // Hide everything below CLEAR/DONE when no types selected
+  // Hide all recommendations when no types selected
   if (dom.vsRecommendationsEl) dom.vsRecommendationsEl.hidden = !hasTypes;
-  if (dom.vsBudgetSectionEl) dom.vsBudgetSectionEl.hidden = !hasTypes;
 
   if (!hasTypes) {
     updateScrollState();
     return;
   }
 
-  // Types selected - render Section 1
+  // Types selected - render type effectiveness (Pokemon Types + Move Types)
   renderVsBrief(oppTypes);
 
-  // Budget counters - always show when types selected
-  renderBudgetCounters(oppTypes);
-  if (dom.vsBudgetSectionEl) dom.vsBudgetSectionEl.hidden = false;
-
-  // Section 2: show results if CSV, otherwise show upload prompt
+  // Section 1: Your Pokemon - always show section, toggle content based on CSV
+  if (dom.vsYourPokeSectionEl) dom.vsYourPokeSectionEl.hidden = false;
   if (dom.vsPokeRecoResultsEl) dom.vsPokeRecoResultsEl.hidden = !hasRoster;
   if (dom.vsUploadPromptEl) dom.vsUploadPromptEl.hidden = hasRoster;
 
   if (hasRoster) {
     renderRosterPicks(oppTypes);
   }
+
+  // Section 2: General Pokemon - always show when types selected
+  renderBudgetCounters(oppTypes);
+  if (dom.vsBudgetSectionEl) dom.vsBudgetSectionEl.hidden = false;
+
+  // Sections 3 & 4 (Pokemon Types, Move Types) - always visible, just collapsed
+  // No visibility toggle needed - they're rendered by renderVsBrief()
 
   updateScrollState();
 }

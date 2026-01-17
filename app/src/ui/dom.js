@@ -55,13 +55,8 @@ export const vsClearBtn = document.getElementById('vsClearBtn');
 // Recommendations container (hidden until types selected)
 export const vsRecommendationsEl = document.getElementById('vsRecommendations');
 
-// Section 1: Type Effectiveness
-export const vsBringMovesEl = document.getElementById('vsBringMoves');
-export const vsAvoidMovesEl = document.getElementById('vsAvoidMoves');
-export const vsBringBodiesEl = document.getElementById('vsBringBodies');
-export const vsAvoidBodiesEl = document.getElementById('vsAvoidBodies');
-
-// Section 2: Pokemon Recommendations
+// Section 1: Your Pokemon (shown first when CSV uploaded)
+export const vsYourPokeSectionEl = document.getElementById('vsYourPokeSection');
 export const vsPokeRecoResultsEl = document.getElementById('vsPokeRecoResults');
 export const vsUploadPromptEl = document.getElementById('vsUploadPrompt');
 export const vsTopPicksEl = document.getElementById('vsTopPicks');
@@ -69,11 +64,20 @@ export const vsRiskyPicksEl = document.getElementById('vsRiskyPicks');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
 export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
 
-// Budget Counters
+// Section 2: General Pokemon (always visible when types selected)
+export const vsGeneralPokeSectionEl = document.getElementById('vsGeneralPokeSection');
 export const vsBudgetSectionEl = document.getElementById('vsBudgetSection');
 export const vsBudgetPicksEl = document.getElementById('vsBudgetPicks');
 
-export const vsRecoHeaderEl = document.getElementById('vsRecoHeader');
+// Section 3: Pokemon Types (collapsed by default)
+export const vsPokeTypesSectionEl = document.getElementById('vsPokeTypesSection');
+export const vsBringBodiesEl = document.getElementById('vsBringBodies');
+export const vsAvoidBodiesEl = document.getElementById('vsAvoidBodies');
+
+// Section 4: Move Types (collapsed by default)
+export const vsMoveTypesSectionEl = document.getElementById('vsMoveTypesSection');
+export const vsBringMovesEl = document.getElementById('vsBringMoves');
+export const vsAvoidMovesEl = document.getElementById('vsAvoidMoves');
 export const vsInfoBtn = document.getElementById('vsInfoBtn');
 export const vsModal = document.getElementById('vsModal');
 export const vsModalBackdrop = document.getElementById('vsModalBackdrop');
