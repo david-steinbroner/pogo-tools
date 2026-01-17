@@ -11,6 +11,7 @@ Polish and bug fixes
 (none)
 
 ## Recent Progress
+- 2026-01-16: Budget Counter Recommendations - curated counters for all 18 types, shown in VS tab for all users (no CSV required)
 - 2026-01-16: Info drawer → About Pogo Pal - drawer z-index fix, UX improvements, simplified copy, help button styling
 - 2026-01-16: Trade/Collection tabs - coming soon placeholders, unified tab structure, collapsible recommendations
 - 2026-01-16: UI polish - type pill pressed effects, info button shadow, modal closes on outside tap
