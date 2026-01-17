@@ -17,6 +17,8 @@ Combat Intelligence Suite
 (none)
 
 ## Recent Progress
+- 2026-01-16: Reusable error modal - showError/hideError functions, styled modal with backdrop, CSV validation messages
+- 2026-01-16: Unified Pokemon cards - consistent height, CP placeholder for general counters, simplified layout
 - 2026-01-16: Budget Counters polish - simplified cards (name + types only), fixed overflow layout, GENERAL vs YOUR POKEMON labels
 - 2026-01-16: Budget Counter Recommendations - curated counters for all 18 types, shown in VS tab for all users (no CSV required)
 - 2026-01-16: Info drawer → About Pogo Pal - drawer z-index fix, UX improvements, simplified copy, help button styling
