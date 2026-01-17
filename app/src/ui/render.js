@@ -750,29 +750,29 @@ function createBackFace(row, typesArr, oppTypes) {
   if (oppTypes && oppTypes.length > 0) {
     const matchups = computeMatchups(typesArr || [], oppTypes);
 
-    // Strong against section
+    // Strong against section (positioned at top)
     const strongSection = document.createElement('div');
-    strongSection.className = 'matchup-detail';
+    strongSection.className = 'matchup-detail strong-section';
     const strongLabel = document.createElement('div');
     strongLabel.className = 'matchup-label strong';
     strongLabel.textContent = 'Strong against';
     strongSection.appendChild(strongLabel);
     const strongPills = document.createElement('div');
     strongPills.className = 'matchup-pills';
-    renderMiniPills(strongPills, matchups.strong, 4);
+    renderMiniPills(strongPills, matchups.strong, 3);
     strongSection.appendChild(strongPills);
     face.appendChild(strongSection);
 
-    // Weak against section
+    // Weak against section (positioned at bottom)
     const weakSection = document.createElement('div');
-    weakSection.className = 'matchup-detail';
+    weakSection.className = 'matchup-detail weak-section';
     const weakLabel = document.createElement('div');
     weakLabel.className = 'matchup-label weak';
     weakLabel.textContent = 'Weak against';
     weakSection.appendChild(weakLabel);
     const weakPills = document.createElement('div');
     weakPills.className = 'matchup-pills';
-    renderMiniPills(weakPills, matchups.weak, 4);
+    renderMiniPills(weakPills, matchups.weak, 3);
     weakSection.appendChild(weakPills);
     face.appendChild(weakSection);
   } else {

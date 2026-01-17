@@ -1680,12 +1680,11 @@ body.no-scroll { overflow: hidden; }
   text-align: center;
 }
 
-/* Back face - hidden by default */
+/* Back face - hidden by default, content centered */
 .flip-card-back {
   display: none;
-  align-items: flex-start;
-  text-align: left;
-  gap: 4px;
+  align-items: center;
+  text-align: center;
   justify-content: center;
 }
 
@@ -1838,16 +1837,31 @@ body.no-scroll { overflow: hidden; }
   flex-shrink: 0;
 }
 
-/* Matchup detail sections */
+/* Matchup detail sections - labels positioned absolutely */
 .matchup-detail {
   width: 100%;
+  text-align: center;
+}
+
+.matchup-detail.strong-section {
+  position: absolute;
+  top: var(--space-xs);
+  left: var(--space-xs);
+  right: var(--space-xs);
+}
+
+.matchup-detail.weak-section {
+  position: absolute;
+  bottom: var(--space-xs);
+  left: var(--space-xs);
+  right: var(--space-xs);
 }
 
 .matchup-label {
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: bold;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -1865,6 +1879,7 @@ body.no-scroll { overflow: hidden; }
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
+  justify-content: center;
 }
 
 /* Mini type pills (icon + label) */
