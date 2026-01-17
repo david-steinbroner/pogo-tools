@@ -68,6 +68,7 @@ export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
 export const vsGeneralPokeSectionEl = document.getElementById('vsGeneralPokeSection');
 export const vsBudgetSectionEl = document.getElementById('vsBudgetSection');
 export const vsBudgetPicksEl = document.getElementById('vsBudgetPicks');
+export const vsBudgetAvoidPicksEl = document.getElementById('vsBudgetAvoidPicks');
 
 // Section 3: Pokemon Types (collapsed by default)
 export const vsPokeTypesSectionEl = document.getElementById('vsPokeTypesSection');

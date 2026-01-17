@@ -5,7 +5,7 @@
 
 import { state, TYPES, TOTAL_TYPES, TYPE_CHART, typeMeta } from '../state.js';
 import { detectCSVMapping } from '../csv/mapping.js';
-import { getBudgetCounters } from '../data/budgetCounters.js';
+import { getBudgetCounters, getWeakCounters } from '../data/budgetCounters.js';
 import * as dom from './dom.js';
 
 // SVG icons for types
@@ -667,18 +667,33 @@ export function renderRosterPicks(oppTypes) {
 }
 
 export function renderBudgetCounters(oppTypes) {
-  if (!dom.vsBudgetPicksEl) return;
-  dom.vsBudgetPicksEl.innerHTML = '';
+  // Render BRING counters
+  if (dom.vsBudgetPicksEl) {
+    dom.vsBudgetPicksEl.innerHTML = '';
+    const counters = getBudgetCounters(oppTypes, 6);
+    counters.forEach(c => {
+      const card = makePokePickCard(
+        { name: c.name },
+        c.types,
+        'CP –'  // Placeholder CP for unified card height
+      );
+      dom.vsBudgetPicksEl.appendChild(card);
+    });
+  }
 
-  const counters = getBudgetCounters(oppTypes, 5);
-  counters.forEach(c => {
-    const card = makePokePickCard(
-      { name: c.name },
-      c.types,
-      'CP –'  // Placeholder CP for unified card height
-    );
-    dom.vsBudgetPicksEl.appendChild(card);
-  });
+  // Render AVOID counters
+  if (dom.vsBudgetAvoidPicksEl) {
+    dom.vsBudgetAvoidPicksEl.innerHTML = '';
+    const weakCounters = getWeakCounters(oppTypes, 6);
+    weakCounters.forEach(c => {
+      const card = makePokePickCard(
+        { name: c.name },
+        c.types,
+        'CP –'
+      );
+      dom.vsBudgetAvoidPicksEl.appendChild(card);
+    });
+  }
 }
 
 export function renderVsBrief(oppTypes) {

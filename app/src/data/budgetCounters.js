@@ -4,6 +4,123 @@
  * All entries are globally available (no regionals in v1)
  */
 
+import { TYPE_CHART } from '../state.js';
+
+/**
+ * Common Pokemon by their primary type (for AVOID recommendations)
+ * These are frequently-used Pokemon that players might mistakenly bring
+ */
+const COMMON_POKEMON_BY_TYPE = {
+  Normal: [
+    { name: 'Snorlax', types: ['Normal'], tier: 'common' },
+    { name: 'Blissey', types: ['Normal'], tier: 'uncommon' },
+    { name: 'Slaking', types: ['Normal'], tier: 'common' },
+    { name: 'Ursaring', types: ['Normal'], tier: 'common' }
+  ],
+  Fire: [
+    { name: 'Charizard', types: ['Fire', 'Flying'], tier: 'common' },
+    { name: 'Flareon', types: ['Fire'], tier: 'common' },
+    { name: 'Arcanine', types: ['Fire'], tier: 'common' },
+    { name: 'Blaziken', types: ['Fire', 'Fighting'], tier: 'common' }
+  ],
+  Water: [
+    { name: 'Gyarados', types: ['Water', 'Flying'], tier: 'common' },
+    { name: 'Vaporeon', types: ['Water'], tier: 'common' },
+    { name: 'Swampert', types: ['Water', 'Ground'], tier: 'common' },
+    { name: 'Kyogre', types: ['Water'], tier: 'legendary' }
+  ],
+  Electric: [
+    { name: 'Jolteon', types: ['Electric'], tier: 'common' },
+    { name: 'Electivire', types: ['Electric'], tier: 'uncommon' },
+    { name: 'Luxray', types: ['Electric'], tier: 'common' },
+    { name: 'Magnezone', types: ['Electric', 'Steel'], tier: 'common' }
+  ],
+  Grass: [
+    { name: 'Venusaur', types: ['Grass', 'Poison'], tier: 'common' },
+    { name: 'Roserade', types: ['Grass', 'Poison'], tier: 'common' },
+    { name: 'Sceptile', types: ['Grass'], tier: 'common' },
+    { name: 'Torterra', types: ['Grass', 'Ground'], tier: 'common' }
+  ],
+  Ice: [
+    { name: 'Mamoswine', types: ['Ice', 'Ground'], tier: 'common' },
+    { name: 'Glaceon', types: ['Ice'], tier: 'common' },
+    { name: 'Weavile', types: ['Dark', 'Ice'], tier: 'uncommon' },
+    { name: 'Lapras', types: ['Water', 'Ice'], tier: 'uncommon' }
+  ],
+  Fighting: [
+    { name: 'Machamp', types: ['Fighting'], tier: 'common' },
+    { name: 'Hariyama', types: ['Fighting'], tier: 'common' },
+    { name: 'Lucario', types: ['Fighting', 'Steel'], tier: 'rare' },
+    { name: 'Conkeldurr', types: ['Fighting'], tier: 'uncommon' }
+  ],
+  Poison: [
+    { name: 'Gengar', types: ['Ghost', 'Poison'], tier: 'common' },
+    { name: 'Roserade', types: ['Grass', 'Poison'], tier: 'common' },
+    { name: 'Toxicroak', types: ['Poison', 'Fighting'], tier: 'common' },
+    { name: 'Nidoking', types: ['Poison', 'Ground'], tier: 'common' }
+  ],
+  Ground: [
+    { name: 'Garchomp', types: ['Dragon', 'Ground'], tier: 'rare' },
+    { name: 'Rhyperior', types: ['Ground', 'Rock'], tier: 'uncommon' },
+    { name: 'Excadrill', types: ['Ground', 'Steel'], tier: 'uncommon' },
+    { name: 'Golem', types: ['Rock', 'Ground'], tier: 'common' }
+  ],
+  Flying: [
+    { name: 'Honchkrow', types: ['Dark', 'Flying'], tier: 'common' },
+    { name: 'Staraptor', types: ['Normal', 'Flying'], tier: 'common' },
+    { name: 'Togekiss', types: ['Fairy', 'Flying'], tier: 'rare' },
+    { name: 'Dragonite', types: ['Dragon', 'Flying'], tier: 'uncommon' }
+  ],
+  Psychic: [
+    { name: 'Alakazam', types: ['Psychic'], tier: 'common' },
+    { name: 'Espeon', types: ['Psychic'], tier: 'common' },
+    { name: 'Gardevoir', types: ['Psychic', 'Fairy'], tier: 'uncommon' },
+    { name: 'Metagross', types: ['Steel', 'Psychic'], tier: 'rare' }
+  ],
+  Bug: [
+    { name: 'Pinsir', types: ['Bug'], tier: 'common' },
+    { name: 'Scizor', types: ['Bug', 'Steel'], tier: 'uncommon' },
+    { name: 'Heracross', types: ['Bug', 'Fighting'], tier: 'rare' },
+    { name: 'Yanmega', types: ['Bug', 'Flying'], tier: 'common' }
+  ],
+  Rock: [
+    { name: 'Tyranitar', types: ['Rock', 'Dark'], tier: 'uncommon' },
+    { name: 'Rhyperior', types: ['Ground', 'Rock'], tier: 'uncommon' },
+    { name: 'Golem', types: ['Rock', 'Ground'], tier: 'common' },
+    { name: 'Rampardos', types: ['Rock'], tier: 'rare' }
+  ],
+  Ghost: [
+    { name: 'Gengar', types: ['Ghost', 'Poison'], tier: 'common' },
+    { name: 'Chandelure', types: ['Ghost', 'Fire'], tier: 'uncommon' },
+    { name: 'Giratina', types: ['Ghost', 'Dragon'], tier: 'legendary' },
+    { name: 'Dusknoir', types: ['Ghost'], tier: 'uncommon' }
+  ],
+  Dragon: [
+    { name: 'Dragonite', types: ['Dragon', 'Flying'], tier: 'uncommon' },
+    { name: 'Garchomp', types: ['Dragon', 'Ground'], tier: 'rare' },
+    { name: 'Salamence', types: ['Dragon', 'Flying'], tier: 'uncommon' },
+    { name: 'Haxorus', types: ['Dragon'], tier: 'rare' }
+  ],
+  Dark: [
+    { name: 'Tyranitar', types: ['Rock', 'Dark'], tier: 'uncommon' },
+    { name: 'Honchkrow', types: ['Dark', 'Flying'], tier: 'common' },
+    { name: 'Weavile', types: ['Dark', 'Ice'], tier: 'uncommon' },
+    { name: 'Absol', types: ['Dark'], tier: 'rare' }
+  ],
+  Steel: [
+    { name: 'Metagross', types: ['Steel', 'Psychic'], tier: 'rare' },
+    { name: 'Magnezone', types: ['Electric', 'Steel'], tier: 'common' },
+    { name: 'Excadrill', types: ['Ground', 'Steel'], tier: 'uncommon' },
+    { name: 'Scizor', types: ['Bug', 'Steel'], tier: 'uncommon' }
+  ],
+  Fairy: [
+    { name: 'Gardevoir', types: ['Psychic', 'Fairy'], tier: 'uncommon' },
+    { name: 'Togekiss', types: ['Fairy', 'Flying'], tier: 'rare' },
+    { name: 'Granbull', types: ['Fairy'], tier: 'common' },
+    { name: 'Clefable', types: ['Fairy'], tier: 'common' }
+  ]
+};
+
 /**
  * Budget counter entry structure:
  * {
@@ -216,6 +333,49 @@ export function getBudgetCounters(oppTypes, limit = 5) {
     if (tierDiff !== 0) return tierDiff;
     return costOrder[a.cost] - costOrder[b.cost];
   });
+
+  return unique.slice(0, limit);
+}
+
+/**
+ * Get common Pokemon that are WEAK against selected opponent types.
+ * These are Pokemon to avoid bringing to battle.
+ * @param {string[]} oppTypes - Array of opponent types
+ * @param {number} limit - Max Pokemon to return
+ * @returns {Array} Common Pokemon that fare poorly against opponent
+ */
+export function getWeakCounters(oppTypes, limit = 6) {
+  if (!oppTypes || oppTypes.length === 0) return [];
+
+  // Find all types that opponent deals super effective damage to
+  const weakTypes = new Set();
+  for (const oppType of oppTypes) {
+    const chart = TYPE_CHART[oppType];
+    if (chart && chart.super) {
+      chart.super.forEach(t => weakTypes.add(t));
+    }
+  }
+
+  // Collect common Pokemon of those weak types
+  const allWeak = [];
+  for (const weakType of weakTypes) {
+    const pokemon = COMMON_POKEMON_BY_TYPE[weakType];
+    if (pokemon) {
+      pokemon.forEach(p => allWeak.push({ ...p, weakType }));
+    }
+  }
+
+  // Deduplicate by name
+  const seen = new Set();
+  const unique = allWeak.filter(p => {
+    if (seen.has(p.name)) return false;
+    seen.add(p.name);
+    return true;
+  });
+
+  // Sort by tier (common first) so most recognizable Pokemon show up
+  const tierOrder = { common: 0, uncommon: 1, rare: 2, legendary: 3 };
+  unique.sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
 
   return unique.slice(0, limit);
 }
