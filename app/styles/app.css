@@ -1698,6 +1698,32 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ============================================
+   BUDGET COUNTER CARDS
+   ============================================ */
+.poke-moveset {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.poke-badges {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+/* Badge color variants (extends .grade-pill) */
+.badge-common { background: #4a7; color: white; }
+.badge-uncommon { background: #58c; color: white; }
+.badge-rare { background: #c84; color: white; }
+.badge-legendary { background: #a5c; color: white; }
+.badge-low { background: #6a6; color: white; }
+.badge-medium { background: #ca6; color: #333; }
+.badge-high { background: #c66; color: white; }
+
+/* ============================================
    UTILITIES
    ============================================ */
 #viewVersus,

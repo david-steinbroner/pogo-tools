@@ -63,6 +63,10 @@ export const vsRiskyPicksEl = document.getElementById('vsRiskyPicks');
 export const vsRosterNoteEl = document.getElementById('vsRosterNote');
 export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
 
+// Budget Counters
+export const vsBudgetSectionEl = document.getElementById('vsBudgetSection');
+export const vsBudgetPicksEl = document.getElementById('vsBudgetPicks');
+
 export const vsRecoHeaderEl = document.getElementById('vsRecoHeader');
 export const vsInfoBtn = document.getElementById('vsInfoBtn');
 export const vsModal = document.getElementById('vsModal');

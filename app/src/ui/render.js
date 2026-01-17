@@ -5,6 +5,7 @@
 
 import { state, TYPES, TOTAL_TYPES, TYPE_CHART, typeMeta } from '../state.js';
 import { detectCSVMapping } from '../csv/mapping.js';
+import { getBudgetCounters } from '../data/budgetCounters.js';
 import * as dom from './dom.js';
 
 // SVG icons for types
@@ -546,7 +547,7 @@ export function scoreRosterAgainst(oppTypes) {
   return scored;
 }
 
-export function makePokePickCard(row, typesArr, cp) {
+export function makePokePickCard(row, typesArr, cpOrMeta, extras = null) {
   const card = document.createElement('div');
   card.className = 'poke-card';
 
@@ -563,7 +564,8 @@ export function makePokePickCard(row, typesArr, cp) {
 
   const meta = document.createElement('div');
   meta.className = 'poke-meta mono';
-  meta.textContent = `CP ${cp || 0}`;
+  // Support both CP number and string meta text
+  meta.textContent = typeof cpOrMeta === 'number' ? `CP ${cpOrMeta || 0}` : (cpOrMeta || '');
 
   const types = document.createElement('div');
   types.className = 'poke-types';
@@ -590,6 +592,27 @@ export function makePokePickCard(row, typesArr, cp) {
   card.appendChild(name);
   card.appendChild(meta);
   card.appendChild(types);
+
+  // Budget counter extras: moveset and badges
+  if (extras) {
+    if (extras.moveset) {
+      const moves = document.createElement('div');
+      moves.className = 'poke-moveset mono';
+      moves.textContent = extras.moveset;
+      card.appendChild(moves);
+    }
+    if (extras.badges && extras.badges.length) {
+      const badgeRow = document.createElement('div');
+      badgeRow.className = 'poke-badges';
+      extras.badges.forEach(b => {
+        const badge = document.createElement('span');
+        badge.className = `grade-pill badge-${b.type}`;
+        badge.textContent = b.label;
+        badgeRow.appendChild(badge);
+      });
+      card.appendChild(badgeRow);
+    }
+  }
 
   return card;
 }
@@ -630,6 +653,28 @@ export function renderRosterPicks(oppTypes) {
   risky.forEach(s => dom.vsRiskyPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp)));
 }
 
+export function renderBudgetCounters(oppTypes) {
+  if (!dom.vsBudgetPicksEl) return;
+  dom.vsBudgetPicksEl.innerHTML = '';
+
+  const counters = getBudgetCounters(oppTypes, 5);
+  counters.forEach(c => {
+    const card = makePokePickCard(
+      { name: c.name },
+      c.types,
+      c.note,
+      {
+        moveset: `${c.fast} / ${c.charged}`,
+        badges: [
+          { type: c.tier, label: c.tier.charAt(0).toUpperCase() + c.tier.slice(1) },
+          { type: c.cost, label: c.cost.charAt(0).toUpperCase() + c.cost.slice(1) }
+        ]
+      }
+    );
+    dom.vsBudgetPicksEl.appendChild(card);
+  });
+}
+
 export function renderVsBrief(oppTypes) {
   const guidance = computeMoveGuidance(oppTypes);
   const avoidBodies = computeAvoidBodies(oppTypes);
@@ -655,6 +700,7 @@ export function syncVsUI() {
 
   // Hide everything below CLEAR/DONE when no types selected
   if (dom.vsRecommendationsEl) dom.vsRecommendationsEl.hidden = !hasTypes;
+  if (dom.vsBudgetSectionEl) dom.vsBudgetSectionEl.hidden = !hasTypes;
 
   if (!hasTypes) {
     updateScrollState();
@@ -663,6 +709,10 @@ export function syncVsUI() {
 
   // Types selected - render Section 1
   renderVsBrief(oppTypes);
+
+  // Budget counters - always show when types selected
+  renderBudgetCounters(oppTypes);
+  if (dom.vsBudgetSectionEl) dom.vsBudgetSectionEl.hidden = false;
 
   // Section 2: show results if CSV, otherwise show upload prompt
   if (dom.vsPokeRecoResultsEl) dom.vsPokeRecoResultsEl.hidden = !hasRoster;
