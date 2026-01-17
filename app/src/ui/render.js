@@ -662,7 +662,7 @@ export function renderBudgetCounters(oppTypes) {
     const card = makePokePickCard(
       { name: c.name },
       c.types,
-      c.note,
+      null,  // Don't show note in meta slot - card has limited space
       {
         moveset: `${c.fast} / ${c.charged}`,
         badges: [
