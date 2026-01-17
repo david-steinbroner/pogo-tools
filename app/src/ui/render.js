@@ -845,10 +845,7 @@ export function makeSimpleCard(row, typesArr, cp) {
  */
 export function renderColumnLayout(container, oppTypes, counters) {
   container.innerHTML = '';
-
-  // Create column container
-  const columnsWrapper = document.createElement('div');
-  columnsWrapper.className = 'type-columns';
+  container.classList.add('type-columns');
 
   // Group counters by targetType
   const byType = {};
@@ -859,7 +856,7 @@ export function renderColumnLayout(container, oppTypes, counters) {
     }
   });
 
-  // Create a column for each opponent type
+  // Create a column for each opponent type (directly in container)
   oppTypes.forEach(oppType => {
     const column = document.createElement('div');
     column.className = 'type-column';
@@ -891,10 +888,8 @@ export function renderColumnLayout(container, oppTypes, counters) {
     });
     column.appendChild(cardsContainer);
 
-    columnsWrapper.appendChild(column);
+    container.appendChild(column);
   });
-
-  container.appendChild(columnsWrapper);
 }
 
 /**

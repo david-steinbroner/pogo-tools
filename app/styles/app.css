@@ -1452,6 +1452,11 @@ body.no-scroll { overflow: hidden; }
   gap: var(--space-sm);
 }
 
+/* When picks-list uses column layout, type-columns grid takes precedence */
+.picks-list.type-columns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .vs-empty {
   display: flex;
   flex-wrap: wrap;
