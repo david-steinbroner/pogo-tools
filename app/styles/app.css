@@ -1944,6 +1944,75 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ============================================
+   COLUMN LAYOUT - Type-grouped Pokemon cards
+   ============================================ */
+
+.type-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.type-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.type-column-header {
+  margin-bottom: var(--space-xs);
+}
+
+.type-column-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+/* ============================================
+   SIMPLE CARD - Accessible Pokemon card
+   ============================================ */
+
+.simple-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  text-align: center;
+}
+
+.simple-card-name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.simple-card-name.long-name {
+  font-size: 12px;
+}
+
+.simple-card-types {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.simple-card-cp {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
    LEGACY STYLES (for backwards compatibility)
    ============================================ */
 

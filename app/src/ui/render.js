@@ -793,54 +793,120 @@ function createBackFace(row, typesArr, oppTypes) {
 }
 
 /**
- * Create a flip card for Pokemon picks
- * Multiple cards can be pressed simultaneously - no global state tracking
+ * Create a simple Pokemon card (no flip interaction)
+ * Shows: Name + Type pills + CP
+ * @param {Object} row - Pokemon data (must have .name)
+ * @param {string[]} typesArr - Pokemon's types
+ * @param {number|null} cp - Combat Power (null for general counters)
+ */
+export function makeSimpleCard(row, typesArr, cp) {
+  const card = document.createElement('div');
+  card.className = 'simple-card';
+
+  // Pokemon name
+  const nameEl = document.createElement('div');
+  nameEl.className = 'simple-card-name';
+  const nameText = row.name || '-';
+  if (nameText.length > 12) nameEl.classList.add('long-name');
+  nameEl.textContent = nameText;
+  card.appendChild(nameEl);
+
+  // Type pills
+  if (typesArr && typesArr.length > 0) {
+    const typeRow = document.createElement('div');
+    typeRow.className = 'simple-card-types';
+    typesArr.forEach(t => {
+      const pill = document.createElement('span');
+      pill.className = 'type-pill-mini';
+      pill.appendChild(createTypeIcon(t, 'mini'));
+      const label = document.createElement('span');
+      label.className = 'type-pill-mini-label';
+      label.textContent = t;
+      pill.appendChild(label);
+      typeRow.appendChild(pill);
+    });
+    card.appendChild(typeRow);
+  }
+
+  // CP
+  const cpEl = document.createElement('div');
+  cpEl.className = 'simple-card-cp mono';
+  cpEl.textContent = (typeof cp === 'number' && cp > 0) ? `CP ${cp}` : '–';
+  card.appendChild(cpEl);
+
+  return card;
+}
+
+/**
+ * Render counters in a column layout grouped by opponent type
+ * @param {HTMLElement} container - Container element
+ * @param {string[]} oppTypes - Selected opponent types (column headers)
+ * @param {Array} counters - Counter Pokemon with targetType property
+ */
+export function renderColumnLayout(container, oppTypes, counters) {
+  container.innerHTML = '';
+
+  // Create column container
+  const columnsWrapper = document.createElement('div');
+  columnsWrapper.className = 'type-columns';
+
+  // Group counters by targetType
+  const byType = {};
+  oppTypes.forEach(t => byType[t] = []);
+  counters.forEach(c => {
+    if (c.targetType && byType[c.targetType]) {
+      byType[c.targetType].push(c);
+    }
+  });
+
+  // Create a column for each opponent type
+  oppTypes.forEach(oppType => {
+    const column = document.createElement('div');
+    column.className = 'type-column';
+
+    // Column header - opponent type pill
+    const header = document.createElement('div');
+    header.className = 'type-column-header';
+    const headerPill = document.createElement('span');
+    headerPill.className = 'type-pill';
+    const meta = typeMeta(oppType);
+    const icon = document.createElement('span');
+    icon.className = 'icon-chip';
+    if (meta) icon.style.background = `var(${meta.colorVar})`;
+    icon.innerHTML = svgForType(oppType);
+    headerPill.appendChild(icon);
+    const label = document.createElement('span');
+    label.textContent = oppType;
+    headerPill.appendChild(label);
+    header.appendChild(headerPill);
+    column.appendChild(header);
+
+    // Cards for this column
+    const cardsContainer = document.createElement('div');
+    cardsContainer.className = 'type-column-cards';
+    const typeCounters = byType[oppType] || [];
+    typeCounters.forEach(c => {
+      const card = makeSimpleCard({ name: c.name }, c.types, null);
+      cardsContainer.appendChild(card);
+    });
+    column.appendChild(cardsContainer);
+
+    columnsWrapper.appendChild(column);
+  });
+
+  container.appendChild(columnsWrapper);
+}
+
+/**
+ * Create a flip card for Pokemon picks (LEGACY - keeping for roster picks)
  * @param {Object} row - Pokemon data (must have .name)
  * @param {string[]} typesArr - Pokemon's types
  * @param {number|null} cp - Combat Power (null for general counters)
  * @param {string[]} oppTypes - Selected opponent types for matchup calc
  */
 export function makePokePickCard(row, typesArr, cp, oppTypes = []) {
-  const cardId = `card-${++cardIdCounter}`;
-
-  // Wrapper for flip card
-  const wrapper = document.createElement('div');
-  wrapper.className = 'flip-card';
-  wrapper.dataset.cardId = cardId;
-  wrapper.setAttribute('tabindex', '0');
-  wrapper.setAttribute('role', 'button');
-  wrapper.setAttribute('aria-label', `${row.name || 'Pokemon'} card, tap to see details`);
-  wrapper.setAttribute('aria-expanded', 'false');
-
-  // Inner container
-  const inner = document.createElement('div');
-  inner.className = 'flip-card-inner';
-
-  // Create front and back faces
-  const front = createFrontFace(row, typesArr, cp, oppTypes);
-  const back = createBackFace(row, typesArr, oppTypes);
-
-  inner.appendChild(front);
-  inner.appendChild(back);
-  wrapper.appendChild(inner);
-
-  // Simple toggle - multiple cards can be pressed at once
-  wrapper.addEventListener('click', (e) => {
-    e.preventDefault();
-    wrapper.classList.toggle('is-pressed');
-    wrapper.setAttribute('aria-expanded', wrapper.classList.contains('is-pressed'));
-  });
-
-  // Keyboard handler (Enter/Space)
-  wrapper.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      wrapper.classList.toggle('is-pressed');
-      wrapper.setAttribute('aria-expanded', wrapper.classList.contains('is-pressed'));
-    }
-  });
-
-  return wrapper;
+  // Use simple card now
+  return makeSimpleCard(row, typesArr, cp);
 }
 
 export function renderRosterPicks(oppTypes) {
@@ -880,19 +946,11 @@ export function renderRosterPicks(oppTypes) {
 }
 
 export function renderBudgetCounters(oppTypes) {
-  // Render BRING counters
+  // Render BRING counters in column layout
   if (dom.vsBudgetPicksEl) {
-    dom.vsBudgetPicksEl.innerHTML = '';
-    const counters = getBudgetCounters(oppTypes, 6);
-    counters.forEach(c => {
-      const card = makePokePickCard(
-        { name: c.name },
-        c.types,
-        null,      // No CP for general counters
-        oppTypes   // Pass opponent types for matchup display
-      );
-      dom.vsBudgetPicksEl.appendChild(card);
-    });
+    // Get more counters since we're grouping by type (3 per type)
+    const counters = getBudgetCounters(oppTypes, oppTypes.length * 3);
+    renderColumnLayout(dom.vsBudgetPicksEl, oppTypes, counters);
   }
 
   // Render AVOID counters
