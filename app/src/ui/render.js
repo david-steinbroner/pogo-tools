@@ -560,29 +560,64 @@ export function scoreRosterAgainst(oppTypes) {
   return scored;
 }
 
-export function makePokePickCard(row, typesArr, cpOrMeta, extras = null) {
+/**
+ * Compute contextual matchups for a Pokemon against selected opponent types.
+ * @param {string[]} pokeTypes - The Pokemon's own types
+ * @param {string[]} oppTypes - Selected opponent types
+ * @returns {{ strong: string[], weak: string[] }} Opponent types this Pokemon is strong/weak against
+ */
+function computeMatchups(pokeTypes, oppTypes) {
+  if (!oppTypes || !oppTypes.length) return { strong: [], weak: [] };
+
+  const strong = [];
+  const weak = [];
+
+  for (const opp of oppTypes) {
+    let dominated = false;  // We dominate this opponent type
+    let vulnerable = false; // We're vulnerable to this opponent type
+
+    for (const poke of pokeTypes) {
+      // Check if we deal super effective damage to opponent
+      if (eff(poke, opp) >= 1.6) dominated = true;
+      // Check if we resist opponent's attacks
+      if (eff(opp, poke) < 1.0) dominated = true;
+      // Check if opponent deals super effective damage to us
+      if (eff(opp, poke) >= 1.6) vulnerable = true;
+    }
+
+    if (dominated && !vulnerable) strong.push(opp);
+    else if (vulnerable && !dominated) weak.push(opp);
+    // If both or neither, skip (neutral matchup)
+  }
+
+  return { strong, weak };
+}
+
+export function makePokePickCard(row, typesArr, cp, oppTypes = []) {
   const card = document.createElement('div');
   card.className = 'poke-card';
 
-  const name = document.createElement('div');
+  // Line 1: CP (top-right)
+  const cpRow = document.createElement('div');
+  cpRow.className = 'poke-cp mono';
+  cpRow.textContent = (typeof cp === 'number' && cp > 0) ? `CP ${cp}` : '–';
+  card.appendChild(cpRow);
+
+  // Line 2: Name (centered)
+  const nameEl = document.createElement('div');
   const nameText = row.name || '-';
-  name.className = 'poke-name';
-  // Dynamic font scaling for long names
+  nameEl.className = 'poke-name';
   if (nameText.length > 14) {
-    name.classList.add('very-long-name');
+    nameEl.classList.add('very-long-name');
   } else if (nameText.length > 10) {
-    name.classList.add('long-name');
+    nameEl.classList.add('long-name');
   }
-  name.textContent = nameText;
+  nameEl.textContent = nameText;
+  card.appendChild(nameEl);
 
-  const meta = document.createElement('div');
-  meta.className = 'poke-meta mono';
-  // Support both CP number and string meta text
-  meta.textContent = typeof cpOrMeta === 'number' ? `CP ${cpOrMeta || 0}` : (cpOrMeta || '');
-
-  const types = document.createElement('div');
-  types.className = 'poke-types';
-
+  // Line 3: Pokemon types (centered)
+  const typesEl = document.createElement('div');
+  typesEl.className = 'poke-types';
   (typesArr || []).forEach(t => {
     const chip = document.createElement('span');
     chip.className = 'type-pill';
@@ -599,32 +634,31 @@ export function makePokePickCard(row, typesArr, cpOrMeta, extras = null) {
 
     chip.appendChild(icon);
     chip.appendChild(label);
-    types.appendChild(chip);
+    typesEl.appendChild(chip);
   });
+  card.appendChild(typesEl);
 
-  card.appendChild(name);
-  card.appendChild(meta);
-  card.appendChild(types);
+  // Line 4: Matchup row (strong left, weak right)
+  if (oppTypes && oppTypes.length > 0) {
+    const matchups = computeMatchups(typesArr || [], oppTypes);
+    const matchupRow = document.createElement('div');
+    matchupRow.className = 'poke-matchups mono';
 
-  // Budget counter extras: moveset and badges
-  if (extras) {
-    if (extras.moveset) {
-      const moves = document.createElement('div');
-      moves.className = 'poke-moveset mono';
-      moves.textContent = extras.moveset;
-      card.appendChild(moves);
-    }
-    if (extras.badges && extras.badges.length) {
-      const badgeRow = document.createElement('div');
-      badgeRow.className = 'poke-badges';
-      extras.badges.forEach(b => {
-        const badge = document.createElement('span');
-        badge.className = `grade-pill badge-${b.type}`;
-        badge.textContent = b.label;
-        badgeRow.appendChild(badge);
-      });
-      card.appendChild(badgeRow);
-    }
+    const strongEl = document.createElement('span');
+    strongEl.className = 'matchup-strong';
+    strongEl.textContent = matchups.strong.length > 0
+      ? `▲ ${matchups.strong.join(', ')}`
+      : '▲ –';
+
+    const weakEl = document.createElement('span');
+    weakEl.className = 'matchup-weak';
+    weakEl.textContent = matchups.weak.length > 0
+      ? `▼ ${matchups.weak.join(', ')}`
+      : '▼ –';
+
+    matchupRow.appendChild(strongEl);
+    matchupRow.appendChild(weakEl);
+    card.appendChild(matchupRow);
   }
 
   return card;
@@ -662,8 +696,8 @@ export function renderRosterPicks(oppTypes) {
     }
   }
 
-  top.forEach(s => dom.vsTopPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp)));
-  risky.forEach(s => dom.vsRiskyPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp)));
+  top.forEach(s => dom.vsTopPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp, oppTypes)));
+  risky.forEach(s => dom.vsRiskyPicksEl.appendChild(makePokePickCard(s.row, s.defTypes, s.cp, oppTypes)));
 }
 
 export function renderBudgetCounters(oppTypes) {
@@ -675,7 +709,8 @@ export function renderBudgetCounters(oppTypes) {
       const card = makePokePickCard(
         { name: c.name },
         c.types,
-        'CP –'  // Placeholder CP for unified card height
+        null,      // No CP for general counters
+        oppTypes   // Pass opponent types for matchup display
       );
       dom.vsBudgetPicksEl.appendChild(card);
     });
@@ -689,7 +724,8 @@ export function renderBudgetCounters(oppTypes) {
       const card = makePokePickCard(
         { name: c.name },
         c.types,
-        'CP –'
+        null,
+        oppTypes
       );
       dom.vsBudgetAvoidPicksEl.appendChild(card);
     });
