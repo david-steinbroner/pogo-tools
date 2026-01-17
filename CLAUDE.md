@@ -1,9 +1,15 @@
 # PoGO Pal - Project Manifest
 
 ## Current Focus
-Polish and bug fixes
+Combat Intelligence Suite
 
 ## Next Up
+### Combat Intelligence Suite
+- [ ] Current Raid Bosses: quick-select UI for active raids, pre-populates VS opponent selector
+- [ ] Regional filter for budget counters: optional dropdown, localStorage persistence
+- [ ] Individual Pokémon Analysis: search/browse any Pokémon, show offensive/defensive profile
+
+### Core Tabs
 - [ ] Trade tab: full implementation (currently placeholder)
 - [ ] Collection tab: full implementation (currently placeholder)
 
