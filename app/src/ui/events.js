@@ -3,9 +3,21 @@
  * User interaction handlers and event wiring
  */
 
-import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState } from '../state.js?v=35';
-import * as dom from './dom.js?v=35';
-import * as render from './render.js?v=35';
+import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState } from '../state.js?v=36';
+import * as dom from './dom.js?v=36';
+import * as render from './render.js?v=36';
+
+// Sentry breadcrumb helper (no-op if Sentry unavailable)
+function addBreadcrumb(message, data = {}) {
+  if (window.Sentry) {
+    Sentry.addBreadcrumb({
+      category: 'user-action',
+      message,
+      data,
+      level: 'info',
+    });
+  }
+}
 
 // Sheet management
 let activeSheet = null;
@@ -35,6 +47,7 @@ export function closeActiveSheet() {
 }
 
 export function openSheet() {
+  addBreadcrumb('open_type_picker');
   openSheetFor(dom.sheet, dom.typesOpenBtn);
 }
 
@@ -43,11 +56,21 @@ export function closeSheet() {
 }
 
 // Mode switching
-export function setModeUI(mode) {
+export function setModeUI(mode, isInitial = false) {
   const m = (mode === 'vs' || mode === 'collection' || mode === 'trade') ? mode : 'collection';
   const isVS = m === 'vs';
   const isCollection = m === 'collection';
   const isTrade = m === 'trade';
+
+  // Update Sentry view tag
+  if (window.Sentry) {
+    Sentry.setTag('view', m);
+  }
+
+  // Add breadcrumb for view switch (skip initial load)
+  if (!isInitial) {
+    addBreadcrumb('switch_view', { view: m });
+  }
 
   const setTab = (btn, on) => {
     if (!btn) return;
@@ -79,6 +102,7 @@ export function handleTypeToggle(typeName) {
 
 // VS type toggle handler
 export function handleVsTypeToggle(typeName) {
+  addBreadcrumb('select_type', { type: typeName });
   const success = toggleVsType(typeName);
   if (!success) {
     // Max 3 types reached - flash the selected pills to indicate limit
@@ -286,6 +310,7 @@ export function wireEvents() {
   }
   if (dom.vsClearBtn) {
     dom.vsClearBtn.addEventListener('click', () => {
+      addBreadcrumb('clear_types');
       clearVsTypes();
       // Ensure type grid stays visible when clearing
       const typeGridSection = document.getElementById('vsTypeGridSection');

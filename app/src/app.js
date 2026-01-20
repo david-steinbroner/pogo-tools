@@ -147,8 +147,17 @@ function wireFileInput() {
       return;
     }
 
-    console.log('[PoGO] CSV selected:', file.name, file.size, 'bytes');
-    window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, { fileName: file.name, fileSize: file.size });
+    console.log('[PoGO] CSV selected, size:', file.size, 'bytes');
+    window.__pogoCSVMeta = Object.assign({}, window.__pogoCSVMeta || {}, { fileSize: file.size });
+
+    // Breadcrumb: CSV upload started (no filename for privacy)
+    if (window.Sentry) {
+      Sentry.addBreadcrumb({
+        category: 'user-action',
+        message: 'csv_upload_started',
+        level: 'info',
+      });
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -156,10 +165,32 @@ function wireFileInput() {
         console.log('[PoGO] CSV loaded, parsing...');
         buildFromCSV(String(reader.result || ''));
         console.log('[PoGO] Parse complete. Rows:', state.allResults.length);
+
+        // Breadcrumb: CSV parse success (row count only, no contents)
+        if (window.Sentry) {
+          Sentry.addBreadcrumb({
+            category: 'user-action',
+            message: 'csv_parse_ok',
+            data: { rowCount: state.allResults.length },
+            level: 'info',
+          });
+        }
+
         // Close upload drawer after successful load
         events.closeUploadDrawer();
       } catch (err) {
         console.error('[PoGO] Parse failed:', err);
+
+        // Breadcrumb: CSV parse failed (error type only, no contents)
+        if (window.Sentry) {
+          Sentry.addBreadcrumb({
+            category: 'user-action',
+            message: 'csv_parse_failed',
+            data: { errorType: err.name || 'Unknown' },
+            level: 'warning',
+          });
+        }
+
         render.showError('Invalid CSV Format', 'This doesn\'t look like a Poke Genie export. Please export your Pokémon list from Poke Genie and try again.');
         try {
           const meta = window.__pogoCSVMeta || null;
@@ -200,7 +231,15 @@ function init() {
       release: 'pogo-pal@2.0.72',
 
       integrations: [
-        Sentry.browserTracingIntegration(),
+        Sentry.browserTracingIntegration({
+          // Set readable transaction name for page loads only
+          beforeStartSpan: (context) => {
+            if (context.op === 'pageload') {
+              return { ...context, name: 'Page Load: PoGO Pal' };
+            }
+            return context;
+          },
+        }),
         Sentry.replayIntegration({
           maskAllText: true,
           blockAllMedia: true,
@@ -260,6 +299,9 @@ function init() {
         return event;
       },
     });
+
+    // Set app version tag for filtering
+    Sentry.setTag('app_version', 'pogo-pal@2.0.72');
   }
 
   try {
@@ -277,8 +319,8 @@ function init() {
     render.renderVsGrid();
     render.syncVsUI();
 
-    // Set initial mode
-    events.setModeUI('vs');
+    // Set initial mode (isInitial=true to skip breadcrumb on first load)
+    events.setModeUI('vs', true);
 
     // Update sticky metrics and view
     render.updateStickyMetrics();
