@@ -3,9 +3,9 @@
  * User interaction handlers and event wiring
  */
 
-import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState } from '../state.js?v=36';
-import * as dom from './dom.js?v=36';
-import * as render from './render.js?v=36';
+import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState } from '../state.js';
+import * as dom from './dom.js';
+import * as render from './render.js';
 
 // Sentry breadcrumb helper (no-op if Sentry unavailable)
 function addBreadcrumb(message, data = {}) {
@@ -299,9 +299,21 @@ export function wireEvents() {
     });
   }
 
-  // VS mode events
+  // VS mode events - use pointerup for iOS Safari reliability with click fallback
   if (dom.vsGridEl) {
+    let vsGridHandled = false;
+
+    dom.vsGridEl.addEventListener('pointerup', (e) => {
+      const btn = e.target.closest('button.type-pill');
+      if (btn && btn.dataset.type) {
+        vsGridHandled = true;
+        handleVsTypeToggle(btn.dataset.type);
+      }
+    });
+
     dom.vsGridEl.addEventListener('click', (e) => {
+      // Skip if already handled by pointerup (avoid double-trigger)
+      if (vsGridHandled) { vsGridHandled = false; return; }
       const btn = e.target.closest('button.type-pill');
       if (btn && btn.dataset.type) {
         handleVsTypeToggle(btn.dataset.type);

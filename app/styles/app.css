@@ -825,6 +825,7 @@ button.type-pill {
   text-align: left;
   min-width: 0;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* iOS Safari: prevent double-tap zoom, ensure taps fire */
 }
 
 @media (hover: hover) {

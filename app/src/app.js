@@ -3,14 +3,14 @@
  * Orchestrates initialization and CSV processing
  */
 
-// Cache-bust: v36
-import { state, setResults } from './state.js?v=36';
-import { parseCSV, normalizeSpeciesName } from './csv/parseCsv.js?v=36';
-import { detectCSVMapping, extractSpeciesName, extractTypesFromRow, computeIVPct, gradeForScore } from './csv/mapping.js?v=36';
-import { parseNumber } from './csv/parseCsv.js?v=36';
-import * as dom from './ui/dom.js?v=36';
-import * as render from './ui/render.js?v=36';
-import * as events from './ui/events.js?v=36';
+// Internal imports: NO query params (cache-busting only in index.html entry point)
+import { state, setResults } from './state.js';
+import { parseCSV, normalizeSpeciesName } from './csv/parseCsv.js';
+import { detectCSVMapping, extractSpeciesName, extractTypesFromRow, computeIVPct, gradeForScore } from './csv/mapping.js';
+import { parseNumber } from './csv/parseCsv.js';
+import * as dom from './ui/dom.js';
+import * as render from './ui/render.js';
+import * as events from './ui/events.js';
 
 /**
  * Build Pokemon data from CSV text

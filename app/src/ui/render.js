@@ -3,10 +3,10 @@
  * UI rendering and display updates
  */
 
-import { state, TYPES, TOTAL_TYPES, TYPE_CHART, typeMeta, setCarouselIndex } from '../state.js?v=35';
-import { detectCSVMapping } from '../csv/mapping.js?v=35';
-import { getBudgetCounters, getCountersPerType, getWeakCounters, getWeakCountersPerType } from '../data/budgetCounters.js?v=35';
-import * as dom from './dom.js?v=35';
+import { state, TYPES, TOTAL_TYPES, TYPE_CHART, typeMeta, setCarouselIndex } from '../state.js';
+import { detectCSVMapping } from '../csv/mapping.js';
+import { getBudgetCounters, getCountersPerType, getWeakCounters, getWeakCountersPerType } from '../data/budgetCounters.js';
+import * as dom from './dom.js';
 
 // SVG icons for types
 export function svgForType(type) {
