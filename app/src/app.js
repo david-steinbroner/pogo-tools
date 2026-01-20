@@ -180,6 +180,27 @@ function init() {
       dsn: 'https://d7a20243d8fd94dd9b415a266d1b19c4@o4510342078529536.ingest.us.sentry.io/4510744994643968',
       environment: location.hostname === 'pogo-pal.pages.dev' ? 'production' : 'development',
       release: 'pogo-pal@2.0.72',
+
+      integrations: [
+        Sentry.browserTracingIntegration(),
+        Sentry.replayIntegration({
+          maskAllText: true,
+          blockAllMedia: true,
+        }),
+      ],
+
+      // Performance tracing: sample 10% of transactions
+      tracesSampleRate: 0.1,
+
+      // Session replay: only capture replays when errors occur
+      replaysSessionSampleRate: 0.0,
+      replaysOnErrorSampleRate: 1.0,
+
+      // Ignore noisy browser errors
+      ignoreErrors: [
+        'ResizeObserver loop limit exceeded',
+        'ResizeObserver loop completed with undelivered notifications',
+      ],
     });
   }
 
