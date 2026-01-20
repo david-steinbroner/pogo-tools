@@ -5,12 +5,12 @@
 
 // Cache-bust: v36
 import { state, setResults } from './state.js?v=36';
-import { parseCSV, normalizeSpeciesName } from './csv/parseCsv.js?v=35';
-import { detectCSVMapping, extractSpeciesName, extractTypesFromRow, computeIVPct, gradeForScore } from './csv/mapping.js?v=35';
-import { parseNumber } from './csv/parseCsv.js?v=35';
-import * as dom from './ui/dom.js?v=35';
-import * as render from './ui/render.js?v=35';
-import * as events from './ui/events.js?v=35';
+import { parseCSV, normalizeSpeciesName } from './csv/parseCsv.js?v=36';
+import { detectCSVMapping, extractSpeciesName, extractTypesFromRow, computeIVPct, gradeForScore } from './csv/mapping.js?v=36';
+import { parseNumber } from './csv/parseCsv.js?v=36';
+import * as dom from './ui/dom.js?v=36';
+import * as render from './ui/render.js?v=36';
+import * as events from './ui/events.js?v=36';
 
 /**
  * Build Pokemon data from CSV text
