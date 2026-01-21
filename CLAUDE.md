@@ -17,6 +17,7 @@ Combat Intelligence Suite
 (none)
 
 ## Recent Progress
+- 2026-01-21: Flatten structure - moved /app/ contents to root, single index.html, simpler project layout
 - 2026-01-17: Non-uploader UX - Your Pokémon moved to bottom (collapsed), de-emphasizes paid Poke Genie CSV export
 - 2026-01-17: README rewrite - fresh README with live site, local dev, privacy, roadmap, contributing sections
 - 2026-01-17: Fix recommendations visibility - flex display was overriding hidden attribute
@@ -56,26 +57,24 @@ Combat Intelligence Suite
 Single-page app using ES modules (no build step):
 
 ```
-/app/
-  index.html              # Entry point (loads app.js as module)
-  /src/
-    app.js                # Main orchestrator, CSV processing
-    state.js              # Single source of truth (types, results, sort state)
-    /csv/
-      parseCsv.js         # CSV parsing, locale-tolerant numbers
-      mapping.js          # Header detection, field extraction, IV calc
-      pokedex.js          # Species → type mappings (~600 Pokemon)
-    /ui/
-      dom.js              # DOM element references
-      render.js           # UI rendering (grid, table, VS mode)
-      events.js           # Event handlers, sheet/drawer management
-  /styles/
-    app.css               # All CSS (~1300 lines, GBA/DS theming)
-  /docs/
-    HANDOFF.md            # Legacy continuity doc
-    design-system.md      # Design System v4 spec (single source of truth)
-    design-migration-plan.md  # Migration plan (complete)
-
+index.html              # Entry point (loads app.js as module)
+/src/
+  app.js                # Main orchestrator, CSV processing
+  state.js              # Single source of truth (types, results, sort state)
+  /csv/
+    parseCsv.js         # CSV parsing, locale-tolerant numbers
+    mapping.js          # Header detection, field extraction, IV calc
+    pokedex.js          # Species → type mappings (~600 Pokemon)
+  /data/
+    budgetCounters.js   # Curated budget counter recommendations
+  /ui/
+    dom.js              # DOM element references
+    render.js           # UI rendering (grid, table, VS mode)
+    events.js           # Event handlers, sheet/drawer management
+/styles/
+  app.css               # All CSS (~1300 lines, GBA/DS theming)
+/docs/
+  design-system.md      # Design System v4 spec (single source of truth)
 /legacy/
   pogo-v3-prototype-v3_35-legacy.html   # Original monolith for reference
 ```
@@ -85,7 +84,7 @@ Pokemon handheld UI vibes (Game Boy → GBA → Nintendo DS). Current theme: **D
 
 ## Dev Setup
 ```bash
-cd ~/Projects/Active\ Development/pogo-pal/app
+cd ~/Projects/Active\ Development/pogo-pal
 python -m http.server 8000
 # Open http://localhost:8000
 ```
