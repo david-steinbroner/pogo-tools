@@ -432,8 +432,8 @@ button { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-lg);
-  padding-top: env(safe-area-inset-top, 0);
+  padding: 4px var(--space-lg);
+  padding-top: calc(4px + env(safe-area-inset-top, 0));
   background-color: #EDE8DC;
   border-top: 2px solid #5a544e;
   border-bottom: 2px solid #5a544e;
