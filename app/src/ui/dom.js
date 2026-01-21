@@ -20,9 +20,18 @@ export const modeCollectionBtn = document.getElementById('modeCollectionBtn');
 export const modeVsBtn = document.getElementById('modeVsBtn');
 export const modeTradeBtn = document.getElementById('modeTradeBtn');
 
+// VS sub-tab elements
+export const vsSubTabTypes = document.getElementById('vsSubTabTypes');
+export const vsSubTabPokemon = document.getElementById('vsSubTabPokemon');
+export const vsSubViewTypes = document.getElementById('vsSubViewTypes');
+export const vsSubViewPokemon = document.getElementById('vsSubViewPokemon');
+
 // Upload elements
 export const uploadBtn = document.getElementById('uploadBtn');
 export const fileInput = document.getElementById('fileInput');
+
+// Dark mode toggle
+export const darkModeBtn = document.getElementById('darkModeBtn');
 
 // Collection view elements
 export const collectionBar = document.getElementById('collectionBar');
@@ -52,16 +61,7 @@ export const vsClearBtn = document.getElementById('vsClearBtn');
 // Recommendations container (hidden until types selected)
 export const vsRecommendationsEl = document.getElementById('vsRecommendations');
 
-// Section 1: Your Pokemon (shown first when CSV uploaded)
-export const vsYourPokeSectionEl = document.getElementById('vsYourPokeSection');
-export const vsPokeRecoResultsEl = document.getElementById('vsPokeRecoResults');
-export const vsUploadPromptEl = document.getElementById('vsUploadPrompt');
-export const vsTopPicksEl = document.getElementById('vsTopPicks');
-export const vsRiskyPicksEl = document.getElementById('vsRiskyPicks');
-export const vsRosterNoteEl = document.getElementById('vsRosterNote');
-export const vsUploadPromptBtn = document.getElementById('vsUploadPromptBtn');
-
-// Section 2: General Pokemon - Are Weak Against (always visible when types selected)
+// Section 1: General Pokemon - Best Counters (always visible when types selected)
 export const vsGeneralPokeSectionEl = document.getElementById('vsGeneralPokeSection');
 export const vsBudgetSectionEl = document.getElementById('vsBudgetSection');
 export const vsBudgetPicksEl = document.getElementById('vsBudgetPicks');
@@ -112,3 +112,11 @@ export const csvDebugSummaryEl = document.getElementById('csvDebugSummary');
 export const csvHeadersEl = document.getElementById('csvHeaders');
 export const csvMappingEl = document.getElementById('csvMapping');
 export const csvSampleEl = document.getElementById('csvSample');
+
+// Pokemon info popup
+export const pokePopup = document.getElementById('pokePopup');
+export const pokePopupText = document.getElementById('pokePopupText');
+
+// Mini type label popup (appears on hold)
+export const typeLabelPopup = document.getElementById('typeLabelPopup');
+export const typeLabelPopupText = document.getElementById('typeLabelPopupText');

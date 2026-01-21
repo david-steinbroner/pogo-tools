@@ -95,6 +95,47 @@ function getDebugMode() {
 
 state.debugMode = getDebugMode();
 
+// Theme mode: 'light' | 'dark' | 'system'
+// Cycle order: system → light → dark → system
+const THEME_CYCLE = ['system', 'light', 'dark'];
+const THEME_STORAGE_KEY = 'pogoTheme';
+
+function getStoredTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored && THEME_CYCLE.includes(stored)) return stored;
+  } catch (e) { /* ignore */ }
+  return 'system';
+}
+
+function applyTheme(theme) {
+  const html = document.documentElement;
+  html.setAttribute('data-theme', theme);
+  state.themeMode = theme;
+}
+
+export function initTheme() {
+  const theme = getStoredTheme();
+  applyTheme(theme);
+}
+
+export function cycleTheme() {
+  const current = state.themeMode || 'system';
+  const currentIndex = THEME_CYCLE.indexOf(current);
+  const nextIndex = (currentIndex + 1) % THEME_CYCLE.length;
+  const nextTheme = THEME_CYCLE[nextIndex];
+
+  applyTheme(nextTheme);
+
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  } catch (e) { /* ignore */ }
+
+  return nextTheme;
+}
+
+state.themeMode = 'system';
+
 // State update functions
 export function setMode(mode) {
   const valid = ['collection', 'vs', 'trade'];

@@ -4,7 +4,7 @@
  */
 
 // Internal imports: NO query params (cache-busting only in index.html entry point)
-import { state, setResults } from './state.js';
+import { state, setResults, initTheme } from './state.js';
 import { parseCSV, normalizeSpeciesName } from './csv/parseCsv.js';
 import { detectCSVMapping, extractSpeciesName, extractTypesFromRow, computeIVPct, gradeForScore } from './csv/mapping.js';
 import { parseNumber } from './csv/parseCsv.js';
@@ -118,13 +118,6 @@ function buildFromCSV(csvText) {
   setResults(out);
   render.updateView();
   render.syncVsUI();
-
-  // If opponent types already selected, navigate carousel to Your Pokemon slide
-  if (state.vsSelectedTypes.size > 0) {
-    setTimeout(() => {
-      render.updateCarousel(6); // Slide 6 = Your Pokemon
-    }, 100);
-  }
 }
 
 /**
@@ -307,6 +300,9 @@ function init() {
 
   try {
     console.log('[PoGO] Initializing app...');
+
+    // Initialize theme from localStorage/system preference
+    initTheme();
 
     // Wire all event listeners
     events.wireEvents();

@@ -3,7 +3,7 @@
  * User interaction handlers and event wiring
  */
 
-import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState } from '../state.js';
+import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, setSortState, cycleTheme } from '../state.js';
 import * as dom from './dom.js';
 import * as render from './render.js';
 
@@ -90,6 +90,25 @@ export function setModeUI(mode, isInitial = false) {
 
   render.updateStickyMetrics();
   render.updateScrollState();
+}
+
+// VS sub-tab switcher
+export function setVsSubTab(subTab) {
+  console.log('[setVsSubTab]', subTab);
+  const isTypes = subTab === 'types';
+  const isPokemon = subTab === 'pokemon';
+
+  const setTab = (btn, on) => {
+    if (!btn) return;
+    btn.classList.toggle('is-active', !!on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  };
+
+  setTab(dom.vsSubTabTypes, isTypes);
+  setTab(dom.vsSubTabPokemon, isPokemon);
+
+  if (dom.vsSubViewTypes) dom.vsSubViewTypes.hidden = !isTypes;
+  if (dom.vsSubViewPokemon) dom.vsSubViewPokemon.hidden = !isPokemon;
 }
 
 // Type toggle handler for collection filter
@@ -228,9 +247,29 @@ export function wireEvents() {
     });
   }
 
+  // VS sub-tabs
+  if (dom.vsSubTabTypes) {
+    dom.vsSubTabTypes.addEventListener('click', () => {
+      setVsSubTab('types');
+    });
+  }
+  if (dom.vsSubTabPokemon) {
+    dom.vsSubTabPokemon.addEventListener('click', () => {
+      setVsSubTab('pokemon');
+    });
+  }
+
   // Upload button - opens upload drawer instead of file picker
   if (dom.uploadBtn) {
     dom.uploadBtn.addEventListener('click', openUploadDrawer);
+  }
+
+  // Dark mode toggle - cycles through system → light → dark
+  if (dom.darkModeBtn) {
+    dom.darkModeBtn.addEventListener('click', () => {
+      const newTheme = cycleTheme();
+      addBreadcrumb('toggle_theme', { theme: newTheme });
+    });
   }
 
   // Upload drawer close button

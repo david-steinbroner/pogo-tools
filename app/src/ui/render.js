@@ -8,6 +8,331 @@ import { detectCSVMapping } from '../csv/mapping.js';
 import { getBudgetCounters, getCountersPerType, getWeakCounters, getWeakCountersPerType } from '../data/budgetCounters.js';
 import * as dom from './dom.js';
 
+// Popup state
+let popupTimeout = null;
+let activePopupTrigger = null;
+
+/**
+ * Check if popup is currently visible
+ */
+function isPopupVisible() {
+  return dom.pokePopup && !dom.pokePopup.hidden && dom.pokePopup.classList.contains('is-visible');
+}
+
+/**
+ * Show Pokemon info popup at tap location
+ * @param {string} pokeName - Pokemon name
+ * @param {string[]} pokeTypes - Pokemon's types
+ * @param {string} oppType - Opponent type this counter is effective against
+ * @param {number} x - X position (from tap)
+ * @param {number} y - Y position (from tap)
+ * @param {HTMLElement} triggerEl - Element that triggered the popup (for toggle behavior)
+ * @param {string} popupMode - 'best_counters' or 'worst_counters'
+ */
+export function showPokePopup(pokeName, pokeTypes, oppType, x, y, triggerEl = null, popupMode = 'best_counters') {
+  if (!dom.pokePopup || !dom.pokePopupText) return;
+
+  // Toggle behavior: if tapping same trigger while popup visible, close it
+  if (isPopupVisible() && triggerEl && triggerEl === activePopupTrigger) {
+    hidePokePopup();
+    return;
+  }
+
+  // Clear any existing timeout
+  if (popupTimeout) {
+    clearTimeout(popupTimeout);
+    popupTimeout = null;
+  }
+
+  // Remove active state from previous trigger
+  if (activePopupTrigger) {
+    activePopupTrigger.classList.remove('is-popup-active');
+  }
+
+  // Track which element triggered this popup
+  activePopupTrigger = triggerEl;
+
+  // Add active state to current trigger
+  if (triggerEl) {
+    triggerEl.classList.add('is-popup-active');
+  }
+
+  // Build popup content with inline icons
+  const pokeType = pokeTypes && pokeTypes[0] ? pokeTypes[0] : 'Normal';
+  const pokeTypeIcon = createTypeIcon(pokeType);
+  pokeTypeIcon.classList.add('is-tappable');
+  attachTypeLabelHandlers(pokeTypeIcon, pokeType);
+
+  const oppTypeIcon = createTypeIcon(oppType);
+  oppTypeIcon.classList.add('is-tappable');
+  attachTypeLabelHandlers(oppTypeIcon, oppType);
+
+  dom.pokePopupText.innerHTML = '';
+
+  if (popupMode === 'worst_counters') {
+    // Worst Counters: "[pokemon]'s [type] type is weak against [opponent type] type Pokémon."
+    dom.pokePopupText.appendChild(document.createTextNode(`${pokeName}'s `));
+    dom.pokePopupText.appendChild(pokeTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type is weak against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon.`));
+  } else {
+    // Best Counters: "[pokemon]'s [type] type and moves are solid choices against [opponent type] type Pokémon."
+    dom.pokePopupText.appendChild(document.createTextNode(`${pokeName}'s `));
+    dom.pokePopupText.appendChild(pokeTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type and moves are solid choices against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon.`));
+  }
+
+  // Position popup near tap, but keep on screen
+  const popup = dom.pokePopup;
+  popup.hidden = false;
+
+  // Get popup dimensions after content is set
+  const popupRect = popup.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Position above the tap point, centered horizontally
+  let left = x - popupRect.width / 2;
+  let top = y - popupRect.height - 12;
+
+  // Keep on screen
+  if (left < 8) left = 8;
+  if (left + popupRect.width > viewportWidth - 8) left = viewportWidth - popupRect.width - 8;
+  if (top < 8) top = y + 24; // Show below if not enough room above
+
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
+
+  // Show with animation
+  requestAnimationFrame(() => {
+    popup.classList.add('is-visible');
+  });
+}
+
+/**
+ * Hide Pokemon info popup
+ */
+export function hidePokePopup() {
+  if (!dom.pokePopup) return;
+  dom.pokePopup.classList.remove('is-visible');
+
+  // Remove active state from trigger
+  if (activePopupTrigger) {
+    activePopupTrigger.classList.remove('is-popup-active');
+  }
+  activePopupTrigger = null;
+
+  popupTimeout = setTimeout(() => {
+    dom.pokePopup.hidden = true;
+  }, 150);
+}
+
+/**
+ * Show type icon popup (for Best Counter Types / Super Effective Move Types)
+ * @param {string} typeName - The type being shown
+ * @param {string} oppType - Opponent type
+ * @param {string} popupMode - 'counter_types' or 'move_types'
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ * @param {HTMLElement} triggerEl - Element that triggered the popup (for toggle behavior)
+ */
+export function showTypePopup(typeName, oppType, popupMode, x, y, triggerEl = null) {
+  if (!dom.pokePopup || !dom.pokePopupText) return;
+
+  // Toggle behavior: if tapping same trigger while popup visible, close it
+  if (isPopupVisible() && triggerEl && triggerEl === activePopupTrigger) {
+    hidePokePopup();
+    return;
+  }
+
+  if (popupTimeout) {
+    clearTimeout(popupTimeout);
+    popupTimeout = null;
+  }
+
+  // Remove active state from previous trigger
+  if (activePopupTrigger) {
+    activePopupTrigger.classList.remove('is-popup-active');
+  }
+
+  // Track which element triggered this popup
+  activePopupTrigger = triggerEl;
+
+  // Add active state to current trigger
+  if (triggerEl) {
+    triggerEl.classList.add('is-popup-active');
+  }
+
+  const typeIcon = createTypeIcon(typeName);
+  typeIcon.classList.add('is-tappable');
+  attachTypeLabelHandlers(typeIcon, typeName);
+
+  const oppTypeIcon = createTypeIcon(oppType);
+  oppTypeIcon.classList.add('is-tappable');
+  attachTypeLabelHandlers(oppTypeIcon, oppType);
+
+  dom.pokePopupText.innerHTML = '';
+
+  if (popupMode === 'counter_types') {
+    // Best Counter Types: "[type] Pokémon will perform well against [opponent type] types."
+    dom.pokePopupText.appendChild(typeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon will perform well against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` types.`));
+  } else if (popupMode === 'worst_counter_types') {
+    // Worst Counter Types: "[type] Pokémon have a disadvantage against [opponent type] type Pokémon."
+    dom.pokePopupText.appendChild(typeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` Pokémon have a disadvantage against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon.`));
+  } else if (popupMode === 'worst_move_types') {
+    // Not Very Effective Move Types: "[type] type moves are not very effective against [opponent type] type Pokémon."
+    dom.pokePopupText.appendChild(typeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type moves are not very effective against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon.`));
+  } else {
+    // Super Effective Move Types (move_types): "[type] type moves are super effective against [opponent type] type Pokémon."
+    dom.pokePopupText.appendChild(typeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type moves are super effective against `));
+    dom.pokePopupText.appendChild(oppTypeIcon);
+    dom.pokePopupText.appendChild(document.createTextNode(` type Pokémon.`));
+  }
+
+  const popup = dom.pokePopup;
+  popup.hidden = false;
+
+  const popupRect = popup.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+
+  let left = x - popupRect.width / 2;
+  let top = y - popupRect.height - 12;
+
+  if (left < 8) left = 8;
+  if (left + popupRect.width > viewportWidth - 8) left = viewportWidth - popupRect.width - 8;
+  if (top < 8) top = y + 24;
+
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
+
+  requestAnimationFrame(() => {
+    popup.classList.add('is-visible');
+  });
+}
+
+/**
+ * Show mini type label popup (on hold)
+ * @param {string} typeName - Type name to display
+ * @param {number} x - X position
+ * @param {number} y - Y position
+ */
+export function showTypeLabelPopup(typeName, x, y) {
+  if (!dom.typeLabelPopup || !dom.typeLabelPopupText) return;
+
+  dom.typeLabelPopupText.textContent = typeName;
+
+  const popup = dom.typeLabelPopup;
+  popup.hidden = false;
+
+  const popupRect = popup.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+
+  let left = x - popupRect.width / 2;
+  let top = y - popupRect.height - 25;
+
+  if (left < 8) left = 8;
+  if (left + popupRect.width > viewportWidth - 8) left = viewportWidth - popupRect.width - 8;
+  if (top < 8) top = y + 35;
+
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
+
+  requestAnimationFrame(() => {
+    popup.classList.add('is-visible');
+  });
+}
+
+/**
+ * Hide mini type label popup
+ */
+export function hideTypeLabelPopup() {
+  if (!dom.typeLabelPopup) return;
+  dom.typeLabelPopup.classList.remove('is-visible');
+  dom.typeLabelPopup.hidden = true;
+}
+
+/**
+ * Attach hold handlers to show type label popup
+ * @param {HTMLElement} icon - Icon element
+ * @param {string} typeName - Type name
+ */
+function attachTypeLabelHandlers(icon, typeName) {
+  icon.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const touch = e.touches[0];
+    showTypeLabelPopup(typeName, touch.clientX, touch.clientY);
+  }, { passive: false });
+
+  icon.addEventListener('touchend', (e) => {
+    e.stopPropagation();
+    hideTypeLabelPopup();
+  }, { passive: false });
+
+  icon.addEventListener('touchcancel', () => {
+    hideTypeLabelPopup();
+  }, { passive: false });
+
+  icon.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    showTypeLabelPopup(typeName, e.clientX, e.clientY);
+  });
+
+  icon.addEventListener('mouseup', (e) => {
+    e.stopPropagation();
+    hideTypeLabelPopup();
+  });
+
+  icon.addEventListener('mouseleave', () => {
+    hideTypeLabelPopup();
+  });
+}
+
+// Capture phase handler to intercept taps when popup is open
+// This ensures outside taps only close the popup without triggering other actions
+document.addEventListener('touchstart', (e) => {
+  if (!isPopupVisible()) return;
+
+  // If tap is inside popup, allow it
+  if (dom.pokePopup.contains(e.target)) return;
+
+  // If tap is on the active trigger element, let it through (for toggle behavior)
+  if (activePopupTrigger && (activePopupTrigger === e.target || activePopupTrigger.contains(e.target))) return;
+
+  // Otherwise, consume the tap and close popup
+  e.preventDefault();
+  e.stopPropagation();
+  hidePokePopup();
+}, { capture: true, passive: false });
+
+document.addEventListener('click', (e) => {
+  if (!isPopupVisible()) return;
+
+  // If click is inside popup, allow it
+  if (dom.pokePopup.contains(e.target)) return;
+
+  // If click is on the active trigger element, let it through (for toggle behavior)
+  if (activePopupTrigger && (activePopupTrigger === e.target || activePopupTrigger.contains(e.target))) return;
+
+  // Otherwise, consume the click and close popup
+  e.preventDefault();
+  e.stopPropagation();
+  hidePokePopup();
+}, { capture: true });
+
 // SVG icons for types
 export function svgForType(type) {
   const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
@@ -832,41 +1157,37 @@ function createBackFace(row, typesArr, oppTypes) {
  * @param {Object} row - Pokemon data (must have .name)
  * @param {string[]} typesArr - Pokemon's types
  * @param {number|null} cp - Combat Power (null for general counters)
+ * @param {string} oppType - Opponent type this counter is effective against (for popup)
+ * @param {string} popupMode - 'best_counters' or 'worst_counters'
  */
-export function makeSimpleCard(row, typesArr, cp) {
+export function makeSimpleCard(row, typesArr, cp, oppType = null, popupMode = 'best_counters') {
   const card = document.createElement('div');
   card.className = 'simple-card';
 
-  // Center group: Name + Type pills (positioned at top)
-  const centerGroup = document.createElement('div');
-  centerGroup.className = 'simple-card-center';
-
-  // Line 2: Pokemon name
-  const nameEl = document.createElement('div');
+  // Pokemon name only - pill style
+  const nameEl = document.createElement('span');
   nameEl.className = 'simple-card-name';
-  const nameText = row.name || '-';
-  if (nameText.length > 12) nameEl.classList.add('long-name');
-  nameEl.textContent = nameText;
-  centerGroup.appendChild(nameEl);
+  nameEl.textContent = row.name || '-';
+  card.appendChild(nameEl);
 
-  // Line 3: Type pills
-  if (typesArr && typesArr.length > 0) {
-    const typeRow = document.createElement('div');
-    typeRow.className = 'simple-card-types';
-    typesArr.forEach(t => {
-      const pill = document.createElement('span');
-      pill.className = 'type-pill-mini';
-      pill.appendChild(createTypeIcon(t, 'mini'));
-      const label = document.createElement('span');
-      label.className = 'type-pill-mini-label';
-      label.textContent = t;
-      pill.appendChild(label);
-      typeRow.appendChild(pill);
+  // Add tap handler for popup if oppType is provided
+  if (oppType) {
+    const pokeName = row.name || 'Pokemon';
+    const pokeTypes = typesArr || [];
+
+    card.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const touch = e.touches[0];
+      showPokePopup(pokeName, pokeTypes, oppType, touch.clientX, touch.clientY, card, popupMode);
+    }, { passive: false });
+
+    card.addEventListener('click', (e) => {
+      showPokePopup(pokeName, pokeTypes, oppType, e.clientX, e.clientY, card, popupMode);
     });
-    centerGroup.appendChild(typeRow);
-  }
 
-  card.appendChild(centerGroup);
+    card.style.cursor = 'pointer';
+  }
 
   return card;
 }
@@ -920,8 +1241,9 @@ export function createTypePill(typeName, asButton = false) {
  * @param {HTMLElement} container - Container element
  * @param {string[]} oppTypes - Selected opponent types (column headers)
  * @param {Object} countersByType - Map of oppType -> array of counters
+ * @param {string} popupMode - 'best_counters' or 'worst_counters'
  */
-export function renderColumnLayout(container, oppTypes, countersByType) {
+export function renderColumnLayout(container, oppTypes, countersByType, popupMode = 'best_counters') {
   container.innerHTML = '';
   container.classList.add('type-columns');
 
@@ -930,14 +1252,13 @@ export function renderColumnLayout(container, oppTypes, countersByType) {
     const column = document.createElement('div');
     column.className = 'type-column';
 
-    // Column header - up arrow only (matches upload icon arrow style)
+    // Column header - type icon (matches opponent header pills)
     const header = document.createElement('div');
     header.className = 'type-column-header';
 
-    const arrow = document.createElement('div');
-    arrow.className = 'type-column-arrow';
-    arrow.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"/></svg>';
-    header.appendChild(arrow);
+    const icon = createTypeIcon(oppType);
+    icon.classList.add('type-column-icon');
+    header.appendChild(icon);
 
     column.appendChild(header);
 
@@ -948,12 +1269,14 @@ export function renderColumnLayout(container, oppTypes, countersByType) {
 
     if (typeCounters.length === 0) {
       // Show placeholder card with contextual message
-      const message = `NO STRONG MATCHUPS\n${oppType} has no super-effective targets.`;
+      const message = popupMode === 'worst_counters'
+        ? `NO WEAK MATCHUPS\n${oppType} has no clear weaknesses.`
+        : `NO STRONG MATCHUPS\n${oppType} has no super-effective targets.`;
       const placeholder = makePlaceholderCard(message);
       cardsContainer.appendChild(placeholder);
     } else {
       typeCounters.forEach(c => {
-        const card = makeSimpleCard({ name: c.name }, c.types, c.cp || null);
+        const card = makeSimpleCard({ name: c.name }, c.types, c.cp || null, oppType, popupMode);
         cardsContainer.appendChild(card);
       });
     }
@@ -977,13 +1300,12 @@ function renderTypePillColumnLayout(container, oppTypes, typesByOpp) {
     const column = document.createElement('div');
     column.className = 'type-column';
 
-    // Column header - up arrow
+    // Column header - type icon (matches opponent header pills)
     const header = document.createElement('div');
     header.className = 'type-column-header';
-    const arrow = document.createElement('div');
-    arrow.className = 'type-column-arrow';
-    arrow.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"/></svg>';
-    header.appendChild(arrow);
+    const icon = createTypeIcon(oppType);
+    icon.classList.add('type-column-icon');
+    header.appendChild(icon);
     column.appendChild(header);
 
     // Type pills for this column
@@ -1009,6 +1331,70 @@ function renderTypePillColumnLayout(container, oppTypes, typesByOpp) {
 }
 
 /**
+ * Render type icons only (no labels) in a horizontal row per column
+ * Used for compact display where space is limited
+ * @param {HTMLElement} container - Container element
+ * @param {string[]} oppTypes - Selected opponent types (column headers)
+ * @param {Object} typesByOpp - Map of oppType -> array of type names
+ * @param {string|null} popupMode - Optional popup mode: 'counter_types' or 'move_types'
+ */
+function renderTypeIconColumnLayout(container, oppTypes, typesByOpp, popupMode = null) {
+  container.innerHTML = '';
+  container.classList.add('type-columns');
+
+  oppTypes.forEach(oppType => {
+    const column = document.createElement('div');
+    column.className = 'type-column';
+
+    // Column header - type icon (matches opponent header pills)
+    const header = document.createElement('div');
+    header.className = 'type-column-header';
+    const headerIcon = createTypeIcon(oppType);
+    headerIcon.classList.add('type-column-icon');
+    header.appendChild(headerIcon);
+    column.appendChild(header);
+
+    // Icons row for this column (horizontal layout)
+    const iconsContainer = document.createElement('div');
+    iconsContainer.className = 'type-column-icons';
+    const types = typesByOpp[oppType] || [];
+
+    if (types.length === 0) {
+      const noneIcon = document.createElement('span');
+      noneIcon.className = 'type-icon-none';
+      noneIcon.textContent = '—';
+      iconsContainer.appendChild(noneIcon);
+    } else {
+      types.forEach(t => {
+        const icon = createTypeIcon(t);
+        icon.classList.add('type-result-icon');
+
+        // Attach popup handlers if popupMode specified
+        if (popupMode) {
+          icon.style.cursor = 'pointer';
+
+          icon.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const touch = e.touches[0];
+            showTypePopup(t, oppType, popupMode, touch.clientX, touch.clientY, icon);
+          }, { passive: false });
+
+          icon.addEventListener('click', (e) => {
+            showTypePopup(t, oppType, popupMode, e.clientX, e.clientY, icon);
+          });
+        }
+
+        iconsContainer.appendChild(icon);
+      });
+    }
+    column.appendChild(iconsContainer);
+
+    container.appendChild(column);
+  });
+}
+
+/**
  * Create a flip card for Pokemon picks (LEGACY - keeping for roster picks)
  * @param {Object} row - Pokemon data (must have .name)
  * @param {string[]} typesArr - Pokemon's types
@@ -1020,109 +1406,18 @@ export function makePokePickCard(row, typesArr, cp, oppTypes = []) {
   return makeSimpleCard(row, typesArr, cp);
 }
 
-/**
- * Get user's best Pokemon grouped by opponent type
- */
-function getRosterCountersPerType(oppTypes, perType = 3) {
-  const roster = Array.isArray(state.allResults) ? state.allResults : [];
-  if (!roster.length) return {};
-
-  const result = {};
-  oppTypes.forEach(oppType => {
-    // Score each Pokemon against this specific opponent type
-    const scored = roster.map(row => {
-      const defTypes = rowTypeList(row);
-      if (!defTypes.length) return null;
-
-      // Incoming damage from this opponent type
-      let incoming = 1.0;
-      defTypes.forEach(d => { incoming *= eff(oppType, d); });
-
-      // Outgoing damage to this opponent type
-      let outgoing = 1.0;
-      defTypes.forEach(d => { outgoing = Math.max(outgoing, eff(d, oppType)); });
-
-      return { row, defTypes, incoming, outgoing, cp: Number(row.cp) || 0 };
-    }).filter(Boolean);
-
-    // Sort: low incoming (resist), high outgoing (super effective), high CP
-    scored.sort((a, b) => {
-      if (a.incoming !== b.incoming) return a.incoming - b.incoming;
-      if (a.outgoing !== b.outgoing) return b.outgoing - a.outgoing;
-      return b.cp - a.cp;
-    });
-
-    result[oppType] = scored.slice(0, perType).map(s => ({
-      name: s.row.name,
-      types: s.defTypes,
-      cp: s.cp
-    }));
-  });
-
-  return result;
-}
-
-/**
- * Get user's worst (risky) Pokemon grouped by opponent type
- */
-function getRiskyRosterPerType(oppTypes, perType = 3) {
-  const roster = Array.isArray(state.allResults) ? state.allResults : [];
-  if (!roster.length) return {};
-
-  const result = {};
-  oppTypes.forEach(oppType => {
-    const scored = roster.map(row => {
-      const defTypes = rowTypeList(row);
-      if (!defTypes.length) return null;
-
-      let incoming = 1.0;
-      defTypes.forEach(d => { incoming *= eff(oppType, d); });
-
-      return { row, defTypes, incoming, cp: Number(row.cp) || 0 };
-    }).filter(Boolean);
-
-    // Sort: HIGH incoming (weak to opponent), then by CP
-    scored.sort((a, b) => {
-      if (a.incoming !== b.incoming) return b.incoming - a.incoming;
-      return b.cp - a.cp;
-    });
-
-    // Only include if actually weak (incoming >= 1.6)
-    const weak = scored.filter(s => s.incoming >= 1.6);
-    result[oppType] = weak.slice(0, perType).map(s => ({
-      name: s.row.name,
-      types: s.defTypes,
-      cp: s.cp
-    }));
-  });
-
-  return result;
-}
-
-export function renderRosterPicks(oppTypes) {
-  if (!dom.vsTopPicksEl || !dom.vsRiskyPicksEl) return;
-
-  // BRING - best Pokemon per opponent type
-  const bringByType = getRosterCountersPerType(oppTypes, 3);
-  renderColumnLayout(dom.vsTopPicksEl, oppTypes, bringByType);
-
-  // DON'T BRING - risky Pokemon per opponent type
-  const riskyByType = getRiskyRosterPerType(oppTypes, 3);
-  renderColumnLayout(dom.vsRiskyPicksEl, oppTypes, riskyByType);
-}
-
 export function renderBudgetCounters(oppTypes) {
-  // Render BRING counters in column layout (ARE WEAK AGAINST section)
+  // Render BRING counters in column layout (Best Counters section)
   if (dom.vsBudgetPicksEl) {
     // Get exactly 3 counters per type
     const countersByType = getCountersPerType(oppTypes, 3);
-    renderColumnLayout(dom.vsBudgetPicksEl, oppTypes, countersByType);
+    renderColumnLayout(dom.vsBudgetPicksEl, oppTypes, countersByType, 'best_counters');
   }
 
-  // Render AVOID counters in ARE STRONG AGAINST section
+  // Render AVOID counters in Worst Counters section
   if (dom.vsStrongAgainstPicksEl) {
     const weakByType = getWeakCountersPerType(oppTypes, 3);
-    renderColumnLayout(dom.vsStrongAgainstPicksEl, oppTypes, weakByType);
+    renderColumnLayout(dom.vsStrongAgainstPicksEl, oppTypes, weakByType, 'worst_counters');
   }
 
   // Show/hide the Strong Against container
@@ -1132,19 +1427,19 @@ export function renderBudgetCounters(oppTypes) {
 }
 
 export function renderVsBrief(oppTypes) {
-  // Move Types - use column layout grouped by opponent type
+  // Move Types - use icon-only layout for compact display
   const bringMoves = getBringMovesPerOpp(oppTypes);
-  renderTypePillColumnLayout(dom.vsBringMovesEl, oppTypes, bringMoves);
+  renderTypeIconColumnLayout(dom.vsBringMovesEl, oppTypes, bringMoves, 'move_types');
 
   const avoidMoves = getAvoidMovesPerOpp(oppTypes);
-  renderTypePillColumnLayout(dom.vsAvoidMovesEl, oppTypes, avoidMoves);
+  renderTypeIconColumnLayout(dom.vsAvoidMovesEl, oppTypes, avoidMoves, 'worst_move_types');
 
-  // Pokemon Types - use column layout grouped by opponent type
+  // Pokemon Types - use icon-only layout for compact display
   const bringTypes = getBringTypesPerOpp(oppTypes);
-  renderTypePillColumnLayout(dom.vsBringBodiesEl, oppTypes, bringTypes);
+  renderTypeIconColumnLayout(dom.vsBringBodiesEl, oppTypes, bringTypes, 'counter_types');
 
   const avoidTypes = getAvoidTypesPerOpp(oppTypes);
-  renderTypePillColumnLayout(dom.vsAvoidBodiesEl, oppTypes, avoidTypes);
+  renderTypeIconColumnLayout(dom.vsAvoidBodiesEl, oppTypes, avoidTypes, 'worst_counter_types');
 }
 
 // Helper to programmatically set collapse state
@@ -1160,39 +1455,12 @@ function setCollapsed(el, collapsed) {
 
 /**
  * Render top arrows between opponent header and recommendations
- * Shows when opponent section is collapsed
+ * DISABLED - carousel track now attaches directly below collapsed opponent header
  */
 function renderTopArrows(oppTypes, isConfirmed) {
-  // Get or create the top arrows container
-  let container = document.getElementById('vsTopArrows');
-
-  if (!isConfirmed || oppTypes.length === 0) {
-    // Hide/remove arrows when not confirmed
-    if (container) container.hidden = true;
-    return;
-  }
-
-  // Create container if it doesn't exist
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'vsTopArrows';
-    container.className = 'vs-top-arrows';
-    // Insert at the start of vsRecommendations
-    if (dom.vsRecommendationsEl) {
-      dom.vsRecommendationsEl.insertBefore(container, dom.vsRecommendationsEl.firstChild);
-    }
-  }
-
-  container.hidden = false;
-  container.innerHTML = '';
-
-  // Create 3 columns with arrows (matching opponent type count)
-  oppTypes.forEach(() => {
-    const arrowCol = document.createElement('div');
-    arrowCol.className = 'vs-top-arrow-col';
-    arrowCol.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17V8.83l-2.59 2.58L7 10l5-5 5 5-1.41 1.41L13 8.83V17h-2z"/></svg>';
-    container.appendChild(arrowCol);
-  });
+  // Remove existing container if present
+  const container = document.getElementById('vsTopArrows');
+  if (container) container.remove();
 }
 
 export function syncVsUI() {
@@ -1236,14 +1504,6 @@ export function syncVsUI() {
 
   // Types selected - render type effectiveness (Pokemon Types + Move Types)
   renderVsBrief(oppTypes);
-
-  // Your Pokemon section - toggle content based on CSV
-  if (dom.vsPokeRecoResultsEl) dom.vsPokeRecoResultsEl.hidden = !hasRoster;
-  if (dom.vsUploadPromptEl) dom.vsUploadPromptEl.hidden = hasRoster;
-
-  if (hasRoster) {
-    renderRosterPicks(oppTypes);
-  }
 
   // General Pokemon - render budget counters
   renderBudgetCounters(oppTypes);
@@ -1314,14 +1574,14 @@ export function updateScrollState() {
 
 /**
  * Update carousel to show specific slide
- * @param {number} index - Slide index (0-6)
+ * @param {number} index - Slide index (0-1)
  */
 export function updateCarousel(index) {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
 
-  // Clamp index to valid range
-  const clampedIndex = Math.max(0, Math.min(6, index));
+  // Clamp index to valid range (2 slides: 0 and 1)
+  const clampedIndex = Math.max(0, Math.min(1, index));
 
   // Update state
   setCarouselIndex(clampedIndex);
