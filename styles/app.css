@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.22";
+  --css-build: "v3.3.24";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -23,11 +23,7 @@
 
   /* Brand Colors */
   --color-primary: #DC0A2D;
-  --color-primary-hover: #B8082A;
-  --color-primary-active: #9A0623;
   --color-secondary: #3B7A8C;
-  --color-secondary-hover: #2D5F6D;
-  --color-secondary-active: #1F444E;
 
   /* Legacy alias */
   --accent: var(--color-primary);
@@ -46,9 +42,7 @@
 
   /* State Colors */
   --color-success: #4CAF50;
-  --color-warning: #FF9800;
   --color-error: #F44336;
-  --color-info: #2196F3;
 
   /* Shadows */
   --shadow-inset: inset 2px 2px 4px rgba(0,0,0,0.1);
@@ -72,10 +66,8 @@
   /* Typography */
   --font-display: "Press Start 2P", monospace;
   --font-body: "VT323", monospace;
-  --font-pixel: "Press Start 2P", monospace;
 
   /* Font Sizes - Display */
-  --text-display-lg: 16px;
   --text-display-md: 12px;
   --text-display-sm: 10px;
   --text-display-xs: 8px;
@@ -85,10 +77,8 @@
   --text-pill-compact: 14px;
 
   /* Font Sizes - Body */
-  --text-body-lg: 24px;
   --text-body-md: 20px;
   --text-body-sm: 18px;
-  --text-body-xs: 16px;
 
   /* Spacing */
   --space-xs: 4px;
@@ -96,16 +86,11 @@
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
-  --space-2xl: 48px;
 
   /* Border Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-
-  /* Transitions */
-  --transition-fast: 0.1s ease;
-  --transition-normal: 0.2s ease;
 
   /* Component Sizes */
   --icon-btn-size: 32px;
@@ -175,11 +160,7 @@ html[data-theme="dark"] {
 
   /* Brand Colors (slightly muted for dark mode) */
   --color-primary: #e53e5a;
-  --color-primary-hover: #f04e6a;
-  --color-primary-active: #c0303f;
   --color-secondary: #4a9aac;
-  --color-secondary-hover: #5aafbf;
-  --color-secondary-active: #3a8090;
 
   /* Shadows */
   --shadow-inset: inset 2px 2px 4px rgba(0,0,0,0.3);
@@ -259,11 +240,7 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
 
     /* Brand Colors */
     --color-primary: #e53e5a;
-    --color-primary-hover: #f04e6a;
-    --color-primary-active: #c0303f;
     --color-secondary: #4a9aac;
-    --color-secondary-hover: #5aafbf;
-    --color-secondary-active: #3a8090;
 
     /* Shadows */
     --shadow-inset: inset 2px 2px 4px rgba(0,0,0,0.3);
@@ -392,9 +369,16 @@ button { font-family: inherit; }
 }
 
 /* ============================================
-   COMPONENTS
+   COMPONENTS - Tap Target Strategy
+   ============================================
+   All interactive elements must meet --tap-target-min (44px) for accessibility.
+   Visual face may be smaller; hit area extends invisibly via ::before pseudo.
+   Pattern: .component { position: relative; } + .component::before { hit area }
    ============================================ */
+
+/* Base icon button - visual face is --icon-btn-size, hit area is --tap-target-min */
 .icon-btn {
+  position: relative;
   width: var(--icon-btn-size);
   height: var(--icon-btn-size);
   border-radius: var(--radius-sm);
@@ -414,6 +398,17 @@ button { font-family: inherit; }
   border-bottom-color: var(--btn-lo);
   box-shadow: var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+/* Invisible hit area extension for icon buttons */
+.icon-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
 }
 
 @media (hover: hover) {
@@ -581,6 +576,7 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 .window-tab {
+  position: relative;
   flex: 1;
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-display);
@@ -592,6 +588,17 @@ html[data-skin="gba-ds"] .skin-mark {
   border: none;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+}
+
+/* Invisible hit area extension for window tabs */
+.window-tab::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  min-height: var(--tap-target-min);
 }
 
 .window-tab:hover {
@@ -709,8 +716,9 @@ html[data-skin="gba-ds"] .skin-mark {
   align-items: center;
 }
 
-/* Sheet button - pixel bevel style */
+/* Sheet button - pixel bevel style, hit area extended via ::before */
 .sheet-btn {
+  position: relative;
   height: 36px;
   min-height: 36px;
   padding: 0 var(--space-md);
@@ -731,6 +739,17 @@ html[data-skin="gba-ds"] .skin-mark {
   border-bottom-color: var(--btn-lo);
   box-shadow: var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+/* Invisible hit area extension for sheet buttons */
+.sheet-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: var(--tap-target-min);
 }
 
 .sheet-btn:hover {
@@ -800,8 +819,8 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 .type-pill .icon-chip {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   flex-shrink: 0;
 }
 
@@ -1104,8 +1123,9 @@ body.no-scroll { overflow: hidden; }
   color: var(--text-primary);
 }
 
-/* Close button - pixel bevel style */
+/* Close button - pixel bevel style, hit area extended */
 .drawer-close-btn {
+  position: relative;
   width: var(--chip-size);
   height: var(--chip-size);
   border-radius: var(--radius-sm);
@@ -1126,6 +1146,17 @@ body.no-scroll { overflow: hidden; }
   border-bottom-color: var(--btn-lo);
   box-shadow: var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+/* Invisible hit area extension */
+.drawer-close-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
 }
 
 .drawer-close-btn:hover {
@@ -1286,8 +1317,9 @@ body.no-scroll { overflow: hidden; }
   justify-content: center;
 }
 
-/* Upload CTA button - pixel bevel style */
+/* Upload CTA button - pixel bevel style, hit area extended */
 .upload-action-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -1307,6 +1339,17 @@ body.no-scroll { overflow: hidden; }
   border-radius: var(--radius-sm);
   box-shadow: var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+/* Invisible hit area extension */
+.upload-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: var(--tap-target-min);
 }
 
 .upload-action-btn .icon {
@@ -1567,6 +1610,7 @@ body.no-scroll { overflow: hidden; }
 }
 
 .collapsible-toggle {
+  position: relative;
   width: 24px;
   height: 24px;
   border-radius: var(--radius-sm);
@@ -1582,6 +1626,17 @@ body.no-scroll { overflow: hidden; }
   cursor: pointer;
   box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
   flex-shrink: 0;
+}
+
+/* Invisible hit area extension */
+.collapsible-toggle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
 }
 
 .collapsible-toggle:hover {
@@ -1825,10 +1880,7 @@ body.no-scroll { overflow: hidden; }
   justify-content: center;
 }
 
-.vs-sticky-header-pills .type-pill .icon-chip {
-  width: 16px;
-  height: 16px;
-}
+/* Inherits base .type-pill .icon-chip sizing (--icon-size-sm) */
 
 /* When sticky header is shown, hide the top border-radius of vs-panel */
 .vs-sticky-header:not([hidden]) + .vs-panel {
@@ -1873,10 +1925,7 @@ body.no-scroll { overflow: hidden; }
   justify-content: center;
 }
 
-.opponent-header-pills .type-pill .icon-chip {
-  width: 16px;
-  height: 16px;
-}
+/* Inherits base .type-pill .icon-chip sizing (--icon-size-sm) */
 
 /* Instructions row inside collapsible content */
 .opponent-instructions {
@@ -1976,6 +2025,7 @@ body.no-scroll { overflow: hidden; }
 }
 
 .modal-close-btn {
+  position: relative;
   font-family: var(--font-display);
   font-size: 12px;
   color: var(--text-secondary);
@@ -1983,6 +2033,17 @@ body.no-scroll { overflow: hidden; }
   border: none;
   cursor: pointer;
   padding: var(--space-xs);
+}
+
+/* Invisible hit area extension */
+.modal-close-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
 }
 
 .modal-close-btn:hover {

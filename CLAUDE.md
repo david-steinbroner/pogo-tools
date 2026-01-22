@@ -17,6 +17,9 @@ Combat Intelligence Suite
 (none)
 
 ## Recent Progress
+- 2026-01-21: UI system tuning - tap-target compliance (44px hit areas), variant discipline, purged 21 unused tokens
+- 2026-01-21: Style tokenization - 24 hardcoded values eliminated, new component size tokens
+- 2026-01-21: Crash fix - dom.tableHeaders undefined, added Sentry breadcrumbs + error handling
 - 2026-01-21: Code audit - removed 594 lines of dead code (10.3%), 19 orphaned DOM refs, duplicate CSS, unused functions
 - 2026-01-21: Navbar padding - added 4px vertical padding to appbar
 - 2026-01-21: Flatten structure - moved /app/ contents to root, single index.html, simpler project layout
@@ -101,6 +104,20 @@ python -m http.server 8000
 - No official Pokemon/Nintendo assets
 - No build step - plain ES modules only
 - All processing happens client-side (privacy-first)
+
+## UI Component Rules
+
+### Tap Targets (Accessibility)
+All clickable elements must meet `--tap-target-min` (44px) for accessibility:
+- Use base classes: `.icon-btn`, `.sheet-btn`, `.window-tab`, `.drawer-close-btn`
+- Hit area is extended via `::before` pseudo-element (visual face stays small)
+- Never set width/height directly on interactive elements; size the inner face instead
+- Any new clickable style must extend a base class or add the hit-area pattern
+
+### Component Size Variants
+- Components use tokens for dimensions: `--icon-btn-size`, `--chip-size`, `--icon-size`
+- Context-specific sizes override tokens on the container, not via one-off classes
+- "Two is a pattern, three is a policy" - if you need a third size, mint a token
 
 ## Session End Protocol
 After each working session, update this file:
