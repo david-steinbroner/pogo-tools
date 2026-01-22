@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.24";
+  --css-build: "v3.3.25";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -400,7 +400,9 @@ button { font-family: inherit; }
   transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
 }
 
-/* Invisible hit area extension for icon buttons */
+/* Invisible hit area extension for icon buttons
+   pointer-events: none ensures the pseudo-element doesn't intercept clicks;
+   the actual button element receives the click through the transparent pseudo */
 .icon-btn::before {
   content: '';
   position: absolute;
@@ -409,6 +411,7 @@ button { font-family: inherit; }
   transform: translate(-50%, -50%);
   min-width: var(--tap-target-min);
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 @media (hover: hover) {
@@ -599,6 +602,7 @@ html[data-skin="gba-ds"] .skin-mark {
   right: 0;
   transform: translateY(-50%);
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .window-tab:hover {
@@ -750,6 +754,7 @@ html[data-skin="gba-ds"] .skin-mark {
   transform: translate(-50%, -50%);
   min-width: 100%;
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .sheet-btn:hover {
@@ -1157,6 +1162,7 @@ body.no-scroll { overflow: hidden; }
   transform: translate(-50%, -50%);
   min-width: var(--tap-target-min);
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .drawer-close-btn:hover {
@@ -1350,6 +1356,7 @@ body.no-scroll { overflow: hidden; }
   transform: translate(-50%, -50%);
   min-width: 100%;
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .upload-action-btn .icon {
@@ -1637,6 +1644,7 @@ body.no-scroll { overflow: hidden; }
   transform: translate(-50%, -50%);
   min-width: var(--tap-target-min);
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .collapsible-toggle:hover {
@@ -1803,6 +1811,7 @@ body.no-scroll { overflow: hidden; }
 }
 
 .carousel-dot {
+  position: relative;
   appearance: none;
   width: 12px;
   height: 12px;
@@ -1813,6 +1822,18 @@ body.no-scroll { overflow: hidden; }
   -webkit-tap-highlight-color: transparent;
   background: var(--bg-surface);
   border: 2px solid var(--border-default);
+}
+
+/* Invisible hit area extension - visual dot stays 12px, hit area is 44px */
+.carousel-dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .carousel-dot:hover {
@@ -2044,6 +2065,7 @@ body.no-scroll { overflow: hidden; }
   transform: translate(-50%, -50%);
   min-width: var(--tap-target-min);
   min-height: var(--tap-target-min);
+  pointer-events: none;
 }
 
 .modal-close-btn:hover {

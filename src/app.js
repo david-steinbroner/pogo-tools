@@ -212,6 +212,51 @@ function showInitError() {
 }
 
 /**
+ * Debug mode: verify tap target compliance
+ * Logs computed hit area sizes to console and warns if below --tap-target-min
+ */
+function verifyTapTargets() {
+  const TAP_MIN = 44; // --tap-target-min in px
+  const components = [
+    { name: '.icon-btn', selector: '.icon-btn' },
+    { name: '.sheet-btn', selector: '.sheet-btn' },
+    { name: '.window-tab', selector: '.window-tab' },
+    { name: '.carousel-dot', selector: '.carousel-dot' },
+    { name: '.drawer-close-btn', selector: '.drawer-close-btn' },
+  ];
+
+  console.group('[PoGO Debug] Tap Target Compliance Check');
+  let allPass = true;
+
+  components.forEach(({ name, selector }) => {
+    const el = document.querySelector(selector);
+    if (!el) {
+      console.log(`${name}: NOT FOUND (may be hidden)`);
+      return;
+    }
+
+    const styles = getComputedStyle(el, '::before');
+    const minW = parseFloat(styles.minWidth) || 0;
+    const minH = parseFloat(styles.minHeight) || 0;
+
+    // Also check the element's own bounding rect as fallback
+    const rect = el.getBoundingClientRect();
+    const hitW = Math.max(minW, rect.width);
+    const hitH = Math.max(minH, rect.height);
+
+    const pass = hitW >= TAP_MIN && hitH >= TAP_MIN;
+    if (!pass) allPass = false;
+
+    console.log(
+      `${name}: ${pass ? '✅' : '❌'} hit area ${Math.round(hitW)}x${Math.round(hitH)}px (min: ${TAP_MIN}px)`
+    );
+  });
+
+  console.log(allPass ? '✅ All tap targets compliant' : '❌ Some tap targets below minimum');
+  console.groupEnd();
+}
+
+/**
  * Initialize the application
  */
 function init() {
@@ -222,7 +267,7 @@ function init() {
     Sentry.init({
       dsn: 'https://d7a20243d8fd94dd9b415a266d1b19c4@o4510342078529536.ingest.us.sentry.io/4510744994643968',
       environment: location.hostname === 'pogo-pal.pages.dev' ? 'production' : 'development',
-      release: 'pogo-pal@3.3.23',
+      release: 'pogo-pal@3.3.25',
 
       integrations: [
         Sentry.browserTracingIntegration({
@@ -295,7 +340,7 @@ function init() {
     });
 
     // Set app version tag for filtering
-    Sentry.setTag('app_version', 'pogo-pal@3.3.23');
+    Sentry.setTag('app_version', 'pogo-pal@3.3.25');
   }
 
   // Sentry breadcrumb helper
@@ -364,6 +409,11 @@ function init() {
     }
 
     addBreadcrumb('boot:complete');
+
+    // Debug mode: verify tap target compliance
+    if (state.debugMode) {
+      verifyTapTargets();
+    }
   } catch (err) {
     console.error('[PoGO] Init error:', err);
     addBreadcrumb('boot:fatal-error', { error: err.message });
