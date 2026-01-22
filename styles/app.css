@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.27";
+  --css-build: "v3.3.28";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -625,7 +625,7 @@ html[data-skin="gba-ds"] .skin-mark {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 12px 12px var(--space-md) 12px;
+  padding: var(--space-md);
   overflow: hidden;
 }
 
@@ -1720,7 +1720,7 @@ body.no-scroll { overflow: hidden; }
   align-items: center;
   justify-content: space-between;
   background: var(--bg-surface-alt);
-  padding: 6px 2px !important;
+  padding: var(--space-xs) var(--space-xs);
   min-height: 40px;
   border-bottom: 2px solid var(--border-default);
   font-family: var(--font-display);
@@ -1786,7 +1786,7 @@ body.no-scroll { overflow: hidden; }
 /* Carousel content */
 .carousel-content {
   flex: 1;
-  padding: 16px var(--space-sm);
+  padding: var(--space-md) var(--space-md);
   touch-action: pan-y;
 }
 

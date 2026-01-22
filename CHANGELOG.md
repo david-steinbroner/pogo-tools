@@ -4,6 +4,33 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.28] - 2026-01-21
+
+### Summary
+Reduce mobile "squish" via section rhythm + inner gutter. Tokenized hardcoded padding values.
+
+### Changed
+- **Section header rhythm**: `.carousel-header` padding reduced from `6px 2px` to `var(--space-xs)` (4px) - headers feel like labels, not dividers
+- **Content spacing**: `.carousel-content` padding changed from `16px 8px` to `var(--space-md)` (16px all sides) - more breathing room after headers
+- **Inner gutter**: `.window-content` padding increased from `12px` to `var(--space-md)` (16px) - content no longer pressed against frame
+
+### Technical
+- Replaced 3 hardcoded padding values with token references
+- No visual redesign - same borders, bevels, typography
+
+### Review
+Open Versus tab with 2+ types selected to see the spacing improvements.
+
+---
+
+## [3.3.27] - 2026-01-21
+
+### Changed
+- **Button shadows**: Enhanced from `0 2px 0` to `2px 3px 0` (adds right-side shadow)
+- **Type result icons**: Now use `var(--btn-shadow)` token for consistent raised-button look
+
+---
+
 ## [3.3.26] - 2026-01-21 (Stable Baseline)
 
 ### Summary
