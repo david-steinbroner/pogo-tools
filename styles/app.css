@@ -519,7 +519,6 @@ html[data-skin="gba-ds"] .skin-mark {
   display: flex;
   background: var(--bg-inset);
   border-bottom: 2px solid var(--border-default);
-  padding: var(--space-xs) 0;
 }
 
 /* Secondary tabs - nested level, connects to panel below */
@@ -1728,7 +1727,8 @@ body.no-scroll { overflow: hidden; }
 
 /* Carousel container - extends beyond parent padding */
 #vsRecommendations {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   position: relative;
   margin: 0 calc(-1 * var(--space-md));
   width: calc(100% + 2 * var(--space-md));
@@ -3030,7 +3030,6 @@ body.no-scroll { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  margin-top: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
   font-family: var(--font-body);
   font-size: 10px;

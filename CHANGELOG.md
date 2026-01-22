@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.33] - 2026-01-21
+
+### Fixed
+- **Carousel dots clipping**: Changed `#vsRecommendations` from `overflow: hidden` to `overflow-x: hidden; overflow-y: visible` so dots remain visible
+- **Footer gap**: Removed `margin-top` that created unintended whitespace above footer
+- **Tab strip seams**: Removed `padding` from `.window-tabs` that caused vertical line artifacts
+
+---
+
 ## [3.3.32] - 2026-01-21
 
 ### Changed
