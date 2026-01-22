@@ -57,7 +57,7 @@
   --btn-lo: #7A7262;
   --btn-hi-active: #6A6252;
   --btn-lo-active: #D0C8B8;
-  --btn-shadow: 0 2px 0 #7A7262;
+  --btn-shadow: 2px 3px 0 #7A7262;
   --btn-inset: inset 1px 1px 0 #7A7262, inset -1px -1px 0 #F8F4EC;
 
   /* Tab Hover */
@@ -175,7 +175,7 @@ html[data-theme="dark"] {
   --btn-lo: #1a1a2a;
   --btn-hi-active: #151525;
   --btn-lo-active: #5a5a75;
-  --btn-shadow: 0 2px 0 #1a1a2a;
+  --btn-shadow: 2px 3px 0 #1a1a2a;
   --btn-inset: inset 1px 1px 0 #1a1a2a, inset -1px -1px 0 #4a4a65;
 
   /* Tab Hover */
@@ -255,7 +255,7 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     --btn-lo: #1a1a2a;
     --btn-hi-active: #151525;
     --btn-lo-active: #5a5a75;
-    --btn-shadow: 0 2px 0 #1a1a2a;
+    --btn-shadow: 2px 3px 0 #1a1a2a;
     --btn-inset: inset 1px 1px 0 #1a1a2a, inset -1px -1px 0 #4a4a65;
 
     /* Tab Hover */
@@ -417,7 +417,7 @@ button { font-family: inherit; }
 @media (hover: hover) {
   .icon-btn:hover {
     background: var(--btn-bg-hover);
-    box-shadow: 0 3px 0 var(--btn-lo);
+    box-shadow: 2px 4px 0 var(--btn-lo);
     transform: translateY(-1px);
   }
 }
@@ -761,7 +761,7 @@ html[data-skin="gba-ds"] .skin-mark {
 
 .sheet-btn:hover {
   background: var(--btn-bg-hover);
-  box-shadow: 0 3px 0 var(--btn-lo);
+  box-shadow: 2px 4px 0 var(--btn-lo);
   transform: translateY(-1px);
 }
 
@@ -855,7 +855,7 @@ button.type-pill {
 @media (hover: hover) {
   button.type-pill:hover {
     background: var(--btn-bg-hover);
-    box-shadow: 0 3px 0 var(--btn-lo);
+    box-shadow: 2px 4px 0 var(--btn-lo);
     transform: translateY(-1px);
   }
 }
