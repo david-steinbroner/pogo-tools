@@ -17,6 +17,8 @@ Combat Intelligence Suite
 (none)
 
 ## Recent Progress
+- 2026-01-21: Code audit - removed 594 lines of dead code (10.3%), 19 orphaned DOM refs, duplicate CSS, unused functions
+- 2026-01-21: Navbar padding - added 4px vertical padding to appbar
 - 2026-01-21: Flatten structure - moved /app/ contents to root, single index.html, simpler project layout
 - 2026-01-17: Non-uploader UX - Your Pokémon moved to bottom (collapsed), de-emphasizes paid Poke Genie CSV export
 - 2026-01-17: README rewrite - fresh README with live site, local dev, privacy, roadmap, contributing sections

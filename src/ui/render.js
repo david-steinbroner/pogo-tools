@@ -3,9 +3,8 @@
  * UI rendering and display updates
  */
 
-import { state, TYPES, TOTAL_TYPES, TYPE_CHART, typeMeta, setCarouselIndex } from '../state.js';
-import { detectCSVMapping } from '../csv/mapping.js';
-import { getBudgetCounters, getCountersPerType, getWeakCounters, getWeakCountersPerType } from '../data/budgetCounters.js';
+import { state, TYPES, TYPE_CHART, typeMeta, setCarouselIndex } from '../state.js';
+import { getCountersPerType, getWeakCountersPerType } from '../data/budgetCounters.js';
 import * as dom from './dom.js';
 
 // Popup state
@@ -458,121 +457,19 @@ export function renderActiveStrip() {
   });
 }
 
-// Render showing line
-export function renderShowingLine() {
-  if (!dom.showingTypesEl || !dom.showingCountEl) return;
-
-  if (state.selectedTypes.size === 0) {
-    dom.showingTypesEl.textContent = 'All types';
-  } else {
-    dom.showingTypesEl.textContent = Array.from(state.selectedTypes).join(', ');
-  }
-
-  const total = state.allResults.length;
-  const visible = state.lastVisibleCount;
-  dom.showingCountEl.textContent = `(${visible} of ${total})`;
-}
-
-// Render collection summary
-export function renderCollectionSummary() {
-  if (!dom.collectionCountEl || !dom.collectionCoverageEl) return;
-
-  if (!state.allResults || state.allResults.length === 0) {
-    dom.collectionCountEl.textContent = '-';
-    dom.collectionCoverageEl.textContent = `-/${TOTAL_TYPES}`;
-    return;
-  }
-
-  const covered = new Set();
-  state.allResults.forEach(r => rowTypeList(r).forEach(t => covered.add(t)));
-
-  dom.collectionCountEl.textContent = String(state.allResults.length);
-  dom.collectionCoverageEl.textContent = `${covered.size}/${TOTAL_TYPES}`;
-}
-
-// Render table
-export function renderTable(rows) {
-  if (!dom.tableBody) return;
-  dom.tableBody.innerHTML = '';
-
-  rows.forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row.name}</td>
-      <td class="mono">${row.score}</td>
-      <td>${row.grade}</td>
-      <td class="mono">${row.cp}</td>
-      <td class="mono">${row.iv}</td>
-      <td>${row.types}</td>
-    `;
-    dom.tableBody.appendChild(tr);
-  });
-}
-
-// Compare function for sorting
-function gradeRank(g) {
-  const map = { 'S': 10, 'A+': 9, 'A': 8, 'B+': 7, 'B': 6, 'C+': 5, 'C': 4, 'D': 3, 'F': 2 };
-  return map[g] ?? 0;
-}
-
-function compare(a, b, key) {
-  const av = a[key];
-  const bv = b[key];
-
-  if (key === 'grade') {
-    return gradeRank(av) - gradeRank(bv);
-  }
-
-  const numKeys = new Set(['score', 'cp', 'iv']);
-  if (numKeys.has(key)) return (Number(av) || 0) - (Number(bv) || 0);
-
-  return String(av).localeCompare(String(bv));
-}
-
-// Render sort indicators
-export function renderSortIndicators() {
-  dom.tableHeaders.forEach(th => {
-    const ind = th.querySelector('.sort-ind');
-    if (!ind) return;
-
-    if (th.dataset.key !== state.sortState.key) {
-      ind.textContent = '';
-      ind.style.opacity = '0.55';
-      return;
-    }
-
-    ind.style.opacity = '0.9';
-    ind.textContent = state.sortState.dir === 'asc' ? '▲' : '▼';
-  });
-}
-
-// Render sorted table
-export function renderSortedTable(rows) {
-  const { key, dir } = state.sortState;
-  const sorted = rows.slice().sort((a, b) => {
-    const delta = compare(a, b, key);
-    return dir === 'asc' ? delta : -delta;
-  });
-  renderTable(sorted);
-  renderSortIndicators();
-}
-
 // Get filtered rows
 export function getFilteredRows() {
   if (state.selectedTypes.size === 0) return state.allResults;
   return state.allResults.filter(r => rowTypeList(r).some(t => state.selectedTypes.has(t)));
 }
 
-// Main view update
+// Main view update (placeholder for future Collection tab implementation)
 export function updateView() {
   const filtered = getFilteredRows();
   state.lastVisibleCount = filtered.length;
-  renderShowingLine();
-  renderCollectionSummary();
-  renderSortedTable(filtered);
 }
 
-// Error modal display (reusable app-wide)
+// Error modal display
 export function showError(title, body) {
   if (!dom.errorModal || !dom.errorModalBackdrop) return;
   if (dom.errorTitle) dom.errorTitle.textContent = title || 'Error';
@@ -588,102 +485,13 @@ export function hideError() {
   document.body.classList.remove('no-scroll');
 }
 
-// Legacy alias for backwards compatibility
-export function showParseError(title, body) {
-  showError(title, body);
-}
-
+// Alias for CSV parse errors
 export function hideParseError() {
   hideError();
 }
 
-// CSV debug panel
-export function renderCSVMetaDebug(meta, firstRow, opts) {
-  if (!dom.csvDebugEl) return;
-
-  const force = !!(opts && opts.force);
-  const reason = (opts && opts.reason) ? String(opts.reason) : '';
-
-  if (!meta || !meta.headers || !meta.headers.length) {
-    dom.csvDebugEl.hidden = true;
-    return;
-  }
-
-  // Gate: debug panel is hidden unless debug mode is on, or we explicitly force it
-  if (!state.debugMode && !force) {
-    dom.csvDebugEl.hidden = true;
-    return;
-  }
-
-  const fileLabel = meta.fileName ? meta.fileName : 'CSV';
-  const rowsLabel = (typeof meta.rows === 'number') ? `${meta.rows} rows` : '';
-  const colsLabel = `${meta.headers.length} cols`;
-  const reasonLabel = reason ? ` | ${reason}` : '';
-  if (dom.csvDebugSummaryEl) {
-    dom.csvDebugSummaryEl.textContent = `(${[fileLabel, rowsLabel, colsLabel].filter(Boolean).join(' | ')}${reasonLabel})`;
-  }
-
-  // Headers chips
-  if (dom.csvHeadersEl) {
-    dom.csvHeadersEl.innerHTML = '';
-    const max = 28;
-    meta.headers.slice(0, max).forEach(h => {
-      const d = document.createElement('div');
-      d.className = 'debug-chip';
-      d.title = String(h);
-      d.textContent = String(h);
-      dom.csvHeadersEl.appendChild(d);
-    });
-    if (meta.headers.length > max) {
-      const d = document.createElement('div');
-      d.className = 'debug-chip';
-      d.textContent = `+${meta.headers.length - max} more`;
-      dom.csvHeadersEl.appendChild(d);
-    }
-  }
-
-  const mapping = detectCSVMapping(meta.headers);
-  if (dom.csvMappingEl) {
-    const lines = [];
-    const add = (label, key) => {
-      const v = mapping[key] ? `"${mapping[key]}"` : '(not found)';
-      lines.push(`${label}: ${v}`);
-    };
-    add('name', 'name');
-    add('cp', 'cp');
-    add('ivPercent', 'ivPercent');
-    add('ivString', 'ivString');
-    add('atkIV', 'atkIV');
-    add('defIV', 'defIV');
-    add('staIV', 'staIV');
-    add('type1', 'type1');
-    add('type2', 'type2');
-    add('types', 'types');
-    lines.push('');
-    lines.push('Note: If types are not present in the CSV, we fall back to a built-in species->type map.');
-    dom.csvMappingEl.textContent = lines.join('\n');
-  }
-
-  if (dom.csvSampleEl) {
-    const r = firstRow || {};
-    const lines = [];
-    const addSample = (header) => {
-      if (!header) return;
-      const raw = r[header];
-      const value = (raw == null) ? '' : String(raw);
-      lines.push(`${header}: ${value}`);
-    };
-
-    Object.values(mapping).filter(Boolean).forEach(h => addSample(h));
-    if (!lines.length) {
-      const keys = Object.keys(r).slice(0, 10);
-      keys.forEach(k => lines.push(`${k}: ${String(r[k] ?? '')}`));
-    }
-    dom.csvSampleEl.textContent = lines.join('\n');
-  }
-
-  dom.csvDebugEl.hidden = false;
-}
+// CSV debug display (no-op, debug panel removed)
+export function renderCSVMetaDebug() {}
 
 // VS mode rendering
 export function renderVsGrid() {

@@ -419,12 +419,7 @@ export function wireEvents() {
     });
   }
 
-  // VS upload prompt button - opens upload drawer
-  if (dom.vsUploadPromptBtn) {
-    dom.vsUploadPromptBtn.addEventListener('click', openUploadDrawer);
-  }
-
-  // Error modal (reusable app-wide)
+  // Error modal
   if (dom.errorModal && dom.errorModalBackdrop) {
     dom.errorModalBackdrop.addEventListener('click', render.hideError);
     dom.errorModal.addEventListener('click', (e) => {

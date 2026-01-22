@@ -25,8 +25,6 @@ export const TYPES = [
   { name: 'Fairy',    colorVar: '--t-fairy'    },
 ];
 
-export const TOTAL_TYPES = 18;
-
 // Type effectiveness chart (Pokemon GO multipliers)
 export const TYPE_CHART = {
   Normal:   { super: [], resist: ['Rock','Steel'], immune: ['Ghost'] },
@@ -137,11 +135,6 @@ export function cycleTheme() {
 state.themeMode = 'system';
 
 // State update functions
-export function setMode(mode) {
-  const valid = ['collection', 'vs', 'trade'];
-  state.currentMode = valid.includes(mode) ? mode : 'collection';
-}
-
 export function toggleType(typeName) {
   if (state.selectedTypes.has(typeName)) {
     state.selectedTypes.delete(typeName);
