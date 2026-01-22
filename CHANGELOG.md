@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.32] - 2026-01-21
+
+### Changed
+- **Footer reformatted**: Two-line layout for better readability
+- **Footer softened**: Smaller text (10px), muted color, `margin-top` breathing room above footer
+- **Token-driven spacing**: Footer padding now uses `--space-xs` / `--space-md` tokens
+
+---
+
 ## [3.3.31] - 2026-01-21
 
 ### Changed
