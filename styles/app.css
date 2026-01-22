@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.9";
+  --css-build: "v3.3.22";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -107,17 +107,19 @@
   --transition-fast: 0.1s ease;
   --transition-normal: 0.2s ease;
 
+  /* Component Sizes */
+  --icon-btn-size: 32px;
+  --chip-size: 28px;
+  --icon-size: 18px;
+  --icon-size-sm: 16px;
+  --tap-target-min: 44px;
+
+  /* Frame Border (dark brown for appbar/footer) */
+  --border-frame: #5a544e;
+
   /* Layout constants */
   --appbar-h: 52px;
   --appbar-real-h: var(--appbar-h);
-  --modebar-h: 44px;
-  --modebar-real-h: 44px;
-  --utilbar-h: 44px;
-  --utilbar-real-h: var(--utilbar-h);
-  --typebar-h: 48px;
-  --collectionbar-h: 60px;
-  --collectionbar-real-h: var(--collectionbar-h);
-  --filterzone-real-h: 0px;
   --sticky-offset: 0px;
   --table-sticky-top: 0px;
   --sticky-stack-h: 0px;
@@ -169,6 +171,7 @@ html[data-theme="dark"] {
   --border-strong: #5a5a70;
   --border-subtle: #303045;
   --border-color: var(--border-default);
+  --border-frame: #404058;
 
   /* Brand Colors (slightly muted for dark mode) */
   --color-primary: #e53e5a;
@@ -200,13 +203,13 @@ html[data-theme="dark"] {
 
 /* Appbar dark mode overrides */
 html[data-theme="dark"] .appbar {
-  background-color: #25253a;
-  border-top-color: #404058;
-  border-bottom-color: #404058;
+  background-color: var(--bg-surface);
+  border-top-color: var(--border-frame);
+  border-bottom-color: var(--border-frame);
 }
 
 html[data-theme="dark"] .app-footer {
-  border-bottom-color: #404058;
+  border-bottom-color: var(--border-frame);
 }
 
 /* Scanline overlay - reduce opacity in dark mode */
@@ -252,6 +255,7 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     --border-strong: #5a5a70;
     --border-subtle: #303045;
     --border-color: var(--border-default);
+    --border-frame: #404058;
 
     /* Brand Colors */
     --color-primary: #e53e5a;
@@ -282,13 +286,13 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
   }
 
   html[data-theme="system"] .appbar {
-    background-color: #25253a;
-    border-top-color: #404058;
-    border-bottom-color: #404058;
+    background-color: var(--bg-surface);
+    border-top-color: var(--border-frame);
+    border-bottom-color: var(--border-frame);
   }
 
   html[data-theme="system"] .app-footer {
-    border-bottom-color: #404058;
+    border-bottom-color: var(--border-frame);
   }
 
   html[data-theme="system"] body::before {
@@ -357,11 +361,11 @@ button { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px var(--space-lg);
-  padding-top: calc(4px + env(safe-area-inset-top, 0));
-  background-color: #EDE8DC;
-  border-top: 2px solid #5a544e;
-  border-bottom: 2px solid #5a544e;
+  padding: var(--space-xs) var(--space-lg);
+  padding-top: calc(var(--space-xs) + env(safe-area-inset-top, 0));
+  background-color: var(--bg-surface);
+  border-top: 2px solid var(--border-frame);
+  border-bottom: 2px solid var(--border-frame);
 }
 
 .appbar-left {
@@ -391,8 +395,8 @@ button { font-family: inherit; }
    COMPONENTS
    ============================================ */
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   display: inline-flex;
@@ -620,8 +624,8 @@ html[data-skin="gba-ds"] .skin-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--chip-size);
+  height: var(--chip-size);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: inset 1px 1px 0 rgba(255,255,255,0.2);
@@ -633,8 +637,8 @@ html[data-skin="gba-ds"] .skin-mark {
 }
 
 .icon-chip svg {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   fill: var(--text-inverse);
   opacity: 0.95;
 }
@@ -1069,7 +1073,7 @@ body.no-scroll { overflow: hidden; }
   width: min(380px, 92vw);
   background: var(--bg-surface);
   /* Match app-window frame: same border weight and color */
-  border-left: 2px solid #5a544e;
+  border-left: 2px solid var(--border-frame);
   box-shadow: -8px 0 24px rgba(0,0,0,0.18);
   transform: translateX(104%);
   transition: transform 180ms ease;
@@ -1102,8 +1106,8 @@ body.no-scroll { overflow: hidden; }
 
 /* Close button - pixel bevel style */
 .drawer-close-btn {
-  width: 28px;
-  height: 28px;
+  width: var(--chip-size);
+  height: var(--chip-size);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-display);
@@ -1306,8 +1310,8 @@ body.no-scroll { overflow: hidden; }
 }
 
 .upload-action-btn .icon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .upload-action-btn:hover {
@@ -1540,8 +1544,8 @@ body.no-scroll { overflow: hidden; }
 }
 
 .vs-top-arrow-col svg {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   fill: var(--text-secondary);
   opacity: 0.95;
 }
@@ -1688,8 +1692,8 @@ body.no-scroll { overflow: hidden; }
   transition: color 0.15s ease, transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
 }
 
 .carousel-arrow svg {
@@ -1709,8 +1713,8 @@ body.no-scroll { overflow: hidden; }
 /* Placeholder for missing arrow (first/last slide) */
 .carousel-arrow-placeholder {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: var(--icon-btn-size);
+  height: var(--icon-btn-size);
 }
 
 /* Carousel content */
@@ -2372,11 +2376,11 @@ body.no-scroll { overflow: hidden; }
 }
 
 .matchup-icons-strong {
-  color: var(--success, #2a7);
+  color: var(--color-success);
 }
 
 .matchup-icons-weak {
-  color: var(--danger, #c55);
+  color: var(--color-error);
 }
 
 .matchup-caret {
@@ -2447,11 +2451,11 @@ body.no-scroll { overflow: hidden; }
 }
 
 .matchup-label.strong {
-  color: var(--success, #2a7);
+  color: var(--color-success);
 }
 
 .matchup-label.weak {
-  color: var(--danger, #c55);
+  color: var(--color-error);
 }
 
 /* Mini type pills container - no wrap, fit on one line */
@@ -2800,11 +2804,11 @@ body.no-scroll { overflow: hidden; }
 }
 
 .matchup-strong {
-  color: var(--success, #2a7);
+  color: var(--color-success);
 }
 
 .matchup-weak {
-  color: var(--danger, #c55);
+  color: var(--color-error);
 }
 
 /* Legacy .poke-meta */
@@ -2875,8 +2879,8 @@ body.no-scroll { overflow: hidden; }
 #viewTrade[hidden] { display: none !important; }
 
 .icon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   opacity: 0.95;
   /* Icons handle their own fill/stroke via currentColor */
 }
@@ -2913,7 +2917,7 @@ body.no-scroll { overflow: hidden; }
   flex-wrap: nowrap;
   white-space: nowrap;
   background: var(--bg-surface);
-  border-bottom: 2px solid #5a544e;
+  border-bottom: 2px solid var(--border-frame);
 }
 
 .app-footer a {

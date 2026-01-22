@@ -993,8 +993,6 @@ export function makeSimpleCard(row, typesArr, cp, oppType = null, popupMode = 'b
     card.addEventListener('click', (e) => {
       showPokePopup(pokeName, pokeTypes, oppType, e.clientX, e.clientY, card, popupMode);
     });
-
-    card.style.cursor = 'pointer';
   }
 
   return card;
@@ -1179,8 +1177,6 @@ function renderTypeIconColumnLayout(container, oppTypes, typesByOpp, popupMode =
 
         // Attach popup handlers if popupMode specified
         if (popupMode) {
-          icon.style.cursor = 'pointer';
-
           icon.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1320,29 +1316,14 @@ export function syncVsUI() {
   updateScrollState();
 }
 
-// Sticky metrics
+// Sticky metrics - only appbar exists now
 export function updateStickyMetrics() {
   const appbar = document.querySelector('.appbar');
-  const modebar = document.querySelector('.modebar');
-  const utilbar = document.querySelector('.utility-row');
-  const collectionbar = document.querySelector('.collectionbar');
-  const filterzone = document.querySelector('.filterzone');
-
   const appH = Math.round(appbar ? appbar.getBoundingClientRect().height : 0);
-  const modeH = Math.round(modebar ? modebar.getBoundingClientRect().height : 0);
-  const utilH = Math.round(utilbar ? utilbar.getBoundingClientRect().height : 0);
-  const colH = Math.round(collectionbar ? collectionbar.getBoundingClientRect().height : 0);
-  const filH = Math.round(filterzone ? filterzone.getBoundingClientRect().height : 0);
 
   document.documentElement.style.setProperty('--appbar-real-h', `${appH}px`);
-  document.documentElement.style.setProperty('--modebar-real-h', `${modeH}px`);
-  document.documentElement.style.setProperty('--utilbar-real-h', `${utilH}px`);
-  document.documentElement.style.setProperty('--collectionbar-real-h', `${colH}px`);
-  document.documentElement.style.setProperty('--filterzone-real-h', `${filH}px`);
-
-  const stackH = appH + modeH + utilH + colH + filH;
-  document.documentElement.style.setProperty('--sticky-stack-h', `${stackH}px`);
-  document.documentElement.style.setProperty('--sticky-offset', `${stackH}px`);
+  document.documentElement.style.setProperty('--sticky-stack-h', `${appH}px`);
+  document.documentElement.style.setProperty('--sticky-offset', `${appH}px`);
 
   updateTableHeaderTop();
 }

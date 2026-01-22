@@ -28,7 +28,7 @@ export function openSheetFor(sheetEl, triggerEl) {
   activeTrigger = triggerEl || null;
   sheetEl.hidden = false;
   dom.backdrop.hidden = false;
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('no-scroll');
   const firstBtn = sheetEl.querySelector('button');
   if (firstBtn) {
     try { firstBtn.focus(); } catch (_) {}
@@ -38,7 +38,7 @@ export function openSheetFor(sheetEl, triggerEl) {
 export function closeActiveSheet() {
   if (activeSheet) activeSheet.hidden = true;
   if (dom.backdrop) dom.backdrop.hidden = true;
-  document.body.style.overflow = '';
+  document.body.classList.remove('no-scroll');
   if (activeTrigger) {
     try { activeTrigger.focus(); } catch (_) {}
   }
