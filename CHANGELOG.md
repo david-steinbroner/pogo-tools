@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.36] - 2026-01-21
+
+### Fixed
+- **Feedback form padding**: Added left/right padding to match other drawer content
+- **Drawer scroll**: Added bottom margin to version number for proper scroll visibility
+- **About drawer default state**: All sections now closed by default (removed `open` from VERSUS)
+
+---
+
 ## [3.3.35] - 2026-01-21
 
 ### Changed

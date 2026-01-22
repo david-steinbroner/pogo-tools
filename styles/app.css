@@ -1289,6 +1289,7 @@ body.no-scroll { overflow: hidden; }
 /* Version display in About drawer */
 .drawer-version {
   margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
   text-align: center;
   display: flex;
   align-items: center;
@@ -3059,7 +3060,7 @@ body.no-scroll { overflow: hidden; }
    ============================================ */
 
 .feedback-form {
-  padding: var(--space-xs) 0;
+  padding: var(--space-xs) var(--space-md) var(--space-md) var(--space-md);
 }
 
 .form-group {
