@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.40";
+  --css-build: "v3.3.41";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -191,6 +191,7 @@ html[data-theme="dark"] {
   --appbar-btn-hi: #8585b0;
   --appbar-btn-lo: #252535;
   --appbar-btn-shadow: 2px 3px 0 #101018;
+  --appbar-btn-outline: rgba(255,255,255,0.22);
 
   /* Tab Hover */
   --tab-hover-bg: rgba(255, 255, 255, 0.1);
@@ -203,14 +204,14 @@ html[data-theme="dark"] .appbar {
   border-bottom-color: var(--border-frame);
 }
 
-/* Appbar icon buttons - pixel bevel for clear tappable affordance */
+/* Appbar icon buttons - pixel bevel + outline for clear tappable affordance */
 html[data-theme="dark"] .appbar .icon-btn {
   background: var(--appbar-btn-bg);
   border-top-color: var(--appbar-btn-hi);
   border-left-color: var(--appbar-btn-hi);
   border-right-color: var(--appbar-btn-lo);
   border-bottom-color: var(--appbar-btn-lo);
-  box-shadow: var(--appbar-btn-shadow);
+  box-shadow: 0 0 0 1px var(--appbar-btn-outline), var(--appbar-btn-shadow);
 }
 
 html[data-theme="dark"] .appbar .icon-btn:active {
@@ -219,7 +220,7 @@ html[data-theme="dark"] .appbar .icon-btn:active {
   border-left-color: var(--appbar-btn-lo);
   border-right-color: var(--appbar-btn-hi);
   border-bottom-color: var(--appbar-btn-hi);
-  box-shadow: none;
+  box-shadow: 0 0 0 1px var(--appbar-btn-outline);
   transform: translateY(2px);
 }
 
@@ -336,6 +337,7 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     --appbar-btn-hi: #8585b0;
     --appbar-btn-lo: #252535;
     --appbar-btn-shadow: 2px 3px 0 #101018;
+    --appbar-btn-outline: rgba(255,255,255,0.22);
 
     /* Tab Hover */
     --tab-hover-bg: rgba(255, 255, 255, 0.1);
@@ -347,14 +349,14 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     border-bottom-color: var(--border-frame);
   }
 
-  /* Appbar icon buttons - pixel bevel for clear tappable affordance */
+  /* Appbar icon buttons - pixel bevel + outline for clear tappable affordance */
   html[data-theme="system"] .appbar .icon-btn {
     background: var(--appbar-btn-bg);
     border-top-color: var(--appbar-btn-hi);
     border-left-color: var(--appbar-btn-hi);
     border-right-color: var(--appbar-btn-lo);
     border-bottom-color: var(--appbar-btn-lo);
-    box-shadow: var(--appbar-btn-shadow);
+    box-shadow: 0 0 0 1px var(--appbar-btn-outline), var(--appbar-btn-shadow);
   }
 
   html[data-theme="system"] .appbar .icon-btn:active {
@@ -363,7 +365,7 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     border-left-color: var(--appbar-btn-lo);
     border-right-color: var(--appbar-btn-hi);
     border-bottom-color: var(--appbar-btn-hi);
-    box-shadow: none;
+    box-shadow: 0 0 0 1px var(--appbar-btn-outline);
     transform: translateY(2px);
   }
 

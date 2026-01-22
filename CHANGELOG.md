@@ -4,6 +4,16 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.41] - 2026-01-21
+
+### Changed
+- **Dark mode: appbar icon buttons - added outer outline for button silhouette**
+  - New `--appbar-btn-outline` token (`rgba(255,255,255,0.22)`)
+  - Box-shadow now includes `0 0 0 1px` outline stroke + drop shadow
+  - Outline persists in pressed state for consistent boundary definition
+
+---
+
 ## [3.3.40] - 2026-01-21
 
 ### Changed
