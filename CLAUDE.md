@@ -50,6 +50,28 @@ Debug mode enables:
 - Additional console logging
 - Sentry breadcrumb trails
 
+### Owner Mode (Feedback Export)
+
+Beta feedback is stored locally in IndexedDB. Only the owner can access export/management controls.
+
+**To unlock owner mode:**
+1. Open About drawer (tap info icon)
+2. Tap the version number **7 times quickly** (within 3 seconds)
+3. Enter passcode when prompted
+4. Owner controls appear in the "BETA FEEDBACK" section
+
+**Alternative:** Add `?debug=1` to URL - this prompts for passcode on load.
+
+**Details:**
+- Passcode: stored as `OWNER_PASSCODE` constant in `src/ui/events.js`
+- localStorage flag: `ownerMode=1`
+- IndexedDB database: `PoGOPalFeedback`, store: `submissions`
+
+**Owner controls:**
+- View submission count
+- Export all feedback as JSON
+- Clear all feedback
+
 ---
 
 ## B. Recent Work Summary (v3.3.20 → v3.3.26)

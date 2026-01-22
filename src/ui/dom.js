@@ -65,6 +65,31 @@ export const versionCopyBtn = document.getElementById('versionCopyBtn');
 export const versionTag = document.getElementById('versionTag');
 export const versionCopied = document.getElementById('versionCopied');
 
+// Feedback form elements
+export const feedbackSection = document.getElementById('feedbackSection');
+export const feedbackRating = document.getElementById('feedbackRating');
+export const feedbackIssues = document.getElementById('feedbackIssues');
+export const feedbackOtherIssue = document.getElementById('feedbackOtherIssue');
+export const feedbackWhere = document.getElementById('feedbackWhere');
+export const feedbackText = document.getElementById('feedbackText');
+export const feedbackAttachment = document.getElementById('feedbackAttachment');
+export const feedbackSubmitBtn = document.getElementById('feedbackSubmitBtn');
+export const feedbackStatus = document.getElementById('feedbackStatus');
+
+// Owner controls
+export const ownerControls = document.getElementById('ownerControls');
+export const feedbackCount = document.getElementById('feedbackCount');
+export const exportFeedbackBtn = document.getElementById('exportFeedbackBtn');
+export const clearFeedbackBtn = document.getElementById('clearFeedbackBtn');
+
+// Passcode modal
+export const passcodeModal = document.getElementById('passcodeModal');
+export const passcodeModalBackdrop = document.getElementById('passcodeModalBackdrop');
+export const passcodeModalClose = document.getElementById('passcodeModalClose');
+export const passcodeInput = document.getElementById('passcodeInput');
+export const passcodeSubmitBtn = document.getElementById('passcodeSubmitBtn');
+export const passcodeError = document.getElementById('passcodeError');
+
 // Upload drawer elements
 export const uploadDrawer = document.getElementById('uploadDrawer');
 export const uploadDrawerCloseBtn = document.getElementById('uploadDrawerCloseBtn');

@@ -3055,6 +3055,174 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ============================================
+   FEEDBACK FORM
+   ============================================ */
+
+.feedback-form {
+  padding: var(--space-sm) 0;
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 8px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+/* Rating buttons */
+.rating-row {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.rating-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  font-family: var(--font-body);
+  font-size: 20px;
+  cursor: pointer;
+  background: var(--btn-bg);
+  border: 2px solid var(--btn-border);
+  border-top-color: var(--btn-hi);
+  border-left-color: var(--btn-hi);
+  border-right-color: var(--btn-lo);
+  border-bottom-color: var(--btn-lo);
+  box-shadow: var(--btn-shadow);
+  border-radius: var(--radius-sm);
+  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+}
+
+.rating-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  pointer-events: none;
+}
+
+.rating-btn.is-selected {
+  background: var(--btn-bg-active);
+  border-top-color: var(--btn-hi-active);
+  border-left-color: var(--btn-hi-active);
+  border-right-color: var(--btn-lo-active);
+  border-bottom-color: var(--btn-lo-active);
+  box-shadow: var(--btn-inset);
+  transform: translateY(1px);
+}
+
+/* Checkbox and radio groups */
+.checkbox-group,
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.checkbox-item,
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: var(--space-xs) 0;
+  min-height: var(--tap-target-min);
+}
+
+.checkbox-item input,
+.radio-item input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--text-primary);
+}
+
+/* Text inputs */
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: var(--space-sm);
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-file {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+/* Submit button */
+.feedback-submit {
+  width: 100%;
+  margin-top: var(--space-sm);
+}
+
+.feedback-status {
+  margin-top: var(--space-sm);
+  font-family: var(--font-body);
+  font-size: 16px;
+  text-align: center;
+}
+
+.feedback-status.success {
+  color: var(--color-success, #2a7d2a);
+}
+
+.feedback-status.error {
+  color: var(--color-error);
+}
+
+/* Owner-only controls */
+.owner-controls {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.owner-stats {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.owner-buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.owner-buttons .sheet-btn {
+  flex: 1;
+}
+
+/* ============================================
    VIEWPORT FIT - In-app browser scaling
    ============================================ */
 #appScaleWrapper {

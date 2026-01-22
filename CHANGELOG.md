@@ -4,6 +4,24 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.34] - 2026-01-21
+
+### Added
+- **Beta feedback form**: In-app feedback collection in About drawer
+  - Rating (1-5), multi-select issues, location, freeform text, screenshot attachment
+  - Stored locally in IndexedDB (no server required)
+- **Owner-only export gate**: Hidden unlock gesture (7 taps on version) + passcode
+  - Export all feedback as JSON
+  - Clear saved feedback
+  - View submission count
+
+### Technical
+- IndexedDB storage with attachment support
+- Owner mode persisted via localStorage
+- `?debug=1` prompts for passcode (doesn't auto-unlock)
+
+---
+
 ## [3.3.33] - 2026-01-21
 
 ### Fixed

@@ -19,6 +19,255 @@ function addBreadcrumb(message, data = {}) {
   }
 }
 
+// Owner mode constants
+const OWNER_PASSCODE = 'pogopal2026';
+let versionTapCount = 0;
+let versionTapTimer = null;
+
+// IndexedDB for feedback storage
+const DB_NAME = 'PoGOPalFeedback';
+const DB_VERSION = 1;
+const STORE_NAME = 'submissions';
+
+function openFeedbackDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+    };
+  });
+}
+
+async function saveFeedback(data) {
+  const db = await openFeedbackDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.add(data);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getAllFeedback() {
+  const db = await openFeedbackDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function clearAllFeedback() {
+  const db = await openFeedbackDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getFeedbackCount() {
+  const db = await openFeedbackDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.count();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Passcode modal functions
+function showPasscodeModal() {
+  if (!dom.passcodeModal || !dom.passcodeModalBackdrop) return;
+  dom.passcodeModalBackdrop.hidden = false;
+  dom.passcodeModal.hidden = false;
+  if (dom.passcodeInput) {
+    dom.passcodeInput.value = '';
+    dom.passcodeInput.focus();
+  }
+  if (dom.passcodeError) dom.passcodeError.hidden = true;
+  document.body.classList.add('no-scroll');
+}
+
+function hidePasscodeModal() {
+  if (dom.passcodeModal) dom.passcodeModal.hidden = true;
+  if (dom.passcodeModalBackdrop) dom.passcodeModalBackdrop.hidden = true;
+  document.body.classList.remove('no-scroll');
+}
+
+function checkPasscode() {
+  const input = dom.passcodeInput?.value || '';
+  if (input === OWNER_PASSCODE) {
+    localStorage.setItem('ownerMode', '1');
+    hidePasscodeModal();
+    enableOwnerMode();
+  } else {
+    if (dom.passcodeError) dom.passcodeError.hidden = false;
+  }
+}
+
+async function enableOwnerMode() {
+  if (dom.ownerControls) dom.ownerControls.hidden = false;
+  await updateFeedbackCount();
+}
+
+async function updateFeedbackCount() {
+  if (!dom.feedbackCount) return;
+  try {
+    const count = await getFeedbackCount();
+    dom.feedbackCount.textContent = `${count} saved submission${count !== 1 ? 's' : ''}`;
+  } catch (err) {
+    dom.feedbackCount.textContent = '? submissions';
+  }
+}
+
+// Feedback form functions
+function showFeedbackStatus(message, type) {
+  if (!dom.feedbackStatus) return;
+  dom.feedbackStatus.textContent = message;
+  dom.feedbackStatus.className = `feedback-status ${type}`;
+  dom.feedbackStatus.hidden = false;
+  setTimeout(() => {
+    if (dom.feedbackStatus) dom.feedbackStatus.hidden = true;
+  }, 3000);
+}
+
+function resetFeedbackForm() {
+  // Clear rating
+  if (dom.feedbackRating) {
+    dom.feedbackRating.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('is-selected'));
+  }
+  // Clear checkboxes
+  if (dom.feedbackIssues) {
+    dom.feedbackIssues.querySelectorAll('input').forEach(cb => cb.checked = false);
+  }
+  // Hide other issue input
+  if (dom.feedbackOtherIssue) {
+    dom.feedbackOtherIssue.hidden = true;
+    dom.feedbackOtherIssue.value = '';
+  }
+  // Reset radio to "not sure"
+  if (dom.feedbackWhere) {
+    const notSure = dom.feedbackWhere.querySelector('input[value="not-sure"]');
+    if (notSure) notSure.checked = true;
+  }
+  // Clear textarea
+  if (dom.feedbackText) dom.feedbackText.value = '';
+  // Clear file input
+  if (dom.feedbackAttachment) dom.feedbackAttachment.value = '';
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({ name: file.name, type: file.type, data: reader.result });
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitFeedback() {
+  // Gather form data
+  const rating = dom.feedbackRating?.querySelector('.rating-btn.is-selected')?.dataset.rating || null;
+
+  const issues = [];
+  dom.feedbackIssues?.querySelectorAll('input:checked').forEach(cb => issues.push(cb.value));
+
+  const where = dom.feedbackWhere?.querySelector('input:checked')?.value || 'not-sure';
+  const otherIssueText = dom.feedbackOtherIssue?.value || '';
+  const freeformText = dom.feedbackText?.value || '';
+
+  // Get attachment as base64 (if any)
+  let attachment = null;
+  const file = dom.feedbackAttachment?.files[0];
+  if (file) {
+    attachment = await fileToBase64(file);
+  }
+
+  // Get app context
+  const activeTab = document.querySelector('.window-tab.is-active')?.textContent || 'Unknown';
+  const selectedTypes = Array.from(document.querySelectorAll('#vsHeaderPills .type-pill')).map(p => p.textContent);
+
+  const submission = {
+    timestamp: new Date().toISOString(),
+    appVersion: dom.versionTag?.textContent || 'unknown',
+    activeTab,
+    selectedOpponentTypes: selectedTypes,
+    url: window.location.href,
+    userAgent: navigator.userAgent,
+    rating: rating ? parseInt(rating, 10) : null,
+    issues,
+    where,
+    otherIssueText,
+    freeformText,
+    attachment
+  };
+
+  try {
+    await saveFeedback(submission);
+    showFeedbackStatus('Thanks for your feedback!', 'success');
+    resetFeedbackForm();
+    await updateFeedbackCount();
+    addBreadcrumb('feedback_submitted', { rating, issues: issues.length });
+  } catch (err) {
+    showFeedbackStatus('Failed to save feedback', 'error');
+    console.error('[PoGO] Feedback save error:', err);
+  }
+}
+
+async function exportFeedback() {
+  try {
+    const submissions = await getAllFeedback();
+    const json = JSON.stringify(submissions, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pogo-pal-feedback-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addBreadcrumb('feedback_exported', { count: submissions.length });
+  } catch (err) {
+    console.error('[PoGO] Export error:', err);
+  }
+}
+
+async function clearFeedback() {
+  if (!confirm('Clear all saved feedback? This cannot be undone.')) return;
+  try {
+    await clearAllFeedback();
+    await updateFeedbackCount();
+    addBreadcrumb('feedback_cleared');
+  } catch (err) {
+    console.error('[PoGO] Clear error:', err);
+  }
+}
+
+// Initialize owner mode on load
+function initOwnerMode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasDebugParam = urlParams.get('debug') === '1';
+  const hasOwnerFlag = localStorage.getItem('ownerMode') === '1';
+
+  if (hasOwnerFlag) {
+    enableOwnerMode();
+  } else if (hasDebugParam) {
+    // debug=1 triggers passcode prompt, doesn't auto-enable
+    showPasscodeModal();
+  }
+}
+
 // Sheet management
 let activeSheet = null;
 let activeTrigger = null;
@@ -479,7 +728,7 @@ export function wireEvents() {
     dom.drawerCloseBtn.addEventListener('click', closeDrawer);
   }
 
-  // Version tap-to-copy
+  // Version tap-to-copy + owner unlock gesture (7 taps)
   if (dom.versionCopyBtn && dom.versionTag) {
     dom.versionCopyBtn.addEventListener('click', async () => {
       const version = dom.versionTag.textContent;
@@ -493,7 +742,68 @@ export function wireEvents() {
         // Fallback for older browsers - just select the text
         console.log('[PoGO] Clipboard API not available');
       }
+
+      // Owner unlock gesture: 7 taps within 3 seconds
+      versionTapCount++;
+      if (versionTapTimer) clearTimeout(versionTapTimer);
+      versionTapTimer = setTimeout(() => { versionTapCount = 0; }, 3000);
+
+      if (versionTapCount >= 7) {
+        versionTapCount = 0;
+        if (versionTapTimer) clearTimeout(versionTapTimer);
+        showPasscodeModal();
+      }
     });
+  }
+
+  // Passcode modal events
+  if (dom.passcodeModalBackdrop) {
+    dom.passcodeModalBackdrop.addEventListener('click', hidePasscodeModal);
+  }
+  if (dom.passcodeModalClose) {
+    dom.passcodeModalClose.addEventListener('click', hidePasscodeModal);
+  }
+  if (dom.passcodeSubmitBtn) {
+    dom.passcodeSubmitBtn.addEventListener('click', checkPasscode);
+  }
+  if (dom.passcodeInput) {
+    dom.passcodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkPasscode();
+    });
+  }
+
+  // Feedback form events
+  if (dom.feedbackRating) {
+    dom.feedbackRating.addEventListener('click', (e) => {
+      const btn = e.target.closest('.rating-btn');
+      if (!btn) return;
+      dom.feedbackRating.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+    });
+  }
+
+  // Show/hide "other" text input based on checkbox
+  if (dom.feedbackIssues) {
+    dom.feedbackIssues.addEventListener('change', (e) => {
+      if (e.target.value === 'other') {
+        if (dom.feedbackOtherIssue) {
+          dom.feedbackOtherIssue.hidden = !e.target.checked;
+        }
+      }
+    });
+  }
+
+  // Submit feedback
+  if (dom.feedbackSubmitBtn) {
+    dom.feedbackSubmitBtn.addEventListener('click', submitFeedback);
+  }
+
+  // Owner controls
+  if (dom.exportFeedbackBtn) {
+    dom.exportFeedbackBtn.addEventListener('click', exportFeedback);
+  }
+  if (dom.clearFeedbackBtn) {
+    dom.clearFeedbackBtn.addEventListener('click', clearFeedback);
   }
 
   // Keyboard
@@ -504,6 +814,9 @@ export function wireEvents() {
       if (dom.uploadDrawer && dom.uploadDrawer.classList.contains('open')) closeUploadDrawer();
       if (dom.errorModal && !dom.errorModal.hidden) {
         render.hideError();
+      }
+      if (dom.passcodeModal && !dom.passcodeModal.hidden) {
+        hidePasscodeModal();
       }
     }
   });
@@ -563,5 +876,8 @@ export function wireEvents() {
       }
     }, { passive: true, capture: true });
   }
+
+  // Initialize owner mode (check localStorage or ?debug=1)
+  initOwnerMode();
 }
 

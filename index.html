@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles/app.css?v=3.3.33">
+<link rel="stylesheet" href="./styles/app.css?v=3.3.34">
 <script
   src="https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js"
   crossorigin="anonymous"
@@ -318,9 +318,77 @@
       </div>
     </details>
 
+    <!-- Beta Feedback Form -->
+    <details id="feedbackSection">
+      <summary>BETA FEEDBACK</summary>
+      <div class="feedback-form">
+        <!-- Rating -->
+        <div class="form-group">
+          <label class="form-label">How's it going?</label>
+          <div class="rating-row" id="feedbackRating">
+            <button type="button" class="rating-btn" data-rating="1" title="Frustrating">1</button>
+            <button type="button" class="rating-btn" data-rating="2" title="Needs work">2</button>
+            <button type="button" class="rating-btn" data-rating="3" title="Okay">3</button>
+            <button type="button" class="rating-btn" data-rating="4" title="Good">4</button>
+            <button type="button" class="rating-btn" data-rating="5" title="Great!">5</button>
+          </div>
+        </div>
+
+        <!-- What went wrong? (MULTI-SELECT) -->
+        <div class="form-group">
+          <label class="form-label">What went wrong? (select all that apply)</label>
+          <div class="checkbox-group" id="feedbackIssues">
+            <label class="checkbox-item"><input type="checkbox" name="issue" value="confusing"> Confusing</label>
+            <label class="checkbox-item"><input type="checkbox" name="issue" value="slow"> Slow/laggy</label>
+            <label class="checkbox-item"><input type="checkbox" name="issue" value="broken"> Something broken</label>
+            <label class="checkbox-item"><input type="checkbox" name="issue" value="ugly"> Doesn't look right</label>
+            <label class="checkbox-item"><input type="checkbox" name="issue" value="other"> Other</label>
+          </div>
+          <input type="text" id="feedbackOtherIssue" class="form-input" placeholder="Describe other issue..." hidden>
+        </div>
+
+        <!-- Where did it happen? -->
+        <div class="form-group">
+          <label class="form-label">Where did it happen?</label>
+          <div class="radio-group" id="feedbackWhere">
+            <label class="radio-item"><input type="radio" name="where" value="versus"> Versus</label>
+            <label class="radio-item"><input type="radio" name="where" value="about"> About/Help</label>
+            <label class="radio-item"><input type="radio" name="where" value="not-sure" checked> Not sure</label>
+          </div>
+        </div>
+
+        <!-- Freeform text -->
+        <div class="form-group">
+          <label class="form-label">Anything else?</label>
+          <textarea id="feedbackText" class="form-textarea" rows="3" placeholder="Optional details..."></textarea>
+        </div>
+
+        <!-- Screenshot attachment -->
+        <div class="form-group">
+          <label class="form-label">Screenshot (optional)</label>
+          <input type="file" id="feedbackAttachment" accept="image/*" class="form-file">
+        </div>
+
+        <!-- Submit button -->
+        <button type="button" id="feedbackSubmitBtn" class="sheet-btn feedback-submit">Submit Feedback</button>
+        <div id="feedbackStatus" class="feedback-status" hidden></div>
+
+        <!-- Owner-only controls (hidden by default) -->
+        <div id="ownerControls" class="owner-controls" hidden>
+          <div class="owner-stats">
+            <span class="mono" id="feedbackCount">0 saved submissions</span>
+          </div>
+          <div class="owner-buttons">
+            <button type="button" id="exportFeedbackBtn" class="sheet-btn ghost">Export JSON</button>
+            <button type="button" id="clearFeedbackBtn" class="sheet-btn ghost">Clear All</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <div class="drawer-version">
       <button id="versionCopyBtn" class="version-copy-btn" type="button" title="Tap to copy version">
-        <span id="versionTag">v3.3.31</span>
+        <span id="versionTag">v3.3.34</span>
       </button>
       <span id="versionCopied" class="version-copied" hidden>Copied!</span>
     </div>
@@ -374,6 +442,22 @@
     </div>
     <div class="modal-body">
       <div class="error-meta" id="errorBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Passcode Modal (owner access) -->
+<div id="passcodeModalBackdrop" class="modal-backdrop" hidden></div>
+<div id="passcodeModal" class="modal" hidden aria-modal="true" role="dialog" aria-label="Enter passcode">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Owner Access</div>
+      <button id="passcodeModalClose" class="modal-close-btn" type="button" aria-label="Dismiss">X</button>
+    </div>
+    <div class="modal-body">
+      <input type="password" id="passcodeInput" class="form-input" placeholder="Enter passcode" autocomplete="off">
+      <button type="button" id="passcodeSubmitBtn" class="sheet-btn" style="margin-top: var(--space-sm); width: 100%;">Unlock</button>
+      <div id="passcodeError" class="feedback-status error" hidden>Incorrect passcode</div>
     </div>
   </div>
 </div>
