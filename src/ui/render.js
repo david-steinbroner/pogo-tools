@@ -58,10 +58,16 @@ export function showPokePopup(pokeName, pokeTypes, oppType, x, y, triggerEl = nu
 
   dom.pokePopupText.innerHTML = '';
 
+  // Helper to create bold Pokemon name span
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'poke-name';
+  nameSpan.textContent = pokeName;
+
   if (popupMode === 'worst_counters') {
     // Worst Counters: "[Pokemon] is usually a risky pick against [OppType] Pokémon."
     // Line 2: "It tends to take heavier damage from [OppType] attacks, and may struggle to deal damage back effectively."
-    dom.pokePopupText.appendChild(document.createTextNode(`${pokeName} is usually a risky pick against `));
+    dom.pokePopupText.appendChild(nameSpan);
+    dom.pokePopupText.appendChild(document.createTextNode(` is usually a risky pick against `));
     dom.pokePopupText.appendChild(oppPill);
     dom.pokePopupText.appendChild(document.createTextNode(` Pokémon.`));
     dom.pokePopupText.appendChild(document.createElement('br'));
@@ -71,7 +77,8 @@ export function showPokePopup(pokeName, pokeTypes, oppType, x, y, triggerEl = nu
   } else {
     // Best Counters: "[Pokemon] is a recommended counter against [OppType] Pokémon."
     // Line 2: "It tends to hold up better against [OppType] attacks, and can deal extra damage back with the right move types."
-    dom.pokePopupText.appendChild(document.createTextNode(`${pokeName} is a recommended counter against `));
+    dom.pokePopupText.appendChild(nameSpan);
+    dom.pokePopupText.appendChild(document.createTextNode(` is a recommended counter against `));
     dom.pokePopupText.appendChild(oppPill);
     dom.pokePopupText.appendChild(document.createTextNode(` Pokémon.`));
     dom.pokePopupText.appendChild(document.createElement('br'));

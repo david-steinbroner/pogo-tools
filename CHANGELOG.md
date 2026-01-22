@@ -4,6 +4,13 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.51] - 2026-01-22
+
+### Changed
+- **Popup styling**: Pokemon names now bold, reduced top padding by 4px
+
+---
+
 ## [3.3.50] - 2026-01-22
 
 ### Changed
