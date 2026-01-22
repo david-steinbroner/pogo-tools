@@ -222,7 +222,7 @@ function init() {
     Sentry.init({
       dsn: 'https://d7a20243d8fd94dd9b415a266d1b19c4@o4510342078529536.ingest.us.sentry.io/4510744994643968',
       environment: location.hostname === 'pogo-pal.pages.dev' ? 'production' : 'development',
-      release: 'pogo-pal@2.0.73',
+      release: 'pogo-pal@3.3.23',
 
       integrations: [
         Sentry.browserTracingIntegration({
@@ -295,43 +295,92 @@ function init() {
     });
 
     // Set app version tag for filtering
-    Sentry.setTag('app_version', 'pogo-pal@2.0.73');
+    Sentry.setTag('app_version', 'pogo-pal@3.3.23');
+  }
+
+  // Sentry breadcrumb helper
+  function addBreadcrumb(message, data = {}) {
+    if (window.Sentry) {
+      Sentry.addBreadcrumb({ category: 'boot', message, data, level: 'info' });
+    }
+    console.log(`[PoGO] ${message}`, Object.keys(data).length ? data : '');
   }
 
   try {
-    console.log('[PoGO] Initializing app...');
+    addBreadcrumb('boot:start');
 
     // Initialize theme from localStorage/system preference
     initTheme();
+    addBreadcrumb('boot:theme-ready');
 
-    // Wire all event listeners
+    // Wire all event listeners (critical - must succeed for app to work)
     events.wireEvents();
+    addBreadcrumb('boot:events-wired');
 
     // Wire file input separately
     wireFileInput();
 
-    // Initial renders
+    // Initial renders (critical)
     render.renderGrid();
     render.renderActiveStrip();
     render.renderVsGrid();
     render.syncVsUI();
+    addBreadcrumb('boot:render-complete');
 
     // Set initial mode (isInitial=true to skip breadcrumb on first load)
     events.setModeUI('vs', true);
 
-    // Update sticky metrics and view
-    render.updateStickyMetrics();
-    render.updateView();
-    render.updateScrollState();
+    // Non-critical: sticky metrics (don't crash app if this fails)
+    try {
+      render.updateStickyMetrics();
+      addBreadcrumb('boot:sticky-metrics-ok');
+    } catch (metricsErr) {
+      console.warn('[PoGO] Sticky metrics failed (non-fatal):', metricsErr);
+      if (window.Sentry) {
+        Sentry.captureException(metricsErr, {
+          level: 'warning',
+          tags: { subsystem: 'sticky-metrics' },
+          extra: { domNodesExist: { tableHeaders: !!document.querySelector('th.sortable') } }
+        });
+      }
+    }
 
-    // Initialize viewport scaling for in-app browsers
-    initViewportFit();
+    // Non-critical: view/scroll state
+    try {
+      render.updateView();
+      render.updateScrollState();
+    } catch (viewErr) {
+      console.warn('[PoGO] View update failed (non-fatal):', viewErr);
+      if (window.Sentry) Sentry.captureException(viewErr, { level: 'warning', tags: { subsystem: 'view-state' } });
+    }
 
-    console.log('[PoGO] App initialized');
+    // Non-critical: viewport scaling for in-app browsers
+    try {
+      initViewportFit();
+      addBreadcrumb('boot:viewport-fit-ok');
+    } catch (vpErr) {
+      console.warn('[PoGO] Viewport fit failed (non-fatal):', vpErr);
+      if (window.Sentry) Sentry.captureException(vpErr, { level: 'warning', tags: { subsystem: 'viewport-fit' } });
+    }
+
+    addBreadcrumb('boot:complete');
   } catch (err) {
     console.error('[PoGO] Init error:', err);
+    addBreadcrumb('boot:fatal-error', { error: err.message });
     showInitError();
-    if (window.Sentry) Sentry.captureException(err);
+    if (window.Sentry) {
+      Sentry.captureException(err, {
+        tags: { subsystem: 'boot', fatal: 'true' },
+        extra: {
+          activeTab: state.currentMode,
+          domNodesExist: {
+            sheet: !!document.getElementById('typesSheet'),
+            vsGrid: !!document.getElementById('vsTypeGrid'),
+            tableHeaders: !!document.querySelector('th.sortable')
+          }
+        }
+      });
+    }
   }
 }
 

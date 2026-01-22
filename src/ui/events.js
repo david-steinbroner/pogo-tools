@@ -455,8 +455,11 @@ export function wireEvents() {
     });
   });
 
-  // Table header sorting
-  dom.tableHeaders.forEach(th => th.addEventListener('click', handleHeaderClick));
+  // Table header sorting (Collection tab - currently placeholder)
+  // Guard: dom.tableHeaders may be empty array if no table exists
+  if (dom.tableHeaders && dom.tableHeaders.length) {
+    dom.tableHeaders.forEach(th => th.addEventListener('click', handleHeaderClick));
+  }
 
   // Info drawer
   if (dom.infoBtn) {
