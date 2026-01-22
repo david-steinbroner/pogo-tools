@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.29";
+  --css-build: "v3.3.30";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -1722,7 +1722,7 @@ body.no-scroll { overflow: hidden; }
   background: var(--bg-surface-alt);
   padding: var(--space-xs) var(--space-xs);
   min-height: 40px;
-  border-bottom: 2px solid var(--border-default);
+  border-bottom: 2px solid var(--border-subtle);
   font-family: var(--font-display);
   font-size: var(--text-display-xs);
   color: var(--text-secondary);
@@ -1732,7 +1732,7 @@ body.no-scroll { overflow: hidden; }
 
 /* Subsequent headers within same slide get top border */
 .carousel-content + .carousel-header {
-  border-top: 2px solid var(--border-default);
+  border-top: 2px solid var(--border-subtle);
 }
 
 .carousel-header .panel-subtitle {

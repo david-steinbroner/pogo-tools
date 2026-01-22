@@ -4,6 +4,13 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.30] - 2026-01-21
+
+### Changed
+- **Internal section dividers**: Softened from `--border-default` to `--border-subtle` - lower contrast, less visual dominance
+
+---
+
 ## [3.3.29] - 2026-01-21
 
 ### Changed
