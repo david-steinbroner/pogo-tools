@@ -4,6 +4,13 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.47] - 2026-01-22
+
+### Fixed
+- **"Not Very Effective Move Types" was empty/incorrect**: Fixed logic bug in `getAvoidMovesPerOpp` that referenced non-existent `chart.weak` property instead of `chart.resist`. The function now correctly identifies move types that deal reduced damage to the opponent.
+
+---
+
 ## [3.3.46] - 2026-01-22
 
 ### Changed

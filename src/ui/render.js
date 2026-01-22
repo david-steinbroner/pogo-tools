@@ -526,11 +526,25 @@ function getAvoidMovesPerOpp(oppTypes) {
     // Find move types that deal not very effective or no damage to this opponent
     const weakMoves = TYPES.filter(t => {
       const chart = TYPE_CHART[t.name];
-      return chart?.weak?.includes(oppType) || chart?.immune?.includes(oppType);
+      // resist = move types that deal NOT VERY EFFECTIVE damage to oppType
+      // immune = move types that deal NO damage to oppType
+      return chart?.resist?.includes(oppType) || chart?.immune?.includes(oppType);
     }).map(t => t.name);
     result[oppType] = weakMoves.slice(0, 3);
   });
   return result;
+}
+
+// Debug sanity check: verify getAvoidMovesPerOpp returns expected results
+// Fire moves should be NOT EFFECTIVE against Water (Fire is in Water's resist list)
+if (state.debugMode) {
+  const testResult = getAvoidMovesPerOpp(['Water']);
+  const fireInResult = testResult['Water']?.includes('Fire');
+  if (fireInResult) {
+    console.log('[DEBUG] getAvoidMovesPerOpp sanity check PASSED: Fire correctly flagged as ineffective vs Water');
+  } else {
+    console.error('[DEBUG] getAvoidMovesPerOpp sanity check FAILED: Fire should be ineffective vs Water, got:', testResult['Water']);
+  }
 }
 
 export function scoreRosterAgainst(oppTypes) {
