@@ -659,6 +659,7 @@ html[data-skin="gba-ds"] .skin-mark {
 .icon-chip-btn {
   border: 2px solid var(--border-default);
   background: var(--bg-surface);
+  box-shadow: var(--btn-shadow);
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -2805,7 +2806,7 @@ body.no-scroll { overflow: hidden; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   /* Unpressed: raised look */
-  box-shadow: 0 2px 0 var(--btn-lo);
+  box-shadow: var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease;
 }
 
