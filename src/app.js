@@ -413,6 +413,8 @@ function init() {
     // Debug mode: verify tap target compliance
     if (state.debugMode) {
       verifyTapTargets();
+      // Expose for manual console testing (only in debug mode)
+      window.verifyTapTargets = verifyTapTargets;
     }
   } catch (err) {
     console.error('[PoGO] Init error:', err);
