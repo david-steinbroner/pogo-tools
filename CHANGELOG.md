@@ -4,6 +4,24 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.49] - 2026-01-22
+
+### Changed
+- **Copy: clearer Best/Worst Counter popup explanations**: Second sentence now explains damage relationships in plain English
+
+---
+
+## [3.3.48] - 2026-01-22
+
+### Fixed
+- **Popups now accurately describe each section**: Each popup type now uses section-specific copy that matches what it represents:
+  - Best/Worst Counters: Describes Pokémon counter recommendations with matchup context
+  - Best/Worst Counter Types: Describes defensive Pokémon type matchups (resist vs weak to opponent)
+  - Super/Not Very Effective Move Types: Describes offensive move effectiveness
+- **Worst Counter Types no longer says the opposite**: Previously all type popups used generic "will perform well" copy; now worst sections correctly warn about disadvantages
+
+---
+
 ## [3.3.47] - 2026-01-22
 
 ### Fixed
