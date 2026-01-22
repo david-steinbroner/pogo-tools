@@ -4,6 +4,13 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.54] - 2026-01-22
+
+### Changed
+- **Opponent header**: Reduced vertical padding further (22px → 18px)
+
+---
+
 ## [3.3.53] - 2026-01-22
 
 ### Changed
