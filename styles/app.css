@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.38";
+  --css-build: "v3.3.39";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -186,8 +186,11 @@ html[data-theme="dark"] {
   --card-shadow: 3px 3px 0 #0c0c18;
   --card-shadow-pressed: inset 2px 2px 4px rgba(0,0,0,0.3);
 
-  /* Appbar icon button keyline - light rim for visibility */
-  --btn-keyline: rgba(255,255,255,0.18);
+  /* Appbar icon button - stronger pixel bevel for visibility */
+  --appbar-btn-bg: #454565;
+  --appbar-btn-hi: #6a6a90;
+  --appbar-btn-lo: #1a1a28;
+  --appbar-btn-shadow: 2px 3px 0 #0a0a12;
 
   /* Tab Hover */
   --tab-hover-bg: rgba(255, 255, 255, 0.1);
@@ -200,10 +203,24 @@ html[data-theme="dark"] .appbar {
   border-bottom-color: var(--border-frame);
 }
 
-/* Appbar icon buttons - keyline for visibility against dark header */
+/* Appbar icon buttons - pixel bevel for clear tappable affordance */
 html[data-theme="dark"] .appbar .icon-btn {
-  outline: 1px solid var(--btn-keyline);
-  outline-offset: -1px;
+  background: var(--appbar-btn-bg);
+  border-top-color: var(--appbar-btn-hi);
+  border-left-color: var(--appbar-btn-hi);
+  border-right-color: var(--appbar-btn-lo);
+  border-bottom-color: var(--appbar-btn-lo);
+  box-shadow: var(--appbar-btn-shadow);
+}
+
+html[data-theme="dark"] .appbar .icon-btn:active {
+  background: var(--btn-bg-active);
+  border-top-color: var(--appbar-btn-lo);
+  border-left-color: var(--appbar-btn-lo);
+  border-right-color: var(--appbar-btn-hi);
+  border-bottom-color: var(--appbar-btn-hi);
+  box-shadow: none;
+  transform: translateY(2px);
 }
 
 html[data-theme="dark"] .app-footer {
@@ -314,8 +331,11 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     --card-shadow: 3px 3px 0 #0c0c18;
     --card-shadow-pressed: inset 2px 2px 4px rgba(0,0,0,0.3);
 
-    /* Appbar icon button keyline - light rim for visibility */
-    --btn-keyline: rgba(255,255,255,0.18);
+    /* Appbar icon button - stronger pixel bevel for visibility */
+    --appbar-btn-bg: #454565;
+    --appbar-btn-hi: #6a6a90;
+    --appbar-btn-lo: #1a1a28;
+    --appbar-btn-shadow: 2px 3px 0 #0a0a12;
 
     /* Tab Hover */
     --tab-hover-bg: rgba(255, 255, 255, 0.1);
@@ -327,10 +347,24 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     border-bottom-color: var(--border-frame);
   }
 
-  /* Appbar icon buttons - keyline for visibility against dark header */
+  /* Appbar icon buttons - pixel bevel for clear tappable affordance */
   html[data-theme="system"] .appbar .icon-btn {
-    outline: 1px solid var(--btn-keyline);
-    outline-offset: -1px;
+    background: var(--appbar-btn-bg);
+    border-top-color: var(--appbar-btn-hi);
+    border-left-color: var(--appbar-btn-hi);
+    border-right-color: var(--appbar-btn-lo);
+    border-bottom-color: var(--appbar-btn-lo);
+    box-shadow: var(--appbar-btn-shadow);
+  }
+
+  html[data-theme="system"] .appbar .icon-btn:active {
+    background: var(--btn-bg-active);
+    border-top-color: var(--appbar-btn-lo);
+    border-left-color: var(--appbar-btn-lo);
+    border-right-color: var(--appbar-btn-hi);
+    border-bottom-color: var(--appbar-btn-hi);
+    box-shadow: none;
+    transform: translateY(2px);
   }
 
   html[data-theme="system"] .app-footer {

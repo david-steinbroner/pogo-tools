@@ -4,6 +4,17 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.39] - 2026-01-21
+
+### Changed
+- **Dark mode: appbar icon buttons now have pixel bevel + stronger pressed state for clearer affordance**
+  - Added appbar-specific tokens: `--appbar-btn-bg`, `--appbar-btn-hi`, `--appbar-btn-lo`, `--appbar-btn-shadow`
+  - Button face slightly lighter than appbar background for contrast
+  - Classic pixel bevel: bright top/left highlight, dark bottom/right shadow
+  - Pressed state: inverted bevel, no shadow, translateY(2px)
+
+---
+
 ## [3.3.38] - 2026-01-21
 
 ### Changed
