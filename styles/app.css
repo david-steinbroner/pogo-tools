@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.43";
+  --css-build: "v3.3.46";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -33,6 +33,9 @@
   --text-secondary: #2D3436;
   --text-muted: #8B9396;
   --text-inverse: #FFFFFF;
+
+  /* Icon glyph color (neutral, high-contrast against colored bg) */
+  --icon-glyph: #2D3436;
 
   /* Border Colors */
   --border-default: #C4BBA8;
@@ -63,6 +66,7 @@
   --btn-lo-active: #D0C8B8;
   --btn-shadow: 2px 3px 0 #7A7262;
   --btn-inset: inset 1px 1px 0 #7A7262, inset -1px -1px 0 #F8F4EC;
+  --icon-tile-glint: inset 0 1px 0 rgba(255,255,255,0.5);
 
   /* Tab Hover */
   --tab-hover-bg: rgba(0, 0, 0, 0.08);
@@ -113,25 +117,25 @@
   --table-sticky-top: 0px;
   --sticky-stack-h: 0px;
 
-  /* Type colors (Pokemon GO palette) */
-  --t-normal: #A8A878;
-  --t-fire: #F08030;
-  --t-water: #6890F0;
-  --t-electric: #F8D030;
-  --t-grass: #78C850;
-  --t-ice: #98D8D8;
-  --t-fighting: #C03028;
-  --t-poison: #A040A0;
-  --t-ground: #E0C068;
-  --t-flying: #A890F0;
-  --t-psychic: #F85888;
-  --t-bug: #A8B820;
-  --t-rock: #B8A038;
-  --t-ghost: #705898;
-  --t-dragon: #7038F8;
-  --t-dark: #705848;
-  --t-steel: #B8B8D0;
-  --t-fairy: #EE99AC;
+  /* Type colors (muted pastels - 15-20% desaturated from Pokemon GO palette) */
+  --t-normal: #AEA88C;
+  --t-fire: #D89868;
+  --t-water: #88A0D8;
+  --t-electric: #E8D070;
+  --t-grass: #88C078;
+  --t-ice: #A8D8D8;
+  --t-fighting: #B85858;
+  --t-poison: #A868A8;
+  --t-ground: #D8C088;
+  --t-flying: #B0A8D8;
+  --t-psychic: #E088A0;
+  --t-bug: #A8B060;
+  --t-rock: #B8A868;
+  --t-ghost: #8070A0;
+  --t-dragon: #8868D0;
+  --t-dark: #786860;
+  --t-steel: #C0C0D0;
+  --t-fairy: #E0A8B8;
 }
 
 /* ============================================
@@ -154,6 +158,9 @@ html[data-theme="dark"] {
   --text-secondary: #a8a8b8;
   --text-muted: #6a6a7a;
   --text-inverse: #1a1a2e;
+
+  /* Icon glyph color (neutral, high-contrast against colored bg) */
+  --icon-glyph: #f0f0f4;
 
   /* Border Colors */
   --border-default: #404058;
@@ -288,6 +295,17 @@ html[data-theme="dark"] .type-result-icon.is-popup-active {
   transform: translateY(2px);
 }
 
+/* Dark mode placeholder lines - match type pill text color */
+html[data-theme="dark"] .type-slot-line {
+  background: var(--text-primary);
+}
+
+/* Dark mode icon tiles - subtle dark edge for glyph contrast */
+html[data-theme="dark"] .icon-chip {
+  border-color: rgba(0,0,0,0.35);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+}
+
 /* Theme icon visibility */
 .theme-icon { display: none; }
 html:not([data-theme]) .theme-icon--system,
@@ -314,6 +332,9 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     --text-secondary: #a8a8b8;
     --text-muted: #6a6a7a;
     --text-inverse: #1a1a2e;
+
+    /* Icon glyph color */
+    --icon-glyph: #f0f0f4;
 
     /* Border Colors */
     --border-default: #404058;
@@ -444,6 +465,16 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
   html[data-theme="system"] .type-result-icon.is-popup-active {
     box-shadow: none;
     transform: translateY(2px);
+  }
+
+  html[data-theme="system"] .type-slot-line {
+    background: var(--text-primary);
+  }
+
+  /* System dark mode icon tiles - subtle dark edge for glyph contrast */
+  html[data-theme="system"] .icon-chip {
+    border-color: rgba(0,0,0,0.35);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
   }
 }
 
@@ -806,6 +837,7 @@ html[data-skin="gba-ds"] .skin-mark {
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: inset 1px 1px 0 rgba(255,255,255,0.2);
   flex: 0 0 auto;
+  color: var(--icon-glyph);
 }
 
 .icon-chip.is-selected {
@@ -815,7 +847,7 @@ html[data-skin="gba-ds"] .skin-mark {
 .icon-chip svg {
   width: var(--icon-size-sm);
   height: var(--icon-size-sm);
-  fill: var(--text-inverse);
+  fill: currentColor;
   opacity: 0.95;
 }
 
@@ -2906,9 +2938,9 @@ body.no-scroll { overflow: hidden; }
   height: 28px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  /* Unpressed: raised look */
+  /* Unpressed: raised look with top-edge glint */
   border-radius: var(--radius-sm);
-  box-shadow: var(--btn-shadow);
+  box-shadow: var(--icon-tile-glint), var(--btn-shadow);
   transition: transform 80ms ease, box-shadow 80ms ease;
 }
 
@@ -2992,7 +3024,7 @@ body.no-scroll { overflow: hidden; }
   position: fixed;
   z-index: 1000;
   background: var(--bg-surface);
-  border: 2px solid var(--border-default);
+  border: 2px solid var(--border-frame);
   border-radius: var(--radius-md);
   padding: 18px 22px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);

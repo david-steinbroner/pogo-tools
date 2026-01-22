@@ -5,6 +5,7 @@
 
 import { state, TYPES, TYPE_CHART, typeMeta, setCarouselIndex } from '../state.js';
 import { getCountersPerType, getWeakCountersPerType } from '../data/budgetCounters.js';
+import { svgForType } from '../data/typeIcons.js';
 import * as dom from './dom.js';
 
 // Popup state
@@ -211,52 +212,6 @@ document.addEventListener('click', (e) => {
   e.stopPropagation();
   hidePokePopup();
 }, { capture: true });
-
-// SVG icons for types
-export function svgForType(type) {
-  const common = 'viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
-  const wrap = (inner) => `<svg ${common}>${inner}</svg>`;
-
-  switch (type) {
-    case 'Water':
-      return wrap('<path d="M12 2C9 6.6 6 10 6 14.2A6 6 0 0 0 12 20a6 6 0 0 0 6-5.8C18 10 15 6.6 12 2z"/>');
-    case 'Fire':
-      return wrap('<path d="M12 2c1.6 3.2.8 5.4-.6 6.9C9.7 10.7 9 12 9 13.6A3.2 3.2 0 0 0 12.2 17c1.9 0 3.4-1.4 3.4-3.3 0-1.4-.7-2.4-1.8-3.8.2 1.2-.6 2.1-1.6 2.3-.6-2.4.4-4.1 2.1-5.8C15.4 4.9 15.1 3.4 12 2z"/>');
-    case 'Grass':
-      return wrap('<path d="M20 4c-6 0-10 3-12 8-1 3-1 6-1 8h3c0-2 .1-3.7.6-5.4C12.6 10.5 15.6 8 20 8V4z"/><path d="M4 12c4.2.2 7.2 2.4 8.8 6.6.2.5.3 1 .4 1.4H9c-.2-.5-.4-1.1-.7-1.7C7.3 16 5.8 14.7 4 14.3V12z"/>');
-    case 'Electric':
-      return wrap('<path d="M13 2 4 13h7l-1 9 10-13h-7l0-7z"/>');
-    case 'Ice':
-      return wrap('<path d="M12 2v20M4 6l16 12M4 18 20 6" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6 5l2 1M18 19l-2-1M6 19l2-1M18 5l-2 1" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>');
-    case 'Fighting':
-      return wrap('<path d="M7 12c0-2 1.5-3.5 3.5-3.5h1C14.4 8.5 16 10 16 12v7H7v-7z"/><path d="M9 7c0-1.2 1-2 2.2-2H14c1.2 0 2 .8 2 2v2H9V7z"/>');
-    case 'Poison':
-      return wrap('<path d="M12 3c3 2 5 4.7 5 7.7A5 5 0 0 1 12 16a5 5 0 0 1-5-5.3C7 7.7 9 5 12 3z"/><path d="M8 19h8" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>');
-    case 'Ground':
-      return wrap('<path d="M3 18h18v2H3z"/><path d="M6 18c1.4-4.5 3.7-7 6-7s4.6 2.5 6 7H6z"/>');
-    case 'Flying':
-      return wrap('<path d="M4 13c5-6 11-6 16 0-3-1.3-5.8-.8-8 1.6C9.8 12.2 7 11.7 4 13z"/><path d="M12 14c.5 2.5 2.2 4.6 5 6-2.9-.6-5.1-1.9-6.6-3.6C8.6 17.7 6.5 19 4 19c3.5-1.2 6.2-2.9 8-5z"/>');
-    case 'Psychic':
-      return wrap('<path d="M12 4c4.2 0 7 2.9 7 6.7S16.2 19 12 19s-7-4.4-7-8.3C5 6.9 7.8 4 12 4z"/><circle cx="12" cy="11" r="2.2" fill="#000" opacity="0.22"/><path d="M8 11c1.2-1.8 2.6-2.7 4-2.7s2.8.9 4 2.7c-1.2 1.8-2.6 2.7-4 2.7S9.2 12.8 8 11z" fill="#000" opacity="0.22"/>');
-    case 'Bug':
-      return wrap('<path d="M12 6c2.2 0 4 1.8 4 4v8H8v-8c0-2.2 1.8-4 4-4z"/><path d="M8 11H4M20 11h-4M9 5 7 3m8 2 2-2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M10 6c0-1.1.9-2 2-2s2 .9 2 2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>');
-    case 'Rock':
-      return wrap('<path d="M7 21 3 14l4-8h10l4 8-4 7H7z"/><path d="M7 6l5 4 5-4" fill="#000" opacity="0.18"/>');
-    case 'Ghost':
-      return wrap('<path d="M12 3c3.3 0 6 2.7 6 6v12l-2-1-2 1-2-1-2 1-2-1-2 1V9c0-3.3 2.7-6 6-6z"/><circle cx="10" cy="10" r="1.2" fill="#000" opacity="0.25"/><circle cx="14" cy="10" r="1.2" fill="#000" opacity="0.25"/>');
-    case 'Dragon':
-      return wrap('<path d="M19 6c-3.5 0-6.5 2.2-8.3 5.3L9 10l1 3-3 1 2 2-1 4 4-2 2 2 1-3 3-1-2-2 1-4 2-1c.3-.8.4-1.6.4-2.4C20 6.6 19.6 6 19 6z"/>');
-    case 'Dark':
-      return wrap('<path d="M14.5 3.5A8 8 0 0 0 8 18.5 7 7 0 1 1 14.5 3.5z"/>');
-    case 'Steel':
-      return wrap('<path d="M12 2 21 7v10l-9 5-9-5V7l9-5z"/><path d="M12 7v10M7.5 9.5 16.5 14.5" stroke="#000" opacity="0.18" stroke-width="2"/>');
-    case 'Fairy':
-      return wrap('<path d="M12 2l2.2 6.6H21l-5.4 3.9 2.1 6.5L12 15.6 6.3 19l2.1-6.5L3 8.6h6.8L12 2z"/>');
-    case 'Normal':
-    default:
-      return wrap('<circle cx="12" cy="12" r="7"/>');
-  }
-}
 
 // Get types from a row
 export function rowTypeList(row) {

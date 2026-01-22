@@ -4,6 +4,20 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.46] - 2026-01-22
+
+### Changed
+- **Type icon refresh**: Replaced custom glyphs with partywhale/pokemon-type-icons (MIT)
+  - Centralized icon mapping in `src/data/typeIcons.js`
+  - SVGs use `currentColor` for CSS-controlled glyph color
+- **Neutral glyph styling**: Icon glyphs now use high-contrast neutral colors
+  - Light mode: near-charcoal (`#2D3436`)
+  - Dark mode: near-white (`#f0f0f4`)
+- **Muted type colors**: All 18 type colors reduced ~15-20% saturation for pastel look
+- **Dark mode edge treatment**: Icon tiles have subtle dark stroke for glyph contrast
+
+---
+
 ## [3.3.45] - 2026-01-22
 
 ### Changed
