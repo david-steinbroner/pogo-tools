@@ -1,11 +1,26 @@
 /**
  * Viewport Fit - Scale app to fit short in-app browser viewports
  * Handles Reddit/Twitter/etc in-app browsers where chrome reduces viewport height
+ *
+ * iOS Keyboard Guard:
+ * When an input is focused on iOS Safari, the visualViewport.height shrinks to
+ * account for the on-screen keyboard. Without a guard, this would trigger scaling
+ * and cause the "shrink + fly up" effect. We set a global __keyboardMode flag
+ * during input focus to disable scaling while typing.
  */
 
 const SAFE_PADDING = 0; // rely on offsetTop accounting only
 
 let baseHeight = null; // Cached design height (measured once at scale=1)
+
+/**
+ * Global keyboard mode flag
+ * When true, viewport scaling is disabled to prevent iOS keyboard shrink effect
+ */
+window.__keyboardMode = false;
+
+// Timeout ID for delayed keyboard mode reset (allows selecting autocomplete options)
+let keyboardModeTimeout = null;
 
 /**
  * Get available viewport height, preferring visualViewport for in-app browsers.
@@ -30,8 +45,15 @@ function measureBaseHeight(app) {
 
 /**
  * Compute and apply scale to fit app in viewport
+ * Skipped when __keyboardMode is true (iOS keyboard open)
  */
 function fitToViewport() {
+  // iOS Keyboard Guard: Skip scaling when an input is focused
+  // This prevents the "shrink + fly up" effect when the keyboard opens
+  if (window.__keyboardMode) {
+    return;
+  }
+
   const wrapper = document.getElementById('appScaleWrapper');
   const app = document.querySelector('.app');
 
@@ -65,6 +87,33 @@ function fitToViewport() {
 }
 
 /**
+ * Enter keyboard mode - disable viewport scaling
+ * Called when a text input or textarea is focused
+ */
+function enterKeyboardMode() {
+  // Clear any pending exit timeout
+  if (keyboardModeTimeout) {
+    clearTimeout(keyboardModeTimeout);
+    keyboardModeTimeout = null;
+  }
+  window.__keyboardMode = true;
+}
+
+/**
+ * Exit keyboard mode after a delay - re-enable viewport scaling
+ * Delay allows selecting autocomplete options without flicker
+ */
+function exitKeyboardMode() {
+  // Delay exit to handle autocomplete selection (tap result → focus briefly lost)
+  keyboardModeTimeout = setTimeout(() => {
+    window.__keyboardMode = false;
+    keyboardModeTimeout = null;
+    // Recompute fit now that keyboard is closed
+    fitToViewport();
+  }, 200);
+}
+
+/**
  * Initialize viewport fitting
  */
 export function initViewportFit() {
@@ -77,8 +126,30 @@ export function initViewportFit() {
   window.addEventListener('resize', fitToViewport);
 
   // Recompute on visualViewport changes (iOS in-app browser chrome)
+  // But NOT when keyboard mode is active
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', fitToViewport);
     window.visualViewport.addEventListener('scroll', fitToViewport);
   }
+
+  // iOS Keyboard Guard: Track input focus to prevent shrink effect
+  // Listen at document level to catch all inputs (including dynamically added ones)
+  document.addEventListener('focusin', (e) => {
+    const target = e.target;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      // Text-like inputs that trigger the keyboard
+      const type = target.type || 'text';
+      const textTypes = ['text', 'search', 'email', 'url', 'tel', 'password', 'number'];
+      if (target.tagName === 'TEXTAREA' || textTypes.includes(type)) {
+        enterKeyboardMode();
+      }
+    }
+  });
+
+  document.addEventListener('focusout', (e) => {
+    const target = e.target;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      exitKeyboardMode();
+    }
+  });
 }

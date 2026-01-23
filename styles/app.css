@@ -8,7 +8,7 @@
    ============================================ */
 :root {
   /* Debug version for cache verification */
-  --css-build: "v3.3.61";
+  --css-build: "v3.3.63";
 
   /* Background Hierarchy (light to dark for depth) */
   --bg-page: #F5F0E6;
@@ -517,6 +517,7 @@ button { font-family: inherit; }
    LAYOUT
    ============================================ */
 .app {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   height: 100%;
@@ -2300,8 +2301,11 @@ body.no-scroll { overflow: hidden; }
   top: 100%;
   left: var(--space-sm);
   right: var(--space-sm);
-  max-height: 280px;
+  /* Use CSS custom property for dynamic max-height (set by JS when keyboard opens) */
+  /* Default: 280px, reduced when iOS keyboard is visible */
+  max-height: var(--search-results-max-height, 280px);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-surface);
   border: 2px solid var(--border-default);
   border-top: none;

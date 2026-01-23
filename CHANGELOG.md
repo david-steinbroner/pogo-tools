@@ -4,6 +4,25 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.63] - 2026-01-22
+
+### Fixed
+- **iOS: prevent app shrink/jump when focusing Opponent Pokemon search**
+  - Added keyboard mode guard to viewport-fit.js
+  - When input is focused, scaling logic is disabled
+  - Search results max-height adjusts dynamically to visible viewport
+  - Results remain visible and scrollable while keyboard is open
+
+---
+
+## [3.3.62] - 2026-01-22
+
+### Fixed
+- **Layout: fixed .app width calculation**
+  - Added explicit width: 100% to .app container to prevent content-based width shrink
+
+---
+
 ## [3.3.61] - 2026-01-22
 
 ### Fixed

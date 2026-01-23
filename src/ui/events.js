@@ -842,6 +842,49 @@ export function wireEvents() {
         hideSearchResults();
       }
     });
+
+    // iOS Keyboard: Adjust search results max-height when keyboard is visible
+    // This ensures results remain visible and scrollable above the keyboard
+    function updateSearchResultsMaxHeight() {
+      if (!dom.vsPokemonSearchResults) return;
+
+      const vv = window.visualViewport;
+      if (vv && window.__keyboardMode) {
+        // Calculate available height from input position to viewport bottom
+        const input = dom.vsPokemonSearchInput;
+        const inputRect = input.getBoundingClientRect();
+        const inputBottom = inputRect.bottom;
+        const viewportBottom = vv.height + vv.offsetTop;
+        const availableHeight = viewportBottom - inputBottom - 20; // 20px buffer
+
+        // Clamp between 120px min and 280px max
+        const maxHeight = Math.max(120, Math.min(280, availableHeight));
+        dom.vsPokemonSearchResults.style.setProperty('--search-results-max-height', `${maxHeight}px`);
+      } else {
+        // Reset to default when keyboard is not visible
+        dom.vsPokemonSearchResults.style.removeProperty('--search-results-max-height');
+      }
+    }
+
+    // Listen for visualViewport changes to adjust results height
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateSearchResultsMaxHeight);
+    }
+
+    // Also update on focus (keyboard just opened)
+    dom.vsPokemonSearchInput.addEventListener('focus', () => {
+      // Small delay to let keyboard animation start
+      setTimeout(updateSearchResultsMaxHeight, 100);
+    });
+
+    dom.vsPokemonSearchInput.addEventListener('blur', () => {
+      // Reset max-height when input loses focus
+      setTimeout(() => {
+        if (dom.vsPokemonSearchResults) {
+          dom.vsPokemonSearchResults.style.removeProperty('--search-results-max-height');
+        }
+      }, 200);
+    });
   }
 
   // VS Pokemon clear button
