@@ -57,7 +57,9 @@ export const vsBringMovesEl = document.getElementById('vsBringMoves');
 export const vsAvoidMovesEl = document.getElementById('vsAvoidMoves');
 
 // VS Pokemon tab elements
-export const vsPokemonSelect = document.getElementById('vsPokemonSelect');
+export const vsPokemonSearchInput = document.getElementById('vsPokemonSearchInput');
+export const vsPokemonSearchResults = document.getElementById('vsPokemonSearchResults');
+export const pokemonUndoToast = document.getElementById('pokemonUndoToast');
 export const vsPokemonClearBtn = document.getElementById('vsPokemonClearBtn');
 export const vsPokemonDoneBtn = document.getElementById('vsPokemonDoneBtn');
 export const vsPokemonHeaderPills = document.getElementById('vsPokemonHeaderPills');

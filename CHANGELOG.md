@@ -4,6 +4,21 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.60] - 2026-01-22
+
+### Added
+- **Opponent Pokemon: search + typeahead selection (all 819 Pokemon)**
+  - Text input with live search results (replaces limited dropdown)
+  - Matching priority: exact > prefix > substring > fuzzy (Levenshtein)
+  - Enter key: selects exact match or shows "Add [Suggestion]?" for typos
+  - Tap header pill to remove Pokemon with 4-second undo toast
+  - Arrow key navigation through results
+
+### Changed
+- Helper text simplified to "Add up to 3."
+
+---
+
 ## [3.3.59] - 2026-01-22
 
 ### Changed

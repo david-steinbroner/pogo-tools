@@ -6,6 +6,7 @@
 import { state, toggleType, clearSelectedTypes, toggleVsType, clearVsTypes, addVsPokemon, removeVsPokemon, clearVsPokemon, setSortState, cycleTheme } from '../state.js';
 import * as dom from './dom.js';
 import * as render from './render.js';
+import { searchPokemonFlat, getExactMatch, getBestFuzzySuggestion, highlightMatch } from './pokemonSearch.js';
 
 // Sentry breadcrumb helper (no-op if Sentry unavailable)
 function addBreadcrumb(message, data = {}) {
@@ -668,24 +669,178 @@ export function wireEvents() {
     });
   }
 
-  // VS Pokemon selector - dropdown change handler
-  if (dom.vsPokemonSelect) {
-    dom.vsPokemonSelect.addEventListener('change', (e) => {
-      const value = e.target.value;
-      if (!value) return;
+  // VS Pokemon search - typeahead input handler
+  if (dom.vsPokemonSearchInput) {
+    // Track current highlighted index for keyboard navigation
+    let highlightedIndex = -1;
 
-      // Get display name from selected option text
-      const option = e.target.options[e.target.selectedIndex];
-      const displayName = option.text.split(' (')[0]; // "Charizard (Fire/Flying)" → "Charizard"
-
-      const added = addVsPokemon(value, displayName);
+    // Helper: Select a Pokemon and clear input
+    function selectPokemon(name, displayName) {
+      const added = addVsPokemon(name, displayName);
       if (added) {
-        addBreadcrumb('add_pokemon', { name: value });
+        addBreadcrumb('add_pokemon', { name });
+        dom.vsPokemonSearchInput.value = '';
+        hideSearchResults();
         render.syncVsPokemonUI();
       }
+    }
 
-      // Reset dropdown to placeholder
-      e.target.value = '';
+    // Helper: Hide search results dropdown
+    function hideSearchResults() {
+      if (dom.vsPokemonSearchResults) {
+        dom.vsPokemonSearchResults.hidden = true;
+        dom.vsPokemonSearchResults.innerHTML = '';
+      }
+      highlightedIndex = -1;
+    }
+
+    // Helper: Render search results
+    function renderSearchResults(results, query) {
+      const ul = dom.vsPokemonSearchResults;
+      if (!ul) return;
+
+      ul.innerHTML = '';
+      highlightedIndex = -1;
+
+      if (results.length === 0) {
+        ul.innerHTML = '<li class="search-no-results">No match. Try fewer letters.</li>';
+        ul.hidden = false;
+        return;
+      }
+
+      results.forEach((pokemon, idx) => {
+        const li = document.createElement('li');
+        li.className = 'search-result-item';
+        li.dataset.name = pokemon.name;
+        li.dataset.displayName = pokemon.displayName;
+        li.dataset.index = idx;
+
+        // Name with highlighted match
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'result-name';
+        nameSpan.innerHTML = highlightMatch(pokemon.displayName, query);
+
+        // Type badges
+        const typesSpan = document.createElement('span');
+        typesSpan.className = 'result-types';
+        pokemon.types.forEach(t => {
+          const badge = render.createTypeIcon(t, 'sm');
+          typesSpan.appendChild(badge);
+          const typeLabel = document.createElement('span');
+          typeLabel.textContent = ' ' + t + ' ';
+          typesSpan.appendChild(typeLabel);
+        });
+
+        li.appendChild(nameSpan);
+        li.appendChild(typesSpan);
+        ul.appendChild(li);
+      });
+
+      ul.hidden = false;
+    }
+
+    // Helper: Show confirm suggestion for fuzzy match
+    function showConfirmSuggestion(pokemon) {
+      const ul = dom.vsPokemonSearchResults;
+      if (!ul) return;
+
+      ul.innerHTML = '';
+      const li = document.createElement('li');
+      li.className = 'search-confirm-row';
+      li.innerHTML = `No exact match. Add <strong>${pokemon.displayName}</strong>?`;
+      const btn = document.createElement('button');
+      btn.className = 'confirm-btn';
+      btn.textContent = 'Add';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        selectPokemon(pokemon.name, pokemon.displayName);
+      };
+      li.appendChild(btn);
+      ul.appendChild(li);
+      ul.hidden = false;
+    }
+
+    // Input handler - update results on keystroke
+    dom.vsPokemonSearchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 1) {
+        hideSearchResults();
+        return;
+      }
+      const results = searchPokemonFlat(query, 10);
+      renderSearchResults(results, query);
+    });
+
+    // Keydown handler - Enter + Arrow keys
+    dom.vsPokemonSearchInput.addEventListener('keydown', (e) => {
+      const items = dom.vsPokemonSearchResults?.querySelectorAll('.search-result-item') || [];
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (items.length > 0) {
+          highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+          items.forEach((item, i) => item.classList.toggle('highlighted', i === highlightedIndex));
+          items[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (items.length > 0) {
+          highlightedIndex = Math.max(highlightedIndex - 1, 0);
+          items.forEach((item, i) => item.classList.toggle('highlighted', i === highlightedIndex));
+          items[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const query = e.target.value.trim();
+        if (!query) return;
+
+        // If item highlighted, select it
+        if (highlightedIndex >= 0 && items[highlightedIndex]) {
+          const item = items[highlightedIndex];
+          selectPokemon(item.dataset.name, item.dataset.displayName);
+          return;
+        }
+
+        // Check for exact match
+        const exact = getExactMatch(query);
+        if (exact) {
+          selectPokemon(exact.name, exact.displayName);
+          return;
+        }
+
+        // Check for close fuzzy suggestion
+        const fuzzy = getBestFuzzySuggestion(query);
+        if (fuzzy && fuzzy.distance <= 2) {
+          showConfirmSuggestion(fuzzy);
+        } else {
+          // No good match
+          const ul = dom.vsPokemonSearchResults;
+          if (ul) {
+            ul.innerHTML = '<li class="search-no-results">No match. Try fewer letters.</li>';
+            ul.hidden = false;
+          }
+        }
+      } else if (e.key === 'Escape') {
+        hideSearchResults();
+        e.target.blur();
+      }
+    });
+
+    // Result click handler
+    if (dom.vsPokemonSearchResults) {
+      dom.vsPokemonSearchResults.addEventListener('click', (e) => {
+        const item = e.target.closest('.search-result-item');
+        if (item) {
+          selectPokemon(item.dataset.name, item.dataset.displayName);
+        }
+      });
+    }
+
+    // Click outside to close results
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.pokemon-selector-row')) {
+        hideSearchResults();
+      }
     });
   }
 
@@ -694,6 +849,12 @@ export function wireEvents() {
     dom.vsPokemonClearBtn.addEventListener('click', () => {
       addBreadcrumb('clear_pokemon');
       clearVsPokemon();
+      // Clear search input
+      if (dom.vsPokemonSearchInput) dom.vsPokemonSearchInput.value = '';
+      if (dom.vsPokemonSearchResults) {
+        dom.vsPokemonSearchResults.hidden = true;
+        dom.vsPokemonSearchResults.innerHTML = '';
+      }
       // Show selector, hide recommendations
       const selectorBody = document.getElementById('vsPokemonSelectorBody');
       if (selectorBody) selectorBody.hidden = false;
@@ -707,7 +868,7 @@ export function wireEvents() {
     dom.vsPokemonDoneBtn.addEventListener('click', () => {
       // Validate at least 1 Pokemon selected
       if (state.vsSelectedPokemon.length === 0) {
-        const helperText = document.querySelector('#vsPokemonSelectorBody .helper-text');
+        const helperText = document.querySelector('#vsPokemonSelectorBody .pokemon-selector-helper');
         if (helperText) {
           helperText.classList.add('flash-error');
           setTimeout(() => helperText.classList.remove('flash-error'), 800);
@@ -722,8 +883,44 @@ export function wireEvents() {
       if (selectorBody) selectorBody.hidden = true;
       if (dom.vsPokemonRecommendationsEl) dom.vsPokemonRecommendationsEl.hidden = false;
 
+      // Clear search input and results
+      if (dom.vsPokemonSearchInput) dom.vsPokemonSearchInput.value = '';
+      if (dom.vsPokemonSearchResults) {
+        dom.vsPokemonSearchResults.hidden = true;
+        dom.vsPokemonSearchResults.innerHTML = '';
+      }
+
       render.syncVsPokemonUI();
     });
+  }
+
+  // Undo toast helper for Pokemon removal
+  let undoToastTimeout = null;
+  function showUndoToast(pokemon) {
+    const toast = dom.pokemonUndoToast;
+    if (!toast) return;
+
+    // Clear any existing timeout
+    if (undoToastTimeout) clearTimeout(undoToastTimeout);
+
+    toast.innerHTML = `Removed ${pokemon.displayName}. `;
+    const btn = document.createElement('button');
+    btn.className = 'undo-btn';
+    btn.textContent = 'Undo';
+    btn.onclick = () => {
+      if (undoToastTimeout) clearTimeout(undoToastTimeout);
+      addVsPokemon(pokemon.name, pokemon.displayName);
+      addBreadcrumb('undo_remove_pokemon', { name: pokemon.name });
+      render.syncVsPokemonUI();
+      toast.hidden = true;
+    };
+    toast.appendChild(btn);
+    toast.hidden = false;
+
+    // Auto-hide after 4 seconds
+    undoToastTimeout = setTimeout(() => {
+      toast.hidden = true;
+    }, 4000);
   }
 
   // VS Pokemon header click - expands when collapsed, removes Pokemon when expanded
@@ -744,9 +941,17 @@ export function wireEvents() {
         // Expanded: check if a pill was clicked to remove it
         const pill = e.target.closest('[data-pokemon]');
         if (pill && pill.dataset.pokemon) {
+          // Find the Pokemon data before removing
+          const pokemonData = state.vsSelectedPokemon.find(
+            p => p.name.toLowerCase() === pill.dataset.pokemon.toLowerCase()
+          );
           removeVsPokemon(pill.dataset.pokemon);
           addBreadcrumb('remove_pokemon', { name: pill.dataset.pokemon });
           render.syncVsPokemonUI();
+          // Show undo toast
+          if (pokemonData) {
+            showUndoToast(pokemonData);
+          }
         }
       }
     });

@@ -785,11 +785,17 @@ let cardIdCounter = 0;
 /**
  * Create a type icon element
  * @param {string} typeName - Type name
- * @param {string} size - 'normal' (20px) or 'mini' (14px)
+ * @param {string} size - 'normal' (20px), 'mini' (14px), or 'sm' (18px)
  */
-function createTypeIcon(typeName, size = 'normal') {
+export function createTypeIcon(typeName, size = 'normal') {
   const icon = document.createElement('span');
-  icon.className = size === 'mini' ? 'icon-chip icon-chip-mini' : 'icon-chip';
+  if (size === 'mini') {
+    icon.className = 'icon-chip icon-chip-mini';
+  } else if (size === 'sm') {
+    icon.className = 'icon-chip icon-chip-sm';
+  } else {
+    icon.className = 'icon-chip';
+  }
   const m = typeMeta(typeName);
   if (m) icon.style.background = `var(${m.colorVar})`;
   icon.innerHTML = svgForType(typeName);
