@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.64] - 2026-01-22
+
+### Fixed
+- **iOS keyboard: additional race condition fix**
+  - Added `isTextInputFocused()` check as fallback for keyboard detection
+  - Handles case where visualViewport resize fires before focusin event
+
+---
+
 ## [3.3.63] - 2026-01-22
 
 ### Fixed

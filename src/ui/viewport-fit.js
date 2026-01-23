@@ -44,13 +44,31 @@ function measureBaseHeight(app) {
 }
 
 /**
+ * Check if a text input or textarea is currently focused
+ * Used as a fallback check for iOS keyboard detection
+ */
+function isTextInputFocused() {
+  const el = document.activeElement;
+  if (!el) return false;
+  if (el.tagName === 'TEXTAREA') return true;
+  if (el.tagName === 'INPUT') {
+    const type = el.type || 'text';
+    const textTypes = ['text', 'search', 'email', 'url', 'tel', 'password', 'number'];
+    return textTypes.includes(type);
+  }
+  return false;
+}
+
+/**
  * Compute and apply scale to fit app in viewport
  * Skipped when __keyboardMode is true (iOS keyboard open)
  */
 function fitToViewport() {
   // iOS Keyboard Guard: Skip scaling when an input is focused
   // This prevents the "shrink + fly up" effect when the keyboard opens
-  if (window.__keyboardMode) {
+  // Check both the flag AND activeElement (handles race condition where
+  // visualViewport resize fires before focusin event)
+  if (window.__keyboardMode || isTextInputFocused()) {
     return;
   }
 
