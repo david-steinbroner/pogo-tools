@@ -981,10 +981,16 @@ export function wireEvents() {
       const isCollapsed = selectorBody.hidden;
 
       if (isCollapsed) {
-        // Collapsed: expand (show selector)
+        // Collapsed: expand (show selector) and auto-focus search input
         selectorBody.hidden = false;
         if (dom.vsPokemonRecommendationsEl) dom.vsPokemonRecommendationsEl.hidden = true;
         render.syncVsPokemonUI();
+        // Focus search input after brief delay to let UI update
+        setTimeout(() => {
+          if (dom.vsPokemonSearchInput) {
+            dom.vsPokemonSearchInput.focus();
+          }
+        }, 50);
       } else {
         // Expanded: check if a pill was clicked to remove it
         const pill = e.target.closest('[data-pokemon]');

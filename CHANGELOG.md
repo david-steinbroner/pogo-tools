@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.69] - 2026-01-22
+
+### Changed
+- **Tap collapsed Pokemon header → auto-focus search input**
+  - When header is collapsed, tapping anywhere on it expands AND focuses search
+  - Keyboard opens automatically for faster Pokemon entry
+
+---
+
 ## [3.3.68] - 2026-01-22
 
 ### Fixed
