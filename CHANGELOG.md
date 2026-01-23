@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.71] - 2026-01-22
+
+### Fixed
+- **Search results type icons: icons only, no text, no wrap**
+  - Removed redundant type text labels
+  - Icons now stay on one line
+
+---
+
 ## [3.3.70] - 2026-01-22
 
 ### Added

@@ -2361,10 +2361,7 @@ body.no-scroll { overflow: hidden; }
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--text-body-sm);
-  color: var(--text-secondary);
-  flex-wrap: wrap;
-  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .result-types .icon-chip {

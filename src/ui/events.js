@@ -755,15 +755,12 @@ export function wireEvents() {
         nameSpan.className = 'result-name';
         nameSpan.textContent = pokemon.displayName;
 
-        // Type badges
+        // Type badges (icons only)
         const typesSpan = document.createElement('span');
         typesSpan.className = 'result-types';
         pokemon.types.forEach(t => {
           const badge = render.createTypeIcon(t, 'sm');
           typesSpan.appendChild(badge);
-          const typeLabel = document.createElement('span');
-          typeLabel.textContent = ' ' + t + ' ';
-          typesSpan.appendChild(typeLabel);
         });
 
         li.appendChild(nameSpan);
@@ -812,15 +809,12 @@ export function wireEvents() {
         nameSpan.className = 'result-name';
         nameSpan.innerHTML = highlightMatch(pokemon.displayName, query);
 
-        // Type badges
+        // Type badges (icons only)
         const typesSpan = document.createElement('span');
         typesSpan.className = 'result-types';
         pokemon.types.forEach(t => {
           const badge = render.createTypeIcon(t, 'sm');
           typesSpan.appendChild(badge);
-          const typeLabel = document.createElement('span');
-          typeLabel.textContent = ' ' + t + ' ';
-          typesSpan.appendChild(typeLabel);
         });
 
         li.appendChild(nameSpan);
