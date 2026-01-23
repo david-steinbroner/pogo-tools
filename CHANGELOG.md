@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.65] - 2026-01-22
+
+### Added
+- **Tap empty Pokemon slot → focus search input**
+  - When Pokemon selector is open, tapping an empty slot focuses the search input
+  - More intuitive UX for adding multiple Pokemon
+
+---
+
 ## [3.3.64] - 2026-01-22
 
 ### Fixed

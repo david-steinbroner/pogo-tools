@@ -1000,6 +1000,16 @@ export function wireEvents() {
     });
   }
 
+  // Tap empty Pokemon slot → focus search input
+  if (dom.vsPokemonHeaderPills) {
+    dom.vsPokemonHeaderPills.addEventListener('click', (e) => {
+      const placeholder = e.target.closest('.type-slot-line');
+      if (placeholder && dom.vsPokemonSearchInput) {
+        dom.vsPokemonSearchInput.focus();
+      }
+    });
+  }
+
   // Error modal
   if (dom.errorModal && dom.errorModalBackdrop) {
     dom.errorModalBackdrop.addEventListener('click', render.hideError);
