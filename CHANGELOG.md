@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.66] - 2026-01-22
+
+### Fixed
+- **Tap empty Pokemon header area → focus search input**
+  - Clicking anywhere in the header pills area (not just the tiny 2px placeholder line) now focuses search
+  - Only triggers when selector is expanded (not collapsed)
+
+---
+
 ## [3.3.65] - 2026-01-22
 
 ### Added

@@ -1000,11 +1000,17 @@ export function wireEvents() {
     });
   }
 
-  // Tap empty Pokemon slot → focus search input
+  // Tap empty area in Pokemon header pills → focus search input
+  // Triggers when clicking anywhere in the pills container that isn't a Pokemon pill
   if (dom.vsPokemonHeaderPills) {
     dom.vsPokemonHeaderPills.addEventListener('click', (e) => {
-      const placeholder = e.target.closest('.type-slot-line');
-      if (placeholder && dom.vsPokemonSearchInput) {
+      // If user clicked on an actual Pokemon pill, don't focus search (let removal handler work)
+      const clickedPill = e.target.closest('.pokemon-header-pill');
+      if (clickedPill) return;
+
+      // Only focus if selector is visible (not collapsed)
+      const selectorBody = document.getElementById('vsPokemonSelectorBody');
+      if (selectorBody && !selectorBody.hidden && dom.vsPokemonSearchInput) {
         dom.vsPokemonSearchInput.focus();
       }
     });
