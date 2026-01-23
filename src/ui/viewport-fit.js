@@ -22,6 +22,13 @@ window.__keyboardMode = false;
 // Timeout ID for delayed keyboard mode reset (allows selecting autocomplete options)
 let keyboardModeTimeout = null;
 
+// Timestamp when keyboard mode ended - used to ignore resize events during keyboard animation
+let keyboardModeEndedAt = 0;
+
+// How long to wait after keyboard dismisses before allowing viewport recalculation
+// iOS keyboard animation is ~300-400ms, so 500ms gives buffer
+const KEYBOARD_SETTLE_MS = 500;
+
 /**
  * Get available viewport height, preferring visualViewport for in-app browsers.
  * Subtracts offsetTop to handle shifted viewports (e.g., in-app browser address bars).
@@ -69,6 +76,12 @@ function fitToViewport() {
   // Check both the flag AND activeElement (handles race condition where
   // visualViewport resize fires before focusin event)
   if (window.__keyboardMode || isTextInputFocused()) {
+    return;
+  }
+
+  // Skip during keyboard dismiss animation settling period
+  // This prevents flash when visualViewport fires resize events during animation
+  if (keyboardModeEndedAt > 0 && (Date.now() - keyboardModeEndedAt) < KEYBOARD_SETTLE_MS) {
     return;
   }
 
@@ -126,8 +139,15 @@ function exitKeyboardMode() {
   keyboardModeTimeout = setTimeout(() => {
     window.__keyboardMode = false;
     keyboardModeTimeout = null;
-    // Recompute fit now that keyboard is closed
-    fitToViewport();
+
+    // Mark when keyboard mode ended - fitToViewport will be blocked during settle period
+    keyboardModeEndedAt = Date.now();
+
+    // Schedule fit after keyboard animation completes
+    setTimeout(() => {
+      keyboardModeEndedAt = 0; // Clear the block
+      fitToViewport();
+    }, KEYBOARD_SETTLE_MS);
   }, 200);
 }
 

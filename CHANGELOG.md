@@ -4,6 +4,16 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.68] - 2026-01-22
+
+### Fixed
+- **iOS: viewport flash when keyboard dismisses**
+  - Added 500ms settling period after keyboard mode ends
+  - Blocks `fitToViewport()` calls during iOS keyboard dismiss animation
+  - Prevents momentary scale calculation on transitional viewport height
+
+---
+
 ## [3.3.67] - 2026-01-22
 
 ### Fixed
