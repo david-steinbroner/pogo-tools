@@ -359,6 +359,11 @@ export function setVsSubTab(subTab) {
 
   if (dom.vsSubViewTypes) dom.vsSubViewTypes.hidden = !isTypes;
   if (dom.vsSubViewPokemon) dom.vsSubViewPokemon.hidden = !isPokemon;
+
+  // Render initial state when switching to Pokemon tab
+  if (isPokemon) {
+    render.syncVsPokemonUI();
+  }
 }
 
 // Type toggle handler for collection filter

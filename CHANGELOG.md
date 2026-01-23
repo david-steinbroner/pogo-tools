@@ -4,6 +4,15 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.67] - 2026-01-22
+
+### Fixed
+- **Pokemon header placeholder lines not showing**
+  - Added `syncVsPokemonUI()` call when switching to Pokemon sub-tab
+  - Placeholder lines now render correctly on initial tab view
+
+---
+
 ## [3.3.66] - 2026-01-22
 
 ### Fixed
