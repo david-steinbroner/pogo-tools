@@ -3138,12 +3138,14 @@ body.no-scroll { overflow: hidden; }
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-xs);
+  overflow: visible;
 }
 
 .type-column {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: visible;
 }
 
 .type-column-header {
@@ -3207,12 +3209,12 @@ body.no-scroll { overflow: hidden; }
 .type-column-icons {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   gap: 12px;
-  width: 100%;
   justify-content: center;
   align-items: center;
   touch-action: pan-y;
+  /* Allow icons to extend beyond column boundaries */
+  overflow: visible;
 }
 
 .type-result-icon {

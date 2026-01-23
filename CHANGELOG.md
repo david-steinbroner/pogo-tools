@@ -4,6 +4,16 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.72] - 2026-01-23
+
+### Fixed
+- **Recommendation type icons no longer wrap**
+  - Removed `flex-wrap` from `.type-column-icons`
+  - Icons can now extend beyond column boundaries
+  - All icons stay on one row
+
+---
+
 ## [3.3.71] - 2026-01-22
 
 ### Fixed
