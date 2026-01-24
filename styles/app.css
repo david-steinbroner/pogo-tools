@@ -234,10 +234,6 @@ html[data-theme="dark"] .appbar .icon-btn:active {
   transform: translateY(2px);
 }
 
-html[data-theme="dark"] .app-footer {
-  border-bottom-color: var(--border-frame);
-}
-
 /* Scanline overlay - reduce opacity in dark mode */
 html[data-theme="dark"] body::before {
   background: repeating-linear-gradient(
@@ -405,10 +401,6 @@ html[data-theme="dark"] .theme-icon--dark { display: block; }
     border-bottom-color: var(--appbar-btn-hi);
     box-shadow: 0 0 0 1px var(--appbar-btn-outline);
     transform: translateY(2px);
-  }
-
-  html[data-theme="system"] .app-footer {
-    border-bottom-color: var(--border-frame);
   }
 
   html[data-theme="system"] body::before {
@@ -3488,30 +3480,31 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ========================================
-   FOOTER
+   CREDITS SECTION (in Info drawer)
    ======================================== */
-.app-footer {
+.credits-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-xs) var(--space-md);
-  font-family: var(--font-body);
-  font-size: 10px;
-  line-height: 1.3;
-  color: var(--text-muted);
-  text-align: center;
-  background: var(--bg-surface);
-  border-bottom: 2px solid var(--border-frame);
+  gap: var(--space-xs);
 }
 
-.app-footer a {
-  color: var(--text-muted);
+.credits-line {
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.credits-line a {
+  color: var(--text-secondary);
   text-decoration: underline;
 }
 
-.app-footer a:hover {
-  color: var(--text-secondary);
+.credits-line a:hover {
+  color: var(--text-primary);
+}
+
+.credits-disclaimer {
+  font-style: italic;
+  color: var(--text-muted);
 }
 
 /* VS Recommendations hidden state */

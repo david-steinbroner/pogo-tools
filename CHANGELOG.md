@@ -4,6 +4,16 @@ All notable changes to PoGO Pal are documented here.
 
 ---
 
+## [3.3.73] - 2026-01-23
+
+### Changed
+- **Footer moved to Info drawer**
+  - Removed persistent footer from main layout (more vertical space)
+  - Added "CREDITS" section to Info drawer with copyright, MIT License, GitHub link, and disclaimer
+  - Links remain tappable with same styling
+
+---
+
 ## [3.3.72] - 2026-01-23
 
 ### Fixed
